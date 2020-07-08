@@ -8,10 +8,11 @@
 
 ## Overview
 ### Description
-[Description of your app]
+
+This app creates a platform for college students to but and sell items from each other.
 
 ### App Evaluation
-[Evaluation of your app across the following attributes]
+
    - **Description**: Allows students to connect and aution/buy items from each other.
    - **Category:** Marketplace
    - **Mobile:** Allows users to scroll through listings and list items to sell.
@@ -39,6 +40,7 @@
 * User can see their buy/sell history
 * User can favorite certain listings
 * User can add a profile picture
+* User can share listings through text/email
 
 ### 2. Screen Archetypes
 
@@ -60,22 +62,39 @@
 
 **Tab Navigation** (Tab to Screen)
 
-* Stream
-* Profile
+* All items Stream
+* Favorites Stream
+* Bids + Purchases
 * Creation
 
 **Flow Navigation** (Screen to Screen)
 
 * Login
-   * Stream
+   * All items Stream
 * Register
-   * Stream
-* Stream
-    * Detail
+   * All items Stream
+* Streams
+    * Buyer Detail
 * Detail
     * Stream
-* Creation
+* Creation (can be accessed through the floating button)
+    * Detail info input
     * Stream
 * Profile
-    * Creation
-    * Detail
+    * Seller Detail
+
+## Wireframes
+<img src="https://i.imgur.com/5OzmNaf.jpg" width=600>
+
+### [BONUS] Digital Wireframes & Mockups
+
+### [BONUS] Interactive Prototype
+
+## Schema 
+[This section will be completed in Unit 9]
+### Models
+[Add table of models]
+### Networking
+- [Add list of network requests by screen ]
+- [Create basic snippets for each Parse network request]
+- [OPTIONAL: List endpoints if using existing API such as Yelp]
