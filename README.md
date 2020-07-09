@@ -54,9 +54,9 @@ This app creates a platform for college students to but and sell items from each
 * Detail
     * User can buy an item
 * Creation
-    * User can buy an item
+    * User can list an item
 * Profile
-    * User can see their buy/sell history
+    * User can manage their listings
 
 ### 3. Navigation
 
@@ -86,15 +86,123 @@ This app creates a platform for college students to but and sell items from each
 ## Wireframes
 <img src="https://i.imgur.com/5OzmNaf.jpg" width=600>
 
-### [BONUS] Digital Wireframes & Mockups
-
-### [BONUS] Interactive Prototype
-
 ## Schema 
-[This section will be completed in Unit 9]
+
 ### Models
-[Add table of models]
+#### Listing
+| Property      | Type     | Description |
+   | ------------- | -------- | ------------|
+   | objectId      | String   | unique id for the user listing (default field) |
+   | seller        | Pointer to User| the user who listed the item |
+   | image         | File     | image of the listed item |
+   | description       | String   | description of the listed item |
+   | sold     | Boolean | returns whether the item has been sold or not |
+   | buyer     | Pointer | initialized to null, but is updated when the auction finishes |
+   | createdAt     | DateTime | date when the listing is created (default field) |
+   | updatedAt     | DateTime | date when listing is last updated (default field) |
+   | favoritesCount**    | Number   | number of ppl that favorited a listing |
+   ** denotes a stretch feature
+   
+#### User
+| Property      | Type     | Description |
+   | ------------- | -------- | ------------|
+   | objectId      | String   | unique id for the user (default field) |
+   | profileImage         | File     | profile picture for the user |
+   | phoneNumber       | String   | the contact information for buyers/sellers to connect |
+   | email     | String | the contact information for buyers/sellers to connect |
+   | username    | String   | how a buyer/seller is displayed to other users |
+   | createdAt     | DateTime | date when the listing is created (default field) |
+   | updatedAt     | DateTime | date when listing is last updated (default field) |
+   
+#### Bid
+| Property      | Type     | Description |
+   | ------------- | -------- | ------------|
+   | objectId      | String   | unique id for the user (default field) |
+   | listings        | Pointer to Listing | attaches every user to their listing |
+   | price         | Double     | the price that a user is willing to buy an item |
+   | listing       | Pointer to a listing   | denotes which post the bid is for |
+   | createdAt     | DateTime | date when the bid is submitted (default field) |
+   | updatedAt     | DateTime | date when bid is last updated (default field) |
+   
 ### Networking
-- [Add list of network requests by screen ]
-- [Create basic snippets for each Parse network request]
-- [OPTIONAL: List endpoints if using existing API such as Yelp]
+#### List of network requests by screen
+   - All Items Stream
+      - (Read/GET) Query all posts
+         ```swift
+         let query = PFQuery(className:"Listing")
+         query.order(byDescending: "createdAt")
+         query.setLimit(20)
+         query.include(Listing.KEY_USER)
+         query.whereKey("sold", equalTo:false)
+         query.findObjectsInBackground { (listings: [PFObject]?, error: Error?) in
+            if let error = error { 
+               print(error.localizedDescription)
+            } else if let listings = listings {
+               print("Successfully retrieved \(Listings.count) listings.")
+           // TODO: Do something with posts...
+            }
+         }
+         ```
+   - Create Listing Screen
+      - (Create/POST) Create a new post object
+        ```swift
+        Listing listing = new Listing();
+        listing.setDescription(description);
+        listing.setImage(new ParseFile(photoFile));
+        listing.setPrice(double initialPrice);
+        listing.setUser((currentUser));
+        listing.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null){
+                    Log.e(TAG, "Error while saving!", e);
+                    Toast.makeText(getContext(), "Error while saving!", Toast.LENGTH_SHORT).show();
+                }
+                // TODO: Do something after the item is listed
+             } 
+          });
+        } 
+   - Purchases and Listings
+      - (Read/GET) Query all posts where user is author
+      ```swift
+      let query = PFQuery(className:"Listing")
+         query.order(byDescending: "createdAt")
+         query.setLimit(20)
+         query.whereEqualTo("user", ParseUser.getCurrentUser())
+         query.include(Listing.KEY_USER)
+         query.findObjectsInBackground { (listings: [PFObject]?, error: Error?) in
+            if let error = error { 
+               print(error.localizedDescription)
+            } else if let listings = listings {
+               print("Successfully retrieved \(Listings.count) listings.")
+           // TODO: Do something with posts...
+            }
+         }
+      ```
+      - (Read/GET) Update user profile image
+      ``swift
+      let query = PFQuery(className:"Listing")
+         query.order(byDescending: "createdAt")
+         query.setLimit(20)
+         query.whereEqualTo("buyer", ParseUser.getCurrentUser())
+         query.include(Listing.KEY_USER)
+         query.findObjectsInBackground { (listings: [PFObject]?, error: Error?) in
+            if let error = error { 
+               print(error.localizedDescription)
+            } else if let listings = listings {
+               print("Successfully retrieved \(Listings.count) listings.")
+           // TODO: Do something with posts...
+            }
+         }
+      ```
+   - Profile Screen
+      - (Read/GET) Query logged in user object
+      ```swift
+      ParseUser.getCurrentUser()
+      ```
+      - (Update/PUT) Update user profile image
+      ```swift
+      user = ParseUser.getCurrentUser()
+      user.putProfileImage(profile image)
+      user.saveInBackground
+      ``` 
