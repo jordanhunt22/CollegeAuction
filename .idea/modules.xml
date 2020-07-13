@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/AndroidStudioProjects-CollegeAuction.iml" filepath="$PROJECT_DIR$/.idea/modules/AndroidStudioProjects-CollegeAuction.iml" group="CollegeAuction" />
+      <module fileurl="file://$PROJECT_DIR$/CollegeAuction.iml" filepath="$PROJECT_DIR$/CollegeAuction.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="CollegeAuction/app" />
+    </modules>
+  </component>
+</project>
