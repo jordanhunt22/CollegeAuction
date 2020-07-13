@@ -30,7 +30,11 @@ This app creates a platform for college students to but and sell items from each
 * User can log-in
 * User can buy an item
 * User can create a listing with pictures/description
+* A couple of sorting options for complex algorithm
+* Double tap on stream to watch a product (Gesture)
 * User can see the most current bid on an item and see the time remaining on the listing
+* Use Maps SDK for specifying seller location & display location on product detail view
+* Animation for growing when clicked on product to display detail view (Materials.io for animation)
 
 **Optional Nice-to-have Stories**
 
@@ -41,6 +45,7 @@ This app creates a platform for college students to but and sell items from each
 * User can favorite certain listings
 * User can add a profile picture
 * User can share listings through text/email
+* User can use Stripe SDK to pay/receive payment from items
 
 ### 2. Screen Archetypes
 
