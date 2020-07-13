@@ -30,6 +30,8 @@ This app creates a platform for college students to but and sell items from each
 * User can log-in
 * User can buy an item
 * User can create a listing with pictures/description
+* User can see their buy/sell history
+* User can favorite certain listings
 * A couple of sorting options for complex algorithm
 * Double tap on stream to watch a product (Gesture)
 * User can see the most current bid on an item and see the time remaining on the listing
@@ -41,8 +43,6 @@ This app creates a platform for college students to but and sell items from each
 * User can search for items by categories/hashtags
 * User can "friend" other users
 * User can view auction listings from their college/area
-* User can see their buy/sell history
-* User can favorite certain listings
 * User can add a profile picture
 * User can share listings through text/email
 * User can use Stripe SDK to pay/receive payment from items
@@ -69,8 +69,9 @@ This app creates a platform for college students to but and sell items from each
 
 * All items Stream
 * Favorites Stream
+* Profile
 * Bids + Purchases
-* Creation
+* Creation (from floating button)
 
 **Flow Navigation** (Screen to Screen)
 
@@ -132,7 +133,7 @@ This app creates a platform for college students to but and sell items from each
 ### Networking
 #### List of network requests by screen
    - All Items Stream
-      - (Read/GET) Query all posts
+      - (Read/GET) Query all listings
          ```swift
          let query = PFQuery(className:"Listing")
          query.order(byDescending: "createdAt")
@@ -149,7 +150,7 @@ This app creates a platform for college students to but and sell items from each
          }
          ```
    - Create Listing Screen
-      - (Create/POST) Create a new post object
+      - (Create/POST) Create a new listing object
         ```swift
         Listing listing = new Listing();
         listing.setDescription(description);
