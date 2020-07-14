@@ -8,4 +8,12 @@
         android:title="home"
         android:visible="true"
         app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_favorites"
+        android:enabled="true"
+        android:icon="@drawable/heart"
+        android:title="favorites"
+        android:visible="true"
+        app:showAsAction="always" />
 </menu>

@@ -34,7 +34,7 @@ public class HomeFragment extends Fragment {
     public static final String TAG = "HomeFragment";
 
     private RecyclerView rvPosts;
-    private SwipeRefreshLayout swipeContainer;
+    protected SwipeRefreshLayout swipeContainer;
     private ListingsAdapter adapter;
     private List<Listing> allListings;
     private EndlessRecyclerViewScrollListener scrollListener;
@@ -63,7 +63,7 @@ public class HomeFragment extends Fragment {
                 // Your code to refresh the list here.
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
-
+                queryListings();
             }
         });
         // Configure the refreshing colors
@@ -116,15 +116,14 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    private void queryListings() {
+    protected void queryListings() {
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
         // limit query to latest 20 items
         query.setLimit(20);
         // Only displays items that have not been sold yet
         query.whereEqualTo("isSold", false);
-        // order posts by creation date (newest first)
-        // TODO: Change later to only items that have not been sold yet
+        // order posts by creation date (newest first)t
         query.addAscendingOrder(Listing.KEY_CREATED);
         // start an asynchronous call for posts
         query.findInBackground(new FindCallback<Listing>() {
