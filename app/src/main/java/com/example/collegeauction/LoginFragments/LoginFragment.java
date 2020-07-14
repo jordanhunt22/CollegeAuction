@@ -24,8 +24,12 @@ import com.parse.ParseUser;
 
 public class LoginFragment extends Fragment {
 
+    public LoginFragment(){
+        // Required constructor
+    }
+
     public static final String TAG = "LoginFragment";
-    public EditText etUsername;
+    private EditText etUsername;
     private EditText etPassword;
     private Button btnLogin;
     private Button btnRegister;
@@ -46,6 +50,7 @@ public class LoginFragment extends Fragment {
             goMainActivity();
         }
 
+        // Resolves the views
         etUsername = view.findViewById(R.id.etUsername);
         etPassword = view.findViewById(R.id.etPassword);
         btnLogin = view.findViewById(R.id.btnLogin);

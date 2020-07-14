@@ -32,6 +32,10 @@ public class RegisterFragment extends Fragment {
     private EditText etNumber;
     private EditText etEmail;
 
+    public RegisterFragment(){
+        // Required constructor
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,

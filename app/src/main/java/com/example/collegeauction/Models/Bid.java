@@ -1,28 +1,22 @@
 package com.example.collegeauction.Models;
 
-
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
-import org.json.JSONArray;
 import org.parceler.Parcel;
 
 import java.util.ArrayList;
 
-@Parcel(analyze={Listing.class})
-@ParseClassName("Listing")
-public class Listing extends ParseObject {
+@Parcel(analyze={Bid.class})
+@ParseClassName("Bid")
+public class Bid extends ParseObject {
 
     public static final String KEY_DESCRIPTION = "description";
-    public static final String KEY_IMAGE = "photo";
+    public static final String KEY_IMAGE = "image";
     public static final String KEY_USER = "user";
-    public static final String KEY_NAME = "name";
     public static final String KEY_CREATED = "createdAt";
-    public static final String KEY_FAVS = "likes";
-
-    public static ArrayList<String> listingsFavoritedByCurrentuser = new ArrayList<String>();
 
     public String getDescription(){
         return getString(KEY_DESCRIPTION);
@@ -30,12 +24,6 @@ public class Listing extends ParseObject {
 
     public void setDescription(String description){
         put(KEY_DESCRIPTION, description);
-    }
-
-    public String getName(){ return getString(KEY_DESCRIPTION); }
-
-    public void setName(String name){
-        put(KEY_NAME, name);
     }
 
     public ParseFile getImage(){
@@ -53,6 +41,5 @@ public class Listing extends ParseObject {
     public void setUser(ParseUser user){
         put(KEY_USER, user);
     }
-
 }
 
