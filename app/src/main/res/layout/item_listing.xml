@@ -55,11 +55,11 @@
                 android:id="@+id/tvBid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="false"
+                android:layout_alignParentTop="true"
                 android:layout_alignParentEnd="true"
-                android:layout_alignParentBottom="true"
+                android:layout_alignParentBottom="false"
+                android:layout_marginTop="4dp"
                 android:layout_marginEnd="14dp"
-                android:layout_marginBottom="8dp"
                 android:text="$15"
                 android:textColor="@android:color/black"
                 android:textSize="24sp" />
@@ -77,6 +77,18 @@
                 android:text="01:10:25"
                 android:textSize="20sp" />
 
+            <ImageButton
+                android:id="@+id/btnFav"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/heart" />
+
         </RelativeLayout>
+
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

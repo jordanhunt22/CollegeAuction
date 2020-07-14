@@ -2,9 +2,11 @@ package com.example.collegeauction.Adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -20,12 +22,16 @@ import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseRelation;
+import com.parse.ParseUser;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHolder> {
 
+    public static final String TAG = "ListingsAdapter";
     private Context context;
     private List<Listing> listings;
 
@@ -56,6 +62,9 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
         private TextView tvName;
         private TextView tvTime;
         private TextView tvBid;
+        private ImageButton btnFav;
+
+        private Listing listing;
         private DateManipulator dateManipulator;
 
         public ViewHolder(@NonNull View itemView) {
@@ -66,8 +75,9 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
             tvName = itemView.findViewById(R.id.tvName);
             tvTime = itemView.findViewById(R.id.tvTime);
             tvBid = itemView.findViewById(R.id.tvBid);
+            btnFav = itemView.findViewById(R.id.btnFav);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
+            ivImage.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     // Gets item position
@@ -75,6 +85,41 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                     // Make sure the position is valid, i.e. actually exists in the view
                     if (position != RecyclerView.NO_POSITION){
                         // Open the buyer's detail view
+                    }
+                }
+            });
+
+            btnFav.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // Gets item position
+                    int position = getAdapterPosition();
+                    // Make sure the position is valid, i.e. actually exists in the view
+                    if (position != RecyclerView.NO_POSITION) {
+                        ParseUser user = ParseUser.getCurrentUser();
+                        ParseRelation<ParseObject> relation = user.getRelation("favoritedListings");
+                        // Get the listing at the position, this won't work if the class is static
+                        listing = listings.get(position);
+                        // Checks to see if the clicked listing is favorited
+                        if (isFavorite(listing)) {
+                            Glide.with(context)
+                                    .load(R.drawable.heart)
+                                    .transform(new CenterCrop())
+                                    .into(btnFav);
+                            Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(listing.getObjectId()));
+                            relation.remove(listing);
+                            Log.i(TAG, "unlike");
+                        }
+                        else{
+                            Glide.with(context)
+                                    .load(R.drawable.heart_active)
+                                    .transform(new CenterCrop())
+                                    .into(btnFav);
+                            relation.add(listing);
+                            Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
+                            Log.i(TAG, "like");
+                        }
+                        user.saveInBackground();
                     }
                 }
             });
@@ -100,7 +145,27 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                         .transform(new CenterCrop())
                         .into(ivImage);
             }
+
+            if (isFavorite(listing)){
+                Glide.with(context)
+                        .load(R.drawable.heart_active)
+                        .transform(new CenterCrop())
+                        .into(btnFav);
+            }
+            else{
+                Glide.with(context)
+                        .load(R.drawable.heart)
+                        .transform(new CenterCrop())
+                        .into(btnFav);
+            }
         }
+    }
+
+    public boolean isFavorite(Listing listing){
+        if (Listing.listingsFavoritedByCurrentuser.contains(listing.getObjectId())){
+            return true;
+        }
+        else { return false; }
     }
 
     // Clean all elements of the recyclerview

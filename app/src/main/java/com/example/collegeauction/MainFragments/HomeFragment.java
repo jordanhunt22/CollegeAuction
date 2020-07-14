@@ -101,7 +101,7 @@ public class HomeFragment extends Fragment {
         user.fetchInBackground(new GetCallback<ParseObject>() {
             @Override
             public void done(final ParseObject object, ParseException e) {
-                ParseRelation<Listing> likedPosts = object.getRelation("favorites");
+                ParseRelation<Listing> likedPosts = object.getRelation("favoritedListings");
                 ParseQuery<Listing> q = likedPosts.getQuery();
                 q.findInBackground(new FindCallback<Listing>() {
                     @Override
