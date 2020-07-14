@@ -20,6 +20,7 @@ public class Listing extends ParseObject {
     public static final String KEY_USER = "user";
     public static final String KEY_NAME = "name";
     public static final String KEY_CREATED = "createdAt";
+    public static final String KEY_BID = "mostRecentBid";
     public static final String KEY_FAVS = "likes";
 
     public static ArrayList<String> listingsFavoritedByCurrentuser = new ArrayList<String>();
@@ -52,6 +53,14 @@ public class Listing extends ParseObject {
 
     public void setUser(ParseUser user){
         put(KEY_USER, user);
+    }
+
+    public ParseObject getRecentBid(){
+        return getParseObject(KEY_BID);
+    }
+
+    public void setRecentBid(ParseUser user){
+        put(KEY_BID, user);
     }
 
 }

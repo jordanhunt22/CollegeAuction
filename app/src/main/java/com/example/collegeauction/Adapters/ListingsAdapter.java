@@ -1,5 +1,6 @@
 package com.example.collegeauction.Adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +14,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
+import com.example.collegeauction.Miscellaneous.DateManipulator;
+import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHolder> {
 
@@ -51,6 +56,7 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
         private TextView tvName;
         private TextView tvTime;
         private TextView tvBid;
+        private DateManipulator dateManipulator;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -74,10 +80,13 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
             });
         }
 
+        @SuppressLint("SetTextI18n")
         public void bind(Listing listing) {
+            // Create instance of date manipulator
+            dateManipulator = new DateManipulator(listing.getCreatedAt());
             // Bind the listing data to the view elements
             tvName.setText(listing.getName());
-            // tvBid.setText("$" + get the most recent bid);
+            tvBid.setText("$" + Objects.requireNonNull(listing.getRecentBid().getNumber(Bid.KEY_PRICE)).toString());
             ParseFile image = listing.getImage();
             if (image != null) {
                 Glide.with(context)

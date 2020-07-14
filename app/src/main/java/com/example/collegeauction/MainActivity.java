@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.View;
 
 import com.example.collegeauction.LoginFragments.LoginFragment;
+import com.example.collegeauction.MainFragments.CreationFragment;
 import com.example.collegeauction.MainFragments.HomeFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.ParseUser;
@@ -40,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // code to open the camera application
+                fragment = new CreationFragment();
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
             }
         });
 

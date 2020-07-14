@@ -118,9 +118,11 @@ public class HomeFragment extends Fragment {
 
     private void queryListings() {
         ParseQuery query = ParseQuery.getQuery(Listing.class);
-        // query.include(Listing.KEY_USER);
+        query.include(Listing.KEY_BID);
         // limit query to latest 20 items
         query.setLimit(20);
+        // Only displays items that have not been sold yet
+        query.whereEqualTo("isSold", false);
         // order posts by creation date (newest first)
         // TODO: Change later to only items that have not been sold yet
         query.addAscendingOrder(Listing.KEY_CREATED);
