@@ -23,9 +23,19 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.example.collegeauction.Models.Bid;
+import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
+import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.io.File;
+import java.util.Calendar;
+import java.util.Date;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -34,6 +44,8 @@ public class CreationFragment extends Fragment {
     public static final String TAG = "ComposeFragment";
     public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 25;
     private EditText etDescription;
+    private EditText etBid;
+    private EditText etName;
     private Button btnCaptureImage;
     private ImageView ivListingImage;
     private Button btnSubmit;
@@ -60,6 +72,9 @@ public class CreationFragment extends Fragment {
         etDescription = view.findViewById(R.id.etDescription);
         btnCaptureImage = view.findViewById(R.id.btnCaptureImage);
         ivListingImage = view.findViewById(R.id.ivListingImage);
+        etBid = view.findViewById(R.id.etBid);
+        etName = view.findViewById(R.id.etName);
+
         btnSubmit = view.findViewById(R.id.btnSubmit);
         pb = view.findViewById(R.id.pbLoading);
 
@@ -75,8 +90,58 @@ public class CreationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 // Here I will save the listing to Parse
+                String description = etDescription.getText().toString();
+                String name = etName.getText().toString();
+                Long bid = Long.parseLong(etBid.getText().toString());
+                if (description.isEmpty()){
+                    Toast.makeText(getContext(), "Description cannot be empty", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (photoFile == null || ivListingImage.getDrawable() == null){
+                    Toast.makeText(getContext(), "There is no image", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // on some click or some loading we need to wait for...
+                pb.setVisibility(ProgressBar.VISIBLE);
+                saveListing(name, description, bid, photoFile);
             }
         });
+    }
+
+    private void saveListing(String name, String description, Long minPrice, File photoFile) {
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        // Sets expire date to 3 days after the current date
+        Date currentDate = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(currentDate);
+        c.add(Calendar.DATE, 3);
+        Date expireDate = c.getTime();
+        Listing listing = new Listing();
+        listing.setDescription(description);
+        listing.setImage(new ParseFile(photoFile));
+        listing.setName(name);
+        listing.setUser((currentUser));
+        listing.put("minPrice", minPrice);
+        listing.setExpireTime(expireDate);
+        // Set isSold equal to false
+        listing.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e != null){
+                    Log.e(TAG, "Error while saving!", e);
+                    Toast.makeText(getContext(), "Error while saving!", Toast.LENGTH_SHORT).show();
+                }
+                Log.i(TAG, "Post save was successful!");
+                etDescription.setText("");
+                etBid.setText("");
+                etName.setText("");
+                ivListingImage.setImageResource(0);
+                // run a background job and once complete
+                pb.setVisibility(ProgressBar.INVISIBLE);
+            }
+        });
+
     }
 
     private void launchCamera() {
@@ -108,7 +173,11 @@ public class CreationFragment extends Fragment {
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
                 // RESIZE BITMAP, see section below
                 // Load the taken image into a preview
-                ivListingImage.setImageBitmap(takenImage);
+                Glide.with(getContext())
+                        .load(takenImage)
+                        .transform(new CenterCrop())
+                        .into(ivListingImage);
+                // ivListingImage.setImageBitmap(takenImage);
                 Toast.makeText(getContext(), "Image was taken!", Toast.LENGTH_SHORT).show();
             } else { // Result was a failure
                 Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();

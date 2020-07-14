@@ -81,7 +81,7 @@ public class FavoritesFragment extends Fragment {
       rvPosts.setAdapter(adapter);
 
       // set the layout manager on the recycler view
-      GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
+      GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
       rvPosts.setLayoutManager(gridLayoutManager);
 
       // Implement ScrollListener for infinite scroll

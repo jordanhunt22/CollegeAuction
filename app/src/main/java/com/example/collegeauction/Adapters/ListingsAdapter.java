@@ -77,7 +77,7 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
             tvBid = itemView.findViewById(R.id.tvBid);
             btnFav = itemView.findViewById(R.id.btnFav);
 
-            ivImage.setOnClickListener(new View.OnClickListener() {
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     // Gets item position
@@ -128,10 +128,19 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
         @SuppressLint("SetTextI18n")
         public void bind(Listing listing) {
             // Create instance of date manipulator
-            dateManipulator = new DateManipulator(listing.getCreatedAt());
+            if (listing.getExpireTime() != null) {
+                dateManipulator = new DateManipulator(listing.getExpireTime());
+                String date = dateManipulator.getDate().toString();
+                tvTime.setText(date);
+            }
             // Bind the listing data to the view elements
             tvName.setText(listing.getName());
-            tvBid.setText("$" + Objects.requireNonNull(listing.getRecentBid().getNumber(Bid.KEY_PRICE)).toString());
+            if (listing.getRecentBid() != null) {
+                tvBid.setText("$" + Objects.requireNonNull(listing.getRecentBid().getNumber(Bid.KEY_PRICE)).toString());
+            }
+            else{
+                tvBid.setText("$" + listing.getNumber("minPrice").toString());
+            }
             ParseFile image = listing.getImage();
             if (image != null) {
                 Glide.with(context)

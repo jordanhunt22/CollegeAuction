@@ -44,9 +44,21 @@ public class DateManipulator {
     public String getDate() {
         diff = d1.getTime() - System.currentTimeMillis();
         diffSeconds = diff / 1000 % 60;
-        long diffMinutes = diff / (60 * 1000) % 60;
+        String diffSecondsStr = Long.toString(diffSeconds);
+        if (diffSeconds < 10){
+            diffSecondsStr = "0" + diffSecondsStr;
+        }
+        diffMinutes = diff / (60 * 1000) % 60;
+        String diffMinutesStr = Long.toString(diffMinutes);
+        if (diffMinutes < 10){
+            diffMinutesStr = "0" + diffMinutesStr;
+        }
         diffHours = diff / (60 * 60 * 1000);
-        String result = diffHours + ":" + diffMinutes + ":" + diffSeconds;
+        String diffHoursStr = Long.toString(diffHours);
+        if (diffHours < 10){
+            diffHoursStr = "0" + diffHoursStr;
+        }
+        String result = diffHoursStr + ":" + diffMinutesStr + ":" + diffSecondsStr;
         return result;
     }
 }

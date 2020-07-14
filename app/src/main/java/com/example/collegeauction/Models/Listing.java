@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.parceler.Parcel;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 @Parcel(analyze={Listing.class})
 @ParseClassName("Listing")
@@ -21,6 +22,7 @@ public class Listing extends ParseObject {
     public static final String KEY_NAME = "name";
     public static final String KEY_CREATED = "createdAt";
     public static final String KEY_BID = "mostRecentBid";
+    public static final String KEY_EXPIRATION = "expiresAt";
     public static final String KEY_FAVS = "likes";
 
     public static ArrayList<String> listingsFavoritedByCurrentuser = new ArrayList<String>();
@@ -61,6 +63,14 @@ public class Listing extends ParseObject {
 
     public void setRecentBid(ParseUser user){
         put(KEY_BID, user);
+    }
+
+    public Date getExpireTime(){
+        return getDate(KEY_EXPIRATION);
+    }
+
+    public void setExpireTime(Date expire){
+        put(KEY_EXPIRATION, expire);
     }
 
 }

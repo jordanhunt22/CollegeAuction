@@ -35,12 +35,18 @@ public class Bid extends ParseObject {
         put(KEY_IMAGE, parseFile);
     }
 
-    public ParseUser getUser(){
-        return getParseUser(KEY_USER);
-    }
+    public ParseUser getUser(){ return getParseUser(KEY_USER); }
 
     public void setUser(ParseUser user){
         put(KEY_USER, user);
+    }
+
+    public Long getPrice(){
+        return getLong(KEY_PRICE);
+    }
+
+    public void setPrice(Long price){
+        put(KEY_PRICE, price);
     }
 }
 
