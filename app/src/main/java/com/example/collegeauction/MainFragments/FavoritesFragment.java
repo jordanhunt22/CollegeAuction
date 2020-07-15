@@ -127,6 +127,8 @@ public class FavoritesFragment extends Fragment {
             }
             ParseRelation<Listing> favoritedPosts = object.getRelation("favoritedListings");
             ParseQuery<Listing> q = favoritedPosts.getQuery();
+            // Add in ascending order?
+            q.addAscendingOrder("createdAt");
             // Includes the most recent bid
             q.include(Listing.KEY_BID);
             q.findInBackground(new FindCallback<Listing>() {

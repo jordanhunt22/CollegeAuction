@@ -1,5 +1,6 @@
 package com.example.collegeauction.MainFragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,25 +14,28 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.collegeauction.Adapters.ListingsAdapter;
+import com.example.collegeauction.Activities.LoginActivity;
 import com.example.collegeauction.Miscellaneous.EndlessRecyclerViewScrollListener;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HomeFragment extends Fragment {
+public class ProfileFragment extends Fragment {
 
-    public static final String TAG = "HomeFragment";
+    public static final String TAG = "ProfileFragment";
+
+    private Button btnLogOut;
+    private TextView tvUsername;
 
     private RecyclerView rvPosts;
     protected SwipeRefreshLayout swipeContainer;
@@ -39,15 +43,15 @@ public class HomeFragment extends Fragment {
     private List<Listing> allListings;
     private EndlessRecyclerViewScrollListener scrollListener;
 
-    public HomeFragment() {
-        // Required empty public constructor
+    public ProfileFragment(){
+        // Required empty constructor
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflate the layout in this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        // Inflate the layout
+        return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 
     @Override
@@ -63,7 +67,7 @@ public class HomeFragment extends Fragment {
                 // Your code to refresh the list here.
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
-                queryListings();
+                queryUsersListings();
             }
         });
         // Configure the refreshing colors
@@ -97,33 +101,34 @@ public class HomeFragment extends Fragment {
 //        rvPosts.addOnScrollListener(scrollListener);
 //
 //
+
+        // Sets the TextView at the top to the current user's username
+        tvUsername = view.findViewById(R.id.tvUsername);
         ParseUser user = ParseUser.getCurrentUser();
-        user.fetchInBackground(new GetCallback<ParseObject>() {
+        tvUsername.setText(user.getUsername());
+
+        // Sends the user to the login screen when they logout
+        btnLogOut = view.findViewById(R.id.btnLogOut);
+        btnLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void done(final ParseObject object, ParseException e) {
-                ParseRelation<Listing> likedPosts = object.getRelation("favoritedListings");
-                ParseQuery<Listing> q = likedPosts.getQuery();
-                q.findInBackground(new FindCallback<Listing>() {
-                    @Override
-                    public void done(List<Listing> objects, ParseException e) {
-                        for(Listing listing : objects) {
-                            Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
-                        }
-                        queryListings();
-                    }
-                });
+            public void onClick(View view) {
+                ParseUser.logOut();
+                goLogIn();
             }
         });
+
+        queryUsersListings();
     }
 
-    protected void queryListings() {
+    private void queryUsersListings() {
+        ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
         // limit query to latest 20 items
         query.setLimit(20);
-        // Only displays items that have not been sold yet
-        query.whereEqualTo("isSold", false);
-        // order posts by creation date (newest first)t
+        // only shows listings where the current user is the seller
+        query.whereEqualTo("user", currentUser);
+        // order posts by creation date (oldest first)
         query.addAscendingOrder(Listing.KEY_CREATED);
         // start an asynchronous call for posts
         query.findInBackground(new FindCallback<Listing>() {
@@ -146,9 +151,9 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        queryListings();
+    private void goLogIn() {
+        Intent i = new Intent(getContext(), LoginActivity.class);
+        startActivity(i);
+        getActivity().finish();
     }
 }

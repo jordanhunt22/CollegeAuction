@@ -1,4 +1,4 @@
-package com.example.collegeauction.MainFragments;
+package com.example.collegeauction.CreationFragments;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -21,6 +21,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -32,6 +33,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
+import com.google.android.material.transition.MaterialContainerTransform;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
@@ -60,6 +62,7 @@ public class CreationFragment extends Fragment {
     public CreationFragment(){
         // Required empty public constructor
     }
+
 
     @Nullable
     @Override
@@ -143,6 +146,7 @@ public class CreationFragment extends Fragment {
                 ivListingImage.setImageResource(0);
                 // run a background job and once complete
                 pb.setVisibility(ProgressBar.INVISIBLE);
+                getActivity().finish();
             }
         });
 

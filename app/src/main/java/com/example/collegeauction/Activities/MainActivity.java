@@ -1,4 +1,4 @@
-package com.example.collegeauction;
+package com.example.collegeauction.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -6,19 +6,21 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.collegeauction.LoginFragments.LoginFragment;
-import com.example.collegeauction.MainFragments.CreationFragment;
+import com.example.collegeauction.CreationFragments.CreationFragment;
 import com.example.collegeauction.MainFragments.FavoritesFragment;
 import com.example.collegeauction.MainFragments.HomeFragment;
+import com.example.collegeauction.MainFragments.ProfileFragment;
+import com.example.collegeauction.R;
 import com.example.collegeauction.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
@@ -27,10 +29,13 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton fab;
     final FragmentManager fragmentManager = getSupportFragmentManager();
     private Fragment fragment;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        context = this;
 
         // Implementing ViewBinding
         ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
@@ -52,14 +57,12 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                fragment = new CreationFragment();
-                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).addToBackStack("home").commit();
+                // Create intent for the new activity
+                Intent intent = new Intent(context, CreationActivity.class);
+                // Show the activity
+                context.startActivity(intent);
             }
         });
-
-        fragment = new HomeFragment();
-
-        fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
 
         // Resolves the bottom navigation bar
         BottomNavigationView bottomNavigationView = binding.bottomNavigation;
@@ -73,16 +76,15 @@ public class MainActivity extends AppCompatActivity {
                         fragment = new HomeFragment();
                         break;
                     case R.id.action_favorites:
-                    default:
                         fragment = new FavoritesFragment();
                         break;
-//                    case R.id.action_profile:
-//                    default:
-//                        fragment = new ProfileFragment();
+                    case R.id.action_profile:
+                    default:
+                        fragment = new ProfileFragment();
 //                        Bundle args = new Bundle();
 //                        args.putParcelable("user", Parcels.wrap(ParseUser.getCurrentUser()));
 //                        fragment.setArguments(args);
-//                        break;
+                        break;
                 }
                 fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
                 return true;

@@ -12,10 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.collegeauction.MainActivity;
+import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.google.android.material.textfield.TextInputEditText;
@@ -23,8 +22,6 @@ import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
-
-import org.w3c.dom.Text;
 
 public class RegisterFragment extends Fragment {
 
