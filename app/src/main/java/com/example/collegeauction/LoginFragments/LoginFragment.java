@@ -18,6 +18,8 @@ import android.widget.Toast;
 import com.example.collegeauction.MainActivity;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -29,8 +31,8 @@ public class LoginFragment extends Fragment {
     }
 
     public static final String TAG = "LoginFragment";
-    private EditText etUsername;
-    private EditText etPassword;
+    private TextInputEditText etUsername;
+    private TextInputEditText etPassword;
     private Button btnLogin;
     private Button btnRegister;
 
@@ -68,7 +70,7 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Fragment fragment = new RegisterFragment();
-                getFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).commit();
+                getFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).addToBackStack("login").commit();
             }
         });
     }

@@ -18,19 +18,22 @@ import android.widget.Toast;
 import com.example.collegeauction.MainActivity;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
+import com.google.android.material.textfield.TextInputEditText;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
+import org.w3c.dom.Text;
+
 public class RegisterFragment extends Fragment {
 
     public static final String TAG = "RegisterFragment";
-    public EditText etUsername;
-    private EditText etPassword;
+    public TextInputEditText etUsername;
+    private TextInputEditText etPassword;
     private Button btnRegister;
-    private EditText etNumber;
-    private EditText etEmail;
+    private TextInputEditText etNumber;
+    private TextInputEditText etEmail;
 
     public RegisterFragment(){
         // Required constructor

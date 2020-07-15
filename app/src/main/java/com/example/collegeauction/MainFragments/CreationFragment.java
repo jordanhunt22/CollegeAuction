@@ -3,6 +3,10 @@ package com.example.collegeauction.MainFragments;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -173,8 +177,12 @@ public class CreationFragment extends Fragment {
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
                 // RESIZE BITMAP, see section below
                 // Load the taken image into a preview
+                Matrix matrix = new Matrix();
+                matrix.postRotate(90);
+                Bitmap rotatedBitmap = Bitmap.createBitmap(takenImage, 0, 0, takenImage.getWidth(), takenImage.getHeight(), matrix, true);
+                Drawable imageDrawable = new BitmapDrawable(getResources(), rotatedBitmap);
                 Glide.with(getContext())
-                        .load(takenImage)
+                        .load(imageDrawable)
                         .transform(new CenterCrop())
                         .into(ivListingImage);
                 // ivListingImage.setImageBitmap(takenImage);

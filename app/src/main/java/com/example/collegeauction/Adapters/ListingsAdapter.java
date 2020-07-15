@@ -2,6 +2,7 @@ package com.example.collegeauction.Adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +49,12 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
     }
 
     @Override
+    public void onViewRecycled(@NonNull ViewHolder holder) {
+        super.onViewRecycled(holder);
+        holder.timerHandler.removeCallbacks(holder.updater);
+    }
+
+    @Override
     public void onBindViewHolder(@NonNull ListingsAdapter.ViewHolder holder, int position) {
         Listing listing = listings.get(position);
         holder.bind(listing);
@@ -63,6 +70,9 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
         private TextView tvTime;
         private TextView tvBid;
         private ImageButton btnFav;
+        Runnable updater;
+        final Handler timerHandler = new Handler();
+
 
         private Listing listing;
         private DateManipulator dateManipulator;
@@ -126,12 +136,19 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
         }
 
         @SuppressLint("SetTextI18n")
-        public void bind(Listing listing) {
+        public void bind(final Listing listing) {
             // Create instance of date manipulator
             if (listing.getExpireTime() != null) {
-                dateManipulator = new DateManipulator(listing.getExpireTime());
-                String date = dateManipulator.getDate().toString();
-                tvTime.setText(date);
+                updater = new Runnable() {
+                    @Override
+                    public void run() {
+                        dateManipulator = new DateManipulator(listing.getExpireTime());
+                        String date = dateManipulator.getDate().toString();
+                        tvTime.setText(date);
+                        timerHandler.postDelayed(updater,1000);
+                    }
+                };
+                timerHandler.post(updater);
             }
             // Bind the listing data to the view elements
             tvName.setText(listing.getName());
@@ -188,5 +205,8 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
         listings.addAll(allPosts);
         notifyDataSetChanged();
     }
+
+
+
 }
 
