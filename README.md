@@ -186,7 +186,7 @@ This app creates a platform for college students to but and sell items from each
          }
       ```
       - (Read/GET) Update user profile image
-      ``swift
+      ```swift
       let query = PFQuery(className:"Listing")
          query.order(byDescending: "createdAt")
          query.setLimit(20)
