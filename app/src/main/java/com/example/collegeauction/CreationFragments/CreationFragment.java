@@ -97,18 +97,28 @@ public class CreationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 // Here I will save the listing to Parse
-                String description = etDescription.getText().toString();
                 String name = etName.getText().toString();
-                Long bid = Long.parseLong(etBid.getText().toString());
+                String description = etDescription.getText().toString();
+                Long bid = null;
+                if (name.isEmpty()){
+                    Toast.makeText(getContext(), "The item name cannot be empty. Try again", Toast.LENGTH_SHORT).show();
+                }
                 if (description.isEmpty()){
-                    Toast.makeText(getContext(), "Description cannot be empty", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "The item description cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                try {
+                    bid = Long.parseLong(etBid.getText().toString());
+                } catch (NumberFormatException e) {
+                    Log.e(TAG, "Your bid is not a valid number", e);
+                    Toast.makeText(getContext(), "Your bid is invalid. Try again", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 if (photoFile == null || ivListingImage.getDrawable() == null){
                     Toast.makeText(getContext(), "There is no image", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
                 // on some click or some loading we need to wait for...
                 pb.setVisibility(ProgressBar.VISIBLE);
                 saveListing(name, description, bid, photoFile);

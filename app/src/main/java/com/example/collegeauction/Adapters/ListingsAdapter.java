@@ -2,6 +2,7 @@ package com.example.collegeauction.Adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -17,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
+import com.example.collegeauction.Activities.ListingDetailsActivity;
 import com.example.collegeauction.Miscellaneous.DateManipulator;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
@@ -25,6 +28,8 @@ import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+
+import org.parceler.Parcels;
 
 import java.util.Collections;
 import java.util.List;
@@ -90,11 +95,33 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    ParseUser currentUser = ParseUser.getCurrentUser();
                     // Gets item position
                     int position = getAdapterPosition();
                     // Make sure the position is valid, i.e. actually exists in the view
                     if (position != RecyclerView.NO_POSITION){
-                        // Open the buyer's detail view
+                        // Get the listing at the position, this won't work if the class is static
+                        listing = listings.get(position);
+
+                        // Create a new intent
+                        Intent intent = new Intent(context, ListingDetailsActivity.class);
+
+                        // Serialize the Post using parceler, use its short name as a key
+                        intent.putExtra(Listing.class.getSimpleName(), Parcels.wrap(listing));
+
+                        if (currentUser.getObjectId().equals(listing.getUser().getObjectId())){
+                            // Open the seller's detail view
+                            Toast.makeText(context, "You are the seller!", Toast.LENGTH_SHORT).show();
+                            return;
+                            // I still need to make a seller detail view
+                            // intent.putExtra("isSeller", true);
+                        }
+                        else{
+                            // open the buyer's detail view
+                            intent.putExtra("isSeller", false);
+                        }
+                        // Start the DetailsActivity
+                        context.startActivity(intent);
                     }
                 }
             });
