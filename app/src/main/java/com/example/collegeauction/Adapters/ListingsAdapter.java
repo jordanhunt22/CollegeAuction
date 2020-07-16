@@ -75,9 +75,8 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
         private TextView tvTime;
         private TextView tvBid;
         private ImageButton btnFav;
-        Runnable updater;
+        private Runnable updater;
         final Handler timerHandler = new Handler();
-
 
         private Listing listing;
         private DateManipulator dateManipulator;

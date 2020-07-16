@@ -50,7 +50,7 @@ public class Bid extends ParseObject {
         put(KEY_PRICE, price);
     }
 
-    public ParseObject geListing(){ return getParseObject(KEY_LISTING); }
+    public ParseObject getListing(){ return getParseObject(KEY_LISTING); }
 
     public void setListing(Listing listing){
         put(KEY_LISTING, listing);

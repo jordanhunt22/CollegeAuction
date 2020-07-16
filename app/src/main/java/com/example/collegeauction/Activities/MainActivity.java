@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.collegeauction.CreationFragments.CreationFragment;
+import com.example.collegeauction.MainFragments.BidsPurchasesFragment;
 import com.example.collegeauction.MainFragments.FavoritesFragment;
 import com.example.collegeauction.MainFragments.HomeFragment;
 import com.example.collegeauction.MainFragments.ProfileFragment;
@@ -72,18 +73,21 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 Fragment fragment;
                 switch (item.getItemId()) {
-                    case R.id.action_home:
-                        fragment = new HomeFragment();
-                        break;
                     case R.id.action_favorites:
                         fragment = new FavoritesFragment();
                         break;
                     case R.id.action_profile:
-                    default:
                         fragment = new ProfileFragment();
 //                        Bundle args = new Bundle();
 //                        args.putParcelable("user", Parcels.wrap(ParseUser.getCurrentUser()));
 //                        fragment.setArguments(args);
+                        break;
+                    case R.id.action_history:
+                        fragment = new BidsPurchasesFragment();
+                        break;
+                    case R.id.action_home:
+                    default:
+                        fragment = new HomeFragment();
                         break;
                 }
                 fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
