@@ -139,19 +139,13 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                         listing = listings.get(position);
                         // Checks to see if the clicked listing is favorited
                         if (isFavorite(listing)) {
-                            Glide.with(context)
-                                    .load(R.drawable.heart)
-                                    .transform(new CenterCrop())
-                                    .into(btnFav);
+                            btnFav.setBackground(context.getDrawable(R.drawable.star));
                             Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(listing.getObjectId()));
                             relation.remove(listing);
                             Log.i(TAG, "unlike");
                         }
                         else{
-                            Glide.with(context)
-                                    .load(R.drawable.heart_active)
-                                    .transform(new CenterCrop())
-                                    .into(btnFav);
+                            btnFav.setBackground(context.getDrawable(R.drawable.star_active));
                             relation.add(listing);
                             Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
                             Log.i(TAG, "like");
@@ -200,16 +194,10 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
             }
 
             if (isFavorite(listing)){
-                Glide.with(context)
-                        .load(R.drawable.heart_active)
-                        .transform(new CenterCrop())
-                        .into(btnFav);
+                btnFav.setBackground(context.getDrawable(R.drawable.star_active));
             }
             else{
-                Glide.with(context)
-                        .load(R.drawable.heart)
-                        .transform(new CenterCrop())
-                        .into(btnFav);
+                btnFav.setBackground(context.getDrawable(R.drawable.star));
             }
         }
     }

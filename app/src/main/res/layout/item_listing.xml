@@ -48,7 +48,7 @@
                 android:layout_alignParentBottom="false"
                 android:layout_marginStart="12dp"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="9dp"
+                android:layout_marginBottom="6dp"
                 android:text="Basketball"
                 android:textColor="@android:color/black"
                 android:textSize="24sp" />
@@ -61,7 +61,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="false"
                 android:layout_marginTop="4dp"
-                android:layout_marginEnd="14dp"
+                android:layout_marginEnd="16dp"
                 android:text="$15"
                 android:textColor="@android:color/black"
                 android:textSize="24sp" />
@@ -75,19 +75,19 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginStart="12dp"
                 android:layout_marginTop="0dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginBottom="10dp"
                 android:text="01:10:25"
                 android:textSize="20sp" />
 
             <ImageButton
                 android:id="@+id/btnFav"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
-                android:background="@drawable/heart" />
+                android:layout_marginBottom="4dp"
+                android:background="@drawable/star" />
 
         </RelativeLayout>
 

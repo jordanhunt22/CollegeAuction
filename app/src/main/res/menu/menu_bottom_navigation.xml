@@ -12,7 +12,7 @@
     <item
     android:id="@+id/action_favorites"
     android:enabled="true"
-    android:icon="@drawable/heart"
+    android:icon="@drawable/star"
     android:title="favorites"
     android:visible="true"
     app:showAsAction="always" />

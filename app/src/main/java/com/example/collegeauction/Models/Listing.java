@@ -23,6 +23,7 @@ public class Listing extends ParseObject {
     public static final String KEY_CREATED = "createdAt";
     public static final String KEY_BID = "mostRecentBid";
     public static final String KEY_EXPIRATION = "expiresAt";
+    public static final String KEY_MINPRICE = "minPrice";
     public static final String KEY_FAVS = "favorites";
 
     public static ArrayList<String> listingsFavoritedByCurrentuser = new ArrayList<String>();
@@ -73,5 +74,10 @@ public class Listing extends ParseObject {
         put(KEY_EXPIRATION, expire);
     }
 
+    public Long getMinPrice(){
+        return getLong(KEY_MINPRICE);
+    }
+
+    public void setMinPrice(Long price){ put(KEY_MINPRICE, price); }
 }
 
