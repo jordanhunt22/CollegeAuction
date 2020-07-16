@@ -32,6 +32,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
 
@@ -51,8 +52,9 @@ public class BuyerDetailFragment extends Fragment {
     private Button btnBid;
     private TextInputEditText etBid;
 
-    private Bid currentBid;
+    private Bid bid;
     private Long minBid;
+    private Long numberBid;
 
     // For the runnable that updates the current bid
     Runnable updater;
@@ -101,7 +103,10 @@ public class BuyerDetailFragment extends Fragment {
         btnBid.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Long numberBid = null;
+                if (etBid.getText().toString().isEmpty()){
+                    Toast.makeText(getContext(), "Your bid cannot be empty!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 try {
                     numberBid = Long.parseLong(etBid.getText().toString());
                 } catch (NumberFormatException e) {
@@ -111,11 +116,23 @@ public class BuyerDetailFragment extends Fragment {
                 }
 
                 if (numberBid <= minBid ){
-                    Toast.makeText(getContext(), "Your bid is less than the current bid!", Toast.LENGTH_SHORT);
+                    Toast.makeText(getContext(), "Your bid is less than the current bid!", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 else{
-                    
+                    bid = new Bid();
+                    bid.setUser(ParseUser.getCurrentUser());
+                    bid.setPrice(numberBid);
+                    bid.setListing(listing);
+                    bid.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            listing.setRecentBid(bid);
+                            listing.saveInBackground();
+                            tvCurrentBid.setText("$" + numberBid.toString());
+                            etBid.setText("");
+                        }
+                    });
                 }
             }
         });
@@ -126,15 +143,15 @@ public class BuyerDetailFragment extends Fragment {
             public void run() {
                 getCurrentBids();
                 if (listing.getRecentBid() != null) {
-                    minBid = (Long) listing.getRecentBid()
-                            .getNumber(Bid.KEY_PRICE);
+                    minBid = listing.getRecentBid()
+                            .getLong(Bid.KEY_PRICE);
                     tvCurrentBid
                             .setText("$" + Objects.requireNonNull(minBid
                                     .toString()));
                 }
                 else{
                     minBid =(Long) listing
-                            .getNumber("minPrice");
+                            .getLong("minPrice");
                     tvCurrentBid
                             .setText("$" + minBid
                                     .toString());

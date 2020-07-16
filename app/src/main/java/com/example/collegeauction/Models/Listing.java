@@ -62,8 +62,8 @@ public class Listing extends ParseObject {
         return getParseObject(KEY_BID);
     }
 
-    public void setRecentBid(ParseUser user){
-        put(KEY_BID, user);
+    public void setRecentBid(Bid bid){
+        put(KEY_BID, bid);
     }
 
     public Date getExpireTime(){

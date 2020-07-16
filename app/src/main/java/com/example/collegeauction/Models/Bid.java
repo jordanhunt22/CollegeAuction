@@ -17,6 +17,7 @@ public class Bid extends ParseObject {
     public static final String KEY_IMAGE = "image";
     public static final String KEY_USER = "user";
     public static final String KEY_PRICE = "price";
+    public static final String KEY_LISTING = "listing";
     public static final String KEY_CREATED = "createdAt";
 
     public String getDescription(){
@@ -47,6 +48,12 @@ public class Bid extends ParseObject {
 
     public void setPrice(Long price){
         put(KEY_PRICE, price);
+    }
+
+    public ParseObject geListing(){ return getParseObject(KEY_LISTING); }
+
+    public void setListing(Listing listing){
+        put(KEY_LISTING, listing);
     }
 }
 
