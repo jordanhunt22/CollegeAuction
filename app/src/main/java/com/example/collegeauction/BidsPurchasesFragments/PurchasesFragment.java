@@ -75,7 +75,7 @@ public class PurchasesFragment extends Fragment {
 
         rvPurchases.setAdapter(purchasesAdapter);
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
         rvPurchases.setLayoutManager(gridLayoutManager);
 
         // Makes fab disappear when scrolling

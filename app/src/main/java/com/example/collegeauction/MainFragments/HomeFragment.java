@@ -83,7 +83,7 @@ public class HomeFragment extends Fragment {
         rvPosts.setAdapter(adapter);
 
         // set the layout manager on the recycler view
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
         rvPosts.setLayoutManager(gridLayoutManager);
 
         // Makes the fab disappear when scrolling
