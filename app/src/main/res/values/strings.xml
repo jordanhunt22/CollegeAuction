@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">CollegeAuction</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="google_maps_api_key">AIzaSyCgFeic2D0wpfnZXXy6bz_XKlYtcEhWGd4</string>
 </resources>

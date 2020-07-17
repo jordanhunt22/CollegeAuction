@@ -163,7 +163,7 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                     @Override
                     public void run() {
                         dateManipulator = new DateManipulator(listing.getExpireTime());
-                        String date = dateManipulator.getDate().toString();
+                        String date = dateManipulator.getDate();
                         tvTime.setText(date);
                         timerHandler.postDelayed(updater,1000);
                     }

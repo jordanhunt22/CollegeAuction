@@ -156,4 +156,10 @@ public class ProfileFragment extends Fragment {
         startActivity(i);
         getActivity().finish();
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        queryUsersListings();
+    }
 }

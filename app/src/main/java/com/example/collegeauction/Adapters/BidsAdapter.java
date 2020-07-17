@@ -52,8 +52,6 @@ public class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.ViewHolder> {
         private TextView tvName;
         private TextView tvTime;
 
-        private Bid bid;
-
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -67,7 +65,7 @@ public class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.ViewHolder> {
         public void bind(Bid bid) {
             tvTime.setText(TimeFormatter.getTimeDifference(bid.getCreatedAt().toString()));
             tvName.setText(bid.getListing().getString(Listing.KEY_NAME));
-            tvPrice.setText("$ " + bid.getPrice().toString());
+            tvPrice.setText("$" + bid.getPrice().toString());
         }
     }
 
@@ -78,8 +76,8 @@ public class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.ViewHolder> {
     }
 
     // Add a list of items -- change to type used
-    public void addAll(List<Bid> allListings) {
-        bids.addAll(allListings);
+    public void addAll(List<Bid> allBids) {
+        bids.addAll(allBids);
         notifyDataSetChanged();
     }
 }

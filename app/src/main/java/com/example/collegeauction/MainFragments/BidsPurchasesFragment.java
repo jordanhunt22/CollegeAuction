@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.collegeauction.Adapters.BidsAdapter;
+import com.example.collegeauction.Adapters.PurchasesAdapter;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
@@ -37,6 +38,7 @@ public class BidsPurchasesFragment extends Fragment {
     private SwipeRefreshLayout swipePurchases;
 
     private BidsAdapter bidsAdapter;
+    private PurchasesAdapter purchasesAdapter;
 
     private List<Listing> allPurchases;
     private List<Bid> allBids;
@@ -69,6 +71,7 @@ public class BidsPurchasesFragment extends Fragment {
             @Override
             public void onRefresh() {
                 // Reload all of the bids
+                queryBids();
             }
         });
 
@@ -76,6 +79,7 @@ public class BidsPurchasesFragment extends Fragment {
             @Override
             public void onRefresh() {
                 // Reload all of the users purchases
+                queryPurchases();
             }
         });
 
@@ -87,31 +91,46 @@ public class BidsPurchasesFragment extends Fragment {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
         rvBids.setLayoutManager(gridLayoutManager);
 
+        allPurchases = new ArrayList<>();
+        purchasesAdapter = new PurchasesAdapter(getContext(), allPurchases);
+
+        rvPurchases.setAdapter(purchasesAdapter);
+
+        GridLayoutManager gridLayoutManager2 = new GridLayoutManager(getContext(), 1);
+        rvPurchases.setLayoutManager(gridLayoutManager2);
+
         queryBids();
-        // queryPurchases();
+        queryPurchases();
     }
 
     private void queryPurchases() {
         ParseUser currentUser = ParseUser.getCurrentUser();
-        ParseQuery query = ParseQuery.getQuery(Listing.class);
-        query.include(Listing.KEY_BID);
-        // limit query to latest 20 items
-        query.setLimit(20);
-        // Only displays items that have not been sold yet
-        query.whereEqualTo("isSold", true);
-        // Only includes listings where the current user has the highest bud
-        query.whereEqualTo("mostRecentBid.user.objectId", currentUser.getObjectId());
-        // order posts by creation date (newest first)t
-        query.addAscendingOrder(Listing.KEY_CREATED);
+        ParseQuery query = ParseQuery.getQuery(Bid.class);
+        // Only gets the currentUser's bids
+        query.whereEqualTo("user", currentUser);
+        // Includes the attached listing
+        query.include(Bid.KEY_LISTING);
+        // Only displays items that have not been sold
+        query.whereEqualTo("isCurrent", true);
+        // order posts by creation date (newest first)
+        query.addAscendingOrder(Bid.KEY_CREATED);
         // start an asynchronous call for posts
-        query.findInBackground(new FindCallback<Listing>() {
+        query.findInBackground(new FindCallback<Bid>() {
             @Override
-            public void done(List<Listing> listings, ParseException e) {
+            public void done(List<Bid> bids, ParseException e) {
                 if (e != null){
                     Log.e(TAG, "Issue with getting listings", e);
                     return;
                 }
-
+                List<Listing> listings = new ArrayList<>();
+                for (Bid bid : bids){
+                    Listing listing = (Listing) bid.getListing();
+                    if (listing.getBoolean("isSold")){
+                        listings.add(listing);
+                    }
+                }
+                purchasesAdapter.clear();
+                purchasesAdapter.addAll(listings);
                 // Save received posts to list and notify adapter of new data
                 swipePurchases.setRefreshing(false);
                 }
@@ -142,7 +161,7 @@ public class BidsPurchasesFragment extends Fragment {
                 bidsAdapter.addAll(bids);
 
                 // Save received posts to list and notify adapter of new data
-                swipePurchases.setRefreshing(false);
+                swipeBids.setRefreshing(false);
             }
         });
     }

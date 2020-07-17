@@ -53,6 +53,7 @@ public class BuyerDetailFragment extends Fragment {
     private TextInputEditText etBid;
 
     private Bid bid;
+    private Bid lastBid;
     private Long minBid;
     private Long numberBid;
 
@@ -124,6 +125,11 @@ public class BuyerDetailFragment extends Fragment {
                     bid.setUser(ParseUser.getCurrentUser());
                     bid.setPrice(numberBid);
                     bid.setListing(listing);
+                    bid.put("isCurrent", true);
+                    if (lastBid != null){
+                        lastBid.put("isCurrent", false);
+                        lastBid.saveInBackground();
+                    }
                     bid.saveInBackground(new SaveCallback() {
                         @Override
                         public void done(ParseException e) {
@@ -142,8 +148,9 @@ public class BuyerDetailFragment extends Fragment {
             @Override
             public void run() {
                 getCurrentBids();
-                if (listing.getRecentBid() != null) {
-                    minBid = listing.getRecentBid()
+                lastBid = (Bid) listing.getRecentBid();
+                if (lastBid != null) {
+                    minBid = lastBid
                             .getLong(Bid.KEY_PRICE);
                     tvCurrentBid
                             .setText("$" + Objects.requireNonNull(minBid
