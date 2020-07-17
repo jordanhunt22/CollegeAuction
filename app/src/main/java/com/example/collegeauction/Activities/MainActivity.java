@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
                         newPosition = 2;
                         break;
                     case R.id.action_history:
-                        fragment = new BidsPurchasesFragment();
+                        fragment = new BidsPurchasesFragment(fragmentManager);
                         newPosition = 3;
                         break;
                     case R.id.action_profile:
@@ -114,20 +114,20 @@ public class MainActivity extends AppCompatActivity {
     private boolean loadFragment(Fragment fragment, int newPosition) {
         if(fragment != null) {
             if(newPosition == 0) {
-                getSupportFragmentManager()
+                fragmentManager
                         .beginTransaction()
                         .replace(R.id.flContainer, fragment).commit();
 
             }
             if(startingPosition > newPosition) {
-                getSupportFragmentManager()
+                fragmentManager
                         .beginTransaction()
                         .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right )
                         .replace(R.id.flContainer, fragment).commit();
 
             }
             if(startingPosition < newPosition) {
-                getSupportFragmentManager()
+                fragmentManager
                         .beginTransaction()
                         .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
                         .replace(R.id.flContainer, fragment).commit();

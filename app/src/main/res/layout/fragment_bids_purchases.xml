@@ -8,61 +8,29 @@
     tools:context=".BidsPurchasesFragments.BidsPurchasesFragment">
 
     <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/action_bids"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bids"
+            android:text="bids"
             />
 
         <com.google.android.material.tabs.TabItem
+            android:id="@+id/action_purchases"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="purchases"
             />
+
     </com.google.android.material.tabs.TabLayout>
 
-
-    <TextView
-        android:id="@+id/tvMyBids"
+    <FrameLayout
+        android:id="@+id/flBidsPurchases"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:text="My Bids"
-        android:textColor="@android:color/black"
-        android:textSize="24sp" />
+        android:layout_height="match_parent" />
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeBids"
-        android:layout_width="match_parent"
-        android:layout_height="200dp">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvBids"
-            android:layout_width="match_parent"
-            android:layout_height="250dp" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:text="My Purchases"
-        android:textColor="@android:color/black"
-        android:textSize="24sp" />
-
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipePurchases"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvPurchases"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </LinearLayout>
