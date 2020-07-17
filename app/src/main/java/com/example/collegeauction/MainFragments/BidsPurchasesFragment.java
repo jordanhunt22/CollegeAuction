@@ -113,7 +113,7 @@ public class BidsPurchasesFragment extends Fragment {
         // Only displays items that have not been sold
         query.whereEqualTo("isCurrent", true);
         // order posts by creation date (newest first)
-        query.addAscendingOrder(Bid.KEY_CREATED);
+        query.addDescendingOrder("listing.expiresAt");
         // start an asynchronous call for posts
         query.findInBackground(new FindCallback<Bid>() {
             @Override

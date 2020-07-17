@@ -129,7 +129,7 @@ public class ProfileFragment extends Fragment {
         // only shows listings where the current user is the seller
         query.whereEqualTo("user", currentUser);
         // order posts by creation date (oldest first)
-        query.addAscendingOrder(Listing.KEY_CREATED);
+        query.addDescendingOrder(Listing.KEY_EXPIRATION);
         // start an asynchronous call for posts
         query.findInBackground(new FindCallback<Listing>() {
             @Override

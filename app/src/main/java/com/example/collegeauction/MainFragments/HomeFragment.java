@@ -27,6 +27,7 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
@@ -117,14 +118,17 @@ public class HomeFragment extends Fragment {
     }
 
     protected void queryListings() {
+        ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
         // limit query to latest 20 items
         query.setLimit(20);
         // Only displays items that have not been sold yet
         query.whereEqualTo("isSold", false);
-        // order posts by creation date (newest first)t
+        // order posts by creation date (newest first)
         query.addAscendingOrder(Listing.KEY_CREATED);
+        // Does not show the current user's posts
+        query.whereNotEqualTo(Listing.KEY_USER, currentUser);
         // start an asynchronous call for posts
         query.findInBackground(new FindCallback<Listing>() {
             @Override
@@ -133,6 +137,16 @@ public class HomeFragment extends Fragment {
                     Log.e(TAG, "Issue with getting listings", e);
                     return;
                 }
+
+                for (int i = 0; i < listings.size(); i++){
+                    Listing listing = listings.get(i);
+                    if (System.currentTimeMillis() > listing.getExpireTime().getTime()){
+                        listing.put("isSold", true);
+                        listing.saveInBackground();
+                        listings.removeAll(Collections.singleton(listing));
+                    }
+                }
+
                 // Clears the adapter
                 adapter.clear();
                 adapter.addAll(listings);

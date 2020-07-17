@@ -27,6 +27,7 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class FavoritesFragment extends Fragment {
@@ -117,7 +118,7 @@ public class FavoritesFragment extends Fragment {
    }
 
    protected void queryListings() {
-      ParseUser user = ParseUser.getCurrentUser();
+      final ParseUser user = ParseUser.getCurrentUser();
       user.fetchInBackground(new GetCallback<ParseObject>() {
          @Override
          public void done(final ParseObject object, ParseException e) {
@@ -129,6 +130,10 @@ public class FavoritesFragment extends Fragment {
             ParseQuery<Listing> q = favoritedPosts.getQuery();
             // Add in ascending order?
             q.addAscendingOrder("createdAt");
+            // Does not show the current user's posts
+            q.whereNotEqualTo(Listing.KEY_USER, user);
+            // Only displays items that have not been sold yet
+            q.whereEqualTo("isSold", false);
             // Includes the most recent bid
             q.include(Listing.KEY_BID);
             q.findInBackground(new FindCallback<Listing>() {
@@ -137,6 +142,14 @@ public class FavoritesFragment extends Fragment {
                   if (e != null){
                      Log.e(TAG, "Issue with getting current user's favorite listings", e);
                      return;
+                  }
+                  for (int i = 0; i < listings.size(); i++){
+                     Listing listing = listings.get(i);
+                     if (System.currentTimeMillis() > listing.getExpireTime().getTime()){
+                        listing.put("isSold", true);
+                        listing.saveInBackground();
+                        listings.removeAll(Collections.singleton(listing));
+                     }
                   }
                   // Clears the adapter
                   adapter.clear();

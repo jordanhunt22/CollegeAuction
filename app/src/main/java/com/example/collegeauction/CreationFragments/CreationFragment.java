@@ -156,7 +156,7 @@ public class CreationFragment extends Fragment {
                 ivListingImage.setImageResource(0);
                 // run a background job and once complete
                 pb.setVisibility(ProgressBar.INVISIBLE);
-                getActivity().finish();
+                Toast.makeText(getContext(), "Your listing was posted successfully!", Toast.LENGTH_SHORT).show();
             }
         });
 
