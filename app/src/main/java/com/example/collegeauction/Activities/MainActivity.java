@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(context, CreationActivity.class);
                 // Show the activity
                 context.startActivity(intent);
+                overridePendingTransition(R.anim.right_bottom_up, R.anim.no_animation);
             }
         });
 
