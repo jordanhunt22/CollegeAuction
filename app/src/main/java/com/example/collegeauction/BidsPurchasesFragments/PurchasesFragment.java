@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.BidsAdapter;
 import com.example.collegeauction.Adapters.PurchasesAdapter;
 import com.example.collegeauction.Models.Bid;
@@ -76,6 +77,19 @@ public class PurchasesFragment extends Fragment {
 
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
         rvPurchases.setLayoutManager(gridLayoutManager);
+
+        // Makes fab disappear when scrolling
+        rvPurchases.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0 && MainActivity.fab.getVisibility() == View.VISIBLE) {
+                    MainActivity.fab.hide();
+                } else if (dy < 0 && MainActivity.fab.getVisibility() != View.VISIBLE) {
+                    MainActivity.fab.show();
+                }
+            }
+        });
 
         queryPurchases();
     }

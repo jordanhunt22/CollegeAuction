@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.ListingsAdapter;
 import com.example.collegeauction.Miscellaneous.EndlessRecyclerViewScrollListener;
 import com.example.collegeauction.Models.Listing;
@@ -84,6 +85,19 @@ public class HomeFragment extends Fragment {
         // set the layout manager on the recycler view
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 1);
         rvPosts.setLayoutManager(gridLayoutManager);
+
+        // Makes the fab disappear when scrolling
+        rvPosts.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0 && MainActivity.fab.getVisibility() == View.VISIBLE) {
+                    MainActivity.fab.hide();
+                } else if (dy < 0 && MainActivity.fab.getVisibility() != View.VISIBLE) {
+                    MainActivity.fab.show();
+                }
+            }
+        });
 
         // Implement ScrollListener for infinite scroll
 //        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {

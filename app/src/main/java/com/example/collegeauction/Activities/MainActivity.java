@@ -24,7 +24,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
 
-    private FloatingActionButton fab;
+    public static FloatingActionButton fab;
     final FragmentManager fragmentManager = getSupportFragmentManager();
     private Fragment fragment;
     private Context context;
