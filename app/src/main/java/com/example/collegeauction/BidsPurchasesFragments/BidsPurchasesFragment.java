@@ -1,4 +1,4 @@
-package com.example.collegeauction.MainFragments;
+package com.example.collegeauction.BidsPurchasesFragments;
 
 import android.os.Bundle;
 

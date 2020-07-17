@@ -28,6 +28,7 @@ import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ProfileFragment extends Fragment {
@@ -138,6 +139,15 @@ public class ProfileFragment extends Fragment {
                     Log.e(TAG, "Issue with getting listings", e);
                     return;
                 }
+
+                for (int i = 0; i < listings.size(); i++){
+                    Listing listing = listings.get(i);
+                    if (System.currentTimeMillis() > listing.getExpireTime().getTime()){
+                        listing.put("isSold", true);
+                        listing.saveInBackground();
+                    }
+                }
+
                 // Clears the adapter
                 adapter.clear();
                 adapter.addAll(listings);

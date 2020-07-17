@@ -21,6 +21,7 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.example.collegeauction.Activities.ListingDetailsActivity;
 import com.example.collegeauction.Miscellaneous.DateManipulator;
+import com.example.collegeauction.Miscellaneous.TimeFormatter;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
@@ -170,8 +171,10 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                 };
                 timerHandler.post(updater);
             }
+            // If the listing is sold,
             else{
-                tvTime.setText("EXPIRED");
+                tvTime.setText("Expired " + TimeFormatter
+                        .getTimeDifference(listing.getDate("expiresAt").toString()) + " ago");
             }
             // Bind the listing data to the view elements
             tvName.setText(listing.getName());
@@ -188,7 +191,6 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                         .transform(new CenterCrop())
                         .into(ivImage);
             } else {
-                //ivImage.setImageResource(android.R.color.transparent);
                 Glide.with(context)
                         .load(R.drawable.ic_launcher_background)
                         .transform(new CenterCrop())
@@ -204,6 +206,7 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
         }
     }
 
+    // Checks to see if the current user has favorited this post
     public boolean isFavorite(Listing listing){
         if (Listing.listingsFavoritedByCurrentuser.contains(listing.getObjectId())){
             return true;

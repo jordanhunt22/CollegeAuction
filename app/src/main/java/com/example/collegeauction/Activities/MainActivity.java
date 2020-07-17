@@ -13,8 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.example.collegeauction.CreationFragments.CreationFragment;
-import com.example.collegeauction.MainFragments.BidsPurchasesFragment;
+import com.example.collegeauction.BidsPurchasesFragments.BidsPurchasesFragment;
 import com.example.collegeauction.MainFragments.FavoritesFragment;
 import com.example.collegeauction.MainFragments.HomeFragment;
 import com.example.collegeauction.MainFragments.ProfileFragment;
@@ -23,14 +22,13 @@ import com.example.collegeauction.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import org.parceler.Parcels;
-
 public class MainActivity extends AppCompatActivity {
 
     private FloatingActionButton fab;
     final FragmentManager fragmentManager = getSupportFragmentManager();
     private Fragment fragment;
     private Context context;
+    private int startingPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,26 +70,33 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 Fragment fragment;
+                int newPosition = 0;
                 switch (item.getItemId()) {
+                    case R.id.action_home:
+                        fragment = new HomeFragment();
+                        newPosition = 1;
+                        break;
                     case R.id.action_favorites:
                         fragment = new FavoritesFragment();
+                        newPosition = 2;
+                        break;
+                    case R.id.action_history:
+                        fragment = new BidsPurchasesFragment();
+                        newPosition = 3;
                         break;
                     case R.id.action_profile:
                         fragment = new ProfileFragment();
+                        newPosition = 4;
 //                        Bundle args = new Bundle();
 //                        args.putParcelable("user", Parcels.wrap(ParseUser.getCurrentUser()));
 //                        fragment.setArguments(args);
                         break;
-                    case R.id.action_history:
-                        fragment = new BidsPurchasesFragment();
-                        break;
-                    case R.id.action_home:
                     default:
-                        fragment = new HomeFragment();
-                        break;
+                        throw new IllegalStateException("Unexpected value: " + item.getItemId());
                 }
-                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
-                return true;
+                // fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+                // return true;
+                return loadFragment(fragment, newPosition);
             }
         });
         // Set default selection
@@ -104,5 +109,34 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
+    }
+
+    private boolean loadFragment(Fragment fragment, int newPosition) {
+        if(fragment != null) {
+            if(newPosition == 0) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.flContainer, fragment).commit();
+
+            }
+            if(startingPosition > newPosition) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right )
+                        .replace(R.id.flContainer, fragment).commit();
+
+            }
+            if(startingPosition < newPosition) {
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
+                        .replace(R.id.flContainer, fragment).commit();
+
+            }
+            startingPosition = newPosition;
+            return true;
+        }
+
+        return false;
     }
 }

@@ -90,7 +90,7 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
                     .getTimeDifference(Objects
                             .requireNonNull(purchase.getDate("expiresAt"))
                             .toString());
-            tvTime.setText(timeStamp);
+            tvTime.setText("Expired " + timeStamp + " ago");
         }
     }
 
