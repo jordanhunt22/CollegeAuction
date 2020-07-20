@@ -86,6 +86,9 @@ public class FavoritesFragment extends Fragment {
       GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
       rvPosts.setLayoutManager(gridLayoutManager);
 
+      // Makes the fab visible whenever a new fragment starts
+      MainActivity.fab.show();
+
       // Makes the fab disappear when scrolling
       rvPosts.addOnScrollListener(new RecyclerView.OnScrollListener() {
          @Override
@@ -157,20 +160,29 @@ public class FavoritesFragment extends Fragment {
                      Log.e(TAG, "Issue with getting current user's favorite listings", e);
                      return;
                   }
+                  List <Listing> returnListings = new ArrayList<>();
+                  returnListings.addAll(listings);
+                  ParseRelation<ParseObject> relation = user.getRelation("purchases");
                   for (int i = 0; i < listings.size(); i++){
                      Listing listing = listings.get(i);
                      if (System.currentTimeMillis() > listing.getExpireTime().getTime()){
+                        relation.add(listing);
+                        user.saveInBackground();
                         listing.put("isSold", true);
                         listing.saveInBackground();
-                        listings.removeAll(Collections.singleton(listing));
+                        returnListings.removeAll(Collections.singleton(listing));
                      }
                   }
+
                   // Clears the adapter
                   adapter.clear();
-                  adapter.addAll(listings);
+                  adapter.addAll(returnListings);
 
                   // Save received posts to list and notify adapter of new data
                   swipeContainer.setRefreshing(false);
+                  for (Listing listing : listings){
+                     // Log.i(TAG, "Listing: " + listing.getDescription() + ", username: " + listing.getUser().getUsername());
+                  }
                }
             });
          }

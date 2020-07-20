@@ -21,8 +21,11 @@ import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -95,7 +98,7 @@ public class PurchasesFragment extends Fragment {
     }
 
     private void queryPurchases() {
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        final ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = ParseQuery.getQuery(Bid.class);
         // Only gets the currentUser's bids
         query.whereEqualTo("user", currentUser);
@@ -103,27 +106,46 @@ public class PurchasesFragment extends Fragment {
         query.include(Bid.KEY_LISTING);
         // Only displays items that have not been sold
         query.whereEqualTo("isCurrent", true);
-        // order posts by creation date (newest first)
+        // Order posts by creation date (newest first)
         query.addDescendingOrder("listing.expiresAt");
-        // start an asynchronous call for posts
+        // Start an asynchronous call for posts
+        // Updates the user's purchases
         query.findInBackground(new FindCallback<Bid>() {
             @Override
             public void done(List<Bid> bids, ParseException e) {
-                if (e != null){
+                if (e != null) {
                     Log.e(TAG, "Issue with getting listings", e);
                     return;
                 }
-                List<Listing> listings = new ArrayList<>();
+                ParseRelation<ParseObject> relation = currentUser.getRelation("purchases");
                 for (Bid bid : bids){
                     Listing listing = (Listing) bid.getListing();
                     if (listing.getBoolean("isSold")){
-                        listings.add(listing);
+                        relation.add(listing);
                     }
                 }
-                purchasesAdapter.clear();
-                purchasesAdapter.addAll(listings);
-                // Save received posts to list and notify adapter of new data
-                swipePurchases.setRefreshing(false);
+                currentUser.saveInBackground();
+
+                // Returns the purchases relation
+                currentUser.fetchInBackground(new GetCallback<ParseObject>() {
+                    @Override
+                    public void done(final ParseObject object, ParseException e) {
+                        ParseRelation<Listing> likedPosts = object.getRelation("purchases");
+                        ParseQuery<Listing> q = likedPosts.getQuery();
+                        q.addDescendingOrder(Listing.KEY_EXPIRATION);
+                        q.setLimit(20);
+                        q.findInBackground(new FindCallback<Listing>() {
+                            @Override
+                            public void done(List<Listing> listings, ParseException e) {
+                                purchasesAdapter.clear();
+                                purchasesAdapter.addAll(listings);
+                                // Save received posts to list and notify adapter of new data
+                                swipePurchases.setRefreshing(false);
+                            }
+                        });
+                    }
+                });
+
             }
         });
     }

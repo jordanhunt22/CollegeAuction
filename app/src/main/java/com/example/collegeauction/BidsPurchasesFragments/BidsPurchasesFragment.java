@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.BidsAdapter;
 import com.example.collegeauction.Adapters.PurchasesAdapter;
 import com.example.collegeauction.Models.Bid;
@@ -84,6 +85,9 @@ public class BidsPurchasesFragment extends Fragment {
 
             }
         });
+
+        // Makes the fab visible whenever a new fragment starts
+        MainActivity.fab.show();
 
         fragment = new BidsFragment();
         fragmentManager.beginTransaction().replace(R.id.flBidsPurchases, fragment).commit();

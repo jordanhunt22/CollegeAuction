@@ -112,6 +112,10 @@ public class HomeFragment extends Fragment {
 //        rvPosts.addOnScrollListener(scrollListener);
 //
 //
+        // Makes the fab visible whenever a new fragment starts
+        MainActivity.fab.show();
+
+        // Retrieves a user's favorited listings
         ParseUser user = ParseUser.getCurrentUser();
         user.fetchInBackground(new GetCallback<ParseObject>() {
             @Override
@@ -132,15 +136,15 @@ public class HomeFragment extends Fragment {
     }
 
     protected void queryListings() {
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        final ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
         // limit query to latest 20 items
         query.setLimit(20);
         // Only displays items that have not been sold yet
-        query.whereEqualTo("isSold", false);
+        // query.whereEqualTo("isSold", false);
         // order posts by creation date (newest first)
-        query.addAscendingOrder(Listing.KEY_CREATED);
+        query.addAscendingOrder(Listing.KEY_EXPIRATION);
         // Does not show the current user's posts
         query.whereNotEqualTo(Listing.KEY_USER, currentUser);
         // start an asynchronous call for posts
@@ -151,19 +155,23 @@ public class HomeFragment extends Fragment {
                     Log.e(TAG, "Issue with getting listings", e);
                     return;
                 }
-
+                List <Listing> returnListings = new ArrayList<>();
+                returnListings.addAll(listings);
+                ParseRelation<ParseObject> relation = currentUser.getRelation("purchases");
                 for (int i = 0; i < listings.size(); i++){
                     Listing listing = listings.get(i);
                     if (System.currentTimeMillis() > listing.getExpireTime().getTime()){
+                        relation.add(listing);
+                        currentUser.saveInBackground();
                         listing.put("isSold", true);
                         listing.saveInBackground();
-                        listings.removeAll(Collections.singleton(listing));
+                        returnListings.removeAll(Collections.singleton(listing));
                     }
                 }
 
                 // Clears the adapter
                 adapter.clear();
-                adapter.addAll(listings);
+                adapter.addAll(returnListings);
 
                 // Save received posts to list and notify adapter of new data
                 swipeContainer.setRefreshing(false);

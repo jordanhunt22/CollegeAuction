@@ -159,22 +159,17 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
         @SuppressLint("SetTextI18n")
         public void bind(final Listing listing) {
             // Create instance of date manipulator
-            if (listing.getExpireTime() != null && !listing.getBoolean("isSold")) {
+            if (listing.getExpireTime() != null) {
+                dateManipulator = new DateManipulator(listing.getExpireTime());
                 updater = new Runnable() {
                     @Override
                     public void run() {
-                        dateManipulator = new DateManipulator(listing.getExpireTime());
                         String date = dateManipulator.getDate();
                         tvTime.setText(date);
                         timerHandler.postDelayed(updater,1000);
                     }
                 };
                 timerHandler.post(updater);
-            }
-            // If the listing is sold,
-            else{
-                tvTime.setText("Expired " + TimeFormatter
-                        .getTimeDifference(listing.getDate("expiresAt").toString()) + " ago");
             }
             // Bind the listing data to the view elements
             tvName.setText(listing.getName());

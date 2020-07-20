@@ -20,12 +20,15 @@ import android.widget.TextView;
 import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.ListingsAdapter;
 import com.example.collegeauction.Activities.LoginActivity;
+import com.example.collegeauction.Adapters.PurchasesAdapter;
 import com.example.collegeauction.Miscellaneous.EndlessRecyclerViewScrollListener;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -41,7 +44,7 @@ public class ProfileFragment extends Fragment {
 
     private RecyclerView rvPosts;
     protected SwipeRefreshLayout swipeContainer;
-    private ListingsAdapter adapter;
+    private PurchasesAdapter adapter;
     private List<Listing> allListings;
     private EndlessRecyclerViewScrollListener scrollListener;
 
@@ -81,7 +84,7 @@ public class ProfileFragment extends Fragment {
         rvPosts = view.findViewById(R.id.rvPosts);
 
         allListings = new ArrayList<>();
-        adapter = new ListingsAdapter(getContext(), allListings);
+        adapter = new PurchasesAdapter(getContext(), allListings);
 
         // Set the adapter on the recycler view
         rvPosts.setAdapter(adapter);
@@ -89,6 +92,9 @@ public class ProfileFragment extends Fragment {
         // set the layout manager on the recycler view
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
         rvPosts.setLayoutManager(gridLayoutManager);
+
+        // Makes the fab visible whenever a new fragment starts
+        MainActivity.fab.show();
 
         // Makes the fab disappear when scrolling
         rvPosts.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -136,7 +142,7 @@ public class ProfileFragment extends Fragment {
     }
 
     private void queryUsersListings() {
-        ParseUser currentUser = ParseUser.getCurrentUser();
+        final ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
         // limit query to latest 20 items
@@ -154,17 +160,23 @@ public class ProfileFragment extends Fragment {
                     return;
                 }
 
+                List <Listing> returnListings = new ArrayList<>();
+                returnListings.addAll(listings);
+                ParseRelation<ParseObject> relation = currentUser.getRelation("purchases");
                 for (int i = 0; i < listings.size(); i++){
                     Listing listing = listings.get(i);
                     if (System.currentTimeMillis() > listing.getExpireTime().getTime()){
+                        relation.add(listing);
+                        currentUser.saveInBackground();
                         listing.put("isSold", true);
                         listing.saveInBackground();
+                        returnListings.removeAll(Collections.singleton(listing));
                     }
                 }
 
                 // Clears the adapter
                 adapter.clear();
-                adapter.addAll(listings);
+                adapter.addAll(returnListings);
 
                 // Save received posts to list and notify adapter of new data
                 swipeContainer.setRefreshing(false);
