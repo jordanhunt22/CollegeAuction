@@ -1,10 +1,12 @@
 package com.example.collegeauction.DetailFragments;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
@@ -20,26 +22,27 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.example.collegeauction.Miscellaneous.DateManipulator;
+import com.example.collegeauction.Miscellaneous.TimeFormatter;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
-import com.parse.FindCallback;
+import com.parse.DeleteCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseRelation;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
 import org.parceler.Parcels;
 
-import java.util.List;
 import java.util.Objects;
 
-public class BuyerDetailFragment extends Fragment {
+public class SellerDetailFragment extends Fragment {
 
     public static final String TAG = "BuyerDetailFragment";
 
@@ -50,29 +53,27 @@ public class BuyerDetailFragment extends Fragment {
     private TextView tvCurrentBid;
     private TextView tvTime;
     private ImageView ivListingImage;
-    private Button btnBid;
-    private TextInputEditText etBid;
+    private Button btnDelete;
 
-    private Bid bid;
+    private AlertDialog.Builder builder;
+
     private Bid lastBid;
     private Long minBid;
-    private Long numberBid;
     private DateManipulator dateManipulator;
 
     // For the runnable that updates the current bid
     Runnable updater;
     final Handler timerHandler = new Handler();
 
-
-    public BuyerDetailFragment(){
-        // Required empty constructor
+    public SellerDetailFragment() {
+        // Required empty public constructor
     }
 
-    @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflate the view
-        return inflater.inflate(R.layout.fragment_buyer_detail, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.fragment_seller_detail, container, false);
     }
 
     @Override
@@ -85,9 +86,10 @@ public class BuyerDetailFragment extends Fragment {
         tvLocation = view.findViewById(R.id.tvLocation);
         tvCurrentBid = view.findViewById(R.id.tvCurrentBid);
         tvTime = view.findViewById(R.id.tvTime);
-        etBid = view.findViewById(R.id.etBid);
-        btnBid = view.findViewById(R.id.btnBid);
         ivListingImage = view.findViewById(R.id.ivListingImage);
+        btnDelete = view.findViewById(R.id.btnDelete);
+
+         builder = new MaterialAlertDialogBuilder(getContext());
 
         // Gets the bundle with listing that was passed in
         Bundle args = getArguments();
@@ -103,46 +105,28 @@ public class BuyerDetailFragment extends Fragment {
                 .transform(new CenterCrop())
                 .into(ivListingImage);
 
-        // Set an onClickListener for when the user submits a bid
-        btnBid.setOnClickListener(new View.OnClickListener() {
+        // Allows the user to delete an item
+        btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (etBid.getText().toString().isEmpty()){
-                    Toast.makeText(getContext(), "Your bid cannot be empty!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                try {
-                    numberBid = Long.parseLong(etBid.getText().toString());
-                } catch (NumberFormatException e) {
-                    Log.e(TAG, "Your bid is not a valid number", e);
-                    Toast.makeText(getContext(), "Your bid is invalid. Try again", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (numberBid <= minBid ){
-                    Toast.makeText(getContext(), "Your bid is less than the current bid!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                else{
-                    bid = new Bid();
-                    bid.setUser(ParseUser.getCurrentUser());
-                    bid.setPrice(numberBid);
-                    bid.setListing(listing);
-                    bid.put("isCurrent", true);
-                    if (lastBid != null){
-                        lastBid.put("isCurrent", false);
-                        lastBid.saveInBackground();
-                    }
-                    bid.saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(ParseException e) {
-                            listing.setRecentBid(bid);
-                            listing.saveInBackground();
-                            tvCurrentBid.setText("$" + numberBid.toString());
-                            etBid.setText("");
-                        }
-                    });
-                }
+                builder
+                        // Add customization options here
+                        .setTitle("Are you sure you want to delete this listing?")
+                        .setNegativeButton("YES", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                listing.deleteInBackground(new DeleteCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        Toast.makeText(getContext(), "Your listing was successfully deleted", Toast.LENGTH_SHORT)
+                                                .show();
+                                        getActivity().finish();
+                                    }
+                                });
+                            }
+                        })
+                        .setPositiveButton("NO", null)
+                        .show();
             }
         });
 
@@ -168,8 +152,14 @@ public class BuyerDetailFragment extends Fragment {
                                     .toString());
                 }
 
-                String date = dateManipulator.getDate();
-                tvTime.setText(date);
+                if(System.currentTimeMillis() >= listing.getExpireTime().getTime()){
+                    tvTime.setText("Expired " + TimeFormatter
+                            .getTimeDifference(listing.getDate("expiresAt").toString()) + " ago");
+                }
+                else {
+                    String date = dateManipulator.getDate();
+                    tvTime.setText(date);
+                }
                 Log.i(TAG, "Handler is running");
                 timerHandler.postDelayed(updater,1000);
             }

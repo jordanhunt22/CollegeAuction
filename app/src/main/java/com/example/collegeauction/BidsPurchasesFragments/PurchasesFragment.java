@@ -130,9 +130,10 @@ public class PurchasesFragment extends Fragment {
                 currentUser.fetchInBackground(new GetCallback<ParseObject>() {
                     @Override
                     public void done(final ParseObject object, ParseException e) {
-                        ParseRelation<Listing> likedPosts = object.getRelation("purchases");
-                        ParseQuery<Listing> q = likedPosts.getQuery();
+                        ParseRelation<Listing> purchases = object.getRelation("purchases");
+                        ParseQuery<Listing> q = purchases.getQuery();
                         q.addDescendingOrder(Listing.KEY_EXPIRATION);
+                        q.include(Listing.KEY_BID);
                         q.setLimit(20);
                         q.findInBackground(new FindCallback<Listing>() {
                             @Override

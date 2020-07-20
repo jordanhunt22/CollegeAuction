@@ -62,31 +62,12 @@
         android:text="Current Bid: $5"
         android:textSize="18sp" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="12dp"
-        android:ems="10"
-        android:outlineProvider="bounds"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        app:prefixText="$">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etBid"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="bid"
-            android:inputType="number" />
-
-    </com.google.android.material.textfield.TextInputLayout>
-
     <Button
-        android:id="@+id/btnBid"
+        android:id="@+id/btnDelete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="Submit Bid" />
+        android:backgroundTint="#D50000"
+        android:text="Delete Listing" />
 
 </LinearLayout>

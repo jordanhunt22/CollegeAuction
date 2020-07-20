@@ -28,6 +28,7 @@ import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -100,9 +101,8 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
                         if (currentUser.getObjectId().equals(purchase.getUser().getObjectId())){
                             // Open the seller's detail view
                             Toast.makeText(context, "You are the seller!", Toast.LENGTH_SHORT).show();
-                            return;
                             // I still need to make a seller detail view
-                            // intent.putExtra("isSeller", true);
+                            intent.putExtra("viewType", "seller");
                         }
                         else{
                             // Open the buyer's detail view
@@ -112,7 +112,7 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
                             // Intent.putExtra("isSeller", false);
                         }
                         // Start the DetailsActivity
-                        // context.startActivity(intent);
+                        context.startActivity(intent);
                     }
                 }
             });
@@ -122,6 +122,16 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
 
             // Bind the listing data to the view elements
             tvName.setText(purchase.getName());
+
+            if (purchase.getRecentBid() != null){
+                tvBid.setText("$" + purchase.getRecentBid().getNumber(Bid.KEY_PRICE).toString());
+            }
+            else if(System.currentTimeMillis() <= purchase.getExpireTime().getTime()){
+                tvBid.setText("$" + purchase.getMinPrice().toString());
+            }
+            else{
+                tvBid.setText("NO SALE");
+            }
 
             ParseFile image = purchase.getImage();
             if (image != null) {
@@ -137,19 +147,20 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
                         .into(ivImage);
             }
 
-            String timeStamp = TimeFormatter
-                    .getTimeDifference(Objects
-                            .requireNonNull(purchase.getDate("expiresAt"))
-                            .toString());
-            // tvTime.setText("Expired " + timeStamp + " ago");
             // Create instance of date manipulator
             if (purchase.getExpireTime() != null && !purchase.getBoolean("isSold")) {
                 dateManipulator = new DateManipulator(purchase.getExpireTime());
                 updater = new Runnable() {
                     @Override
                     public void run() {
-                        String date = dateManipulator.getDate();
-                        tvTime.setText(date);
+                         if(System.currentTimeMillis() <= purchase.getExpireTime().getTime()){
+                             tvTime.setText("Expired " + TimeFormatter
+                                     .getTimeDifference(purchase.getDate("expiresAt").toString()) + " ago");
+                         }
+                         else {
+                             String date = dateManipulator.getDate();
+                             tvTime.setText(date);
+                         }
                         timerHandler.postDelayed(updater,1000);
                     }
                 };

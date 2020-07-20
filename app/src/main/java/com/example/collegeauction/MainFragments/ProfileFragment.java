@@ -141,6 +141,7 @@ public class ProfileFragment extends Fragment {
         queryUsersListings();
     }
 
+
     private void queryUsersListings() {
         final ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
@@ -160,29 +161,12 @@ public class ProfileFragment extends Fragment {
                     return;
                 }
 
-                List <Listing> returnListings = new ArrayList<>();
-                returnListings.addAll(listings);
-                ParseRelation<ParseObject> relation = currentUser.getRelation("purchases");
-                for (int i = 0; i < listings.size(); i++){
-                    Listing listing = listings.get(i);
-                    if (System.currentTimeMillis() > listing.getExpireTime().getTime()){
-                        relation.add(listing);
-                        currentUser.saveInBackground();
-                        listing.put("isSold", true);
-                        listing.saveInBackground();
-                        returnListings.removeAll(Collections.singleton(listing));
-                    }
-                }
-
                 // Clears the adapter
                 adapter.clear();
-                adapter.addAll(returnListings);
+                adapter.addAll(listings);
 
                 // Save received posts to list and notify adapter of new data
                 swipeContainer.setRefreshing(false);
-                for (Listing listing : listings){
-                    // Log.i(TAG, "Listing: " + listing.getDescription() + ", username: " + listing.getUser().getUsername());
-                }
             }
         });
     }

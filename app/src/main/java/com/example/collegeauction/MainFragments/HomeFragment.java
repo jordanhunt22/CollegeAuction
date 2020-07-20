@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.ListingsAdapter;
 import com.example.collegeauction.Miscellaneous.EndlessRecyclerViewScrollListener;
+import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.parse.FindCallback;
@@ -135,14 +136,14 @@ public class HomeFragment extends Fragment {
         });
     }
 
-    protected void queryListings() {
+    public void queryListings() {
         final ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
         // limit query to latest 20 items
         query.setLimit(20);
         // Only displays items that have not been sold yet
-        // query.whereEqualTo("isSold", false);
+        query.whereEqualTo("isSold", false);
         // order posts by creation date (newest first)
         query.addAscendingOrder(Listing.KEY_EXPIRATION);
         // Does not show the current user's posts
@@ -160,9 +161,13 @@ public class HomeFragment extends Fragment {
                 ParseRelation<ParseObject> relation = currentUser.getRelation("purchases");
                 for (int i = 0; i < listings.size(); i++){
                     Listing listing = listings.get(i);
+                    if(listing.getRecentBid() != null) {
+                        if (listing.getRecentBid().getParseUser(Bid.KEY_USER).equals(currentUser)) {
+                            relation.add(listing);
+                            currentUser.saveInBackground();
+                        }
+                    }
                     if (System.currentTimeMillis() > listing.getExpireTime().getTime()){
-                        relation.add(listing);
-                        currentUser.saveInBackground();
                         listing.put("isSold", true);
                         listing.saveInBackground();
                         returnListings.removeAll(Collections.singleton(listing));

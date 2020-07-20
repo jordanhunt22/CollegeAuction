@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.example.collegeauction.Activities.ListingDetailsActivity;
+import com.example.collegeauction.MainFragments.HomeFragment;
 import com.example.collegeauction.Miscellaneous.DateManipulator;
 import com.example.collegeauction.Miscellaneous.TimeFormatter;
 import com.example.collegeauction.Models.Bid;
@@ -32,6 +33,7 @@ import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -109,17 +111,15 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                         // Serialize the Post using parceler, use its short name as a key
                         intent.putExtra(Listing.class.getSimpleName(), Parcels.wrap(listing));
 
-                        if (currentUser.getObjectId().equals(listing.getUser().getObjectId())){
-                            // Open the seller's detail view
-                            Toast.makeText(context, "You are the seller!", Toast.LENGTH_SHORT).show();
-                            return;
-                            // I still need to make a seller detail view
-                            // intent.putExtra("isSeller", true);
-                        }
-                        else{
+//                        if (currentUser.getObjectId().equals(listing.getUser().getObjectId())){
+//                            // Open the seller's detail view
+//                            Toast.makeText(context, "You are the seller!", Toast.LENGTH_SHORT).show();
+//                            intent.putExtra("viewType", "seller");
+//                        }
+//                        else{
                             // open the buyer's detail view
-                            intent.putExtra("isSeller", false);
-                        }
+                            intent.putExtra("viewType", "buyer");
+//                        }
                         // Start the DetailsActivity
                         context.startActivity(intent);
                     }
@@ -164,6 +164,11 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                 updater = new Runnable() {
                     @Override
                     public void run() {
+                        if(System.currentTimeMillis() >= listing.getExpireTime().getTime()){
+                            listings.removeAll(Collections.singleton(listing));
+                            notifyDataSetChanged();
+                            listing.put("isSold", true);
+                        }
                         String date = dateManipulator.getDate();
                         tvTime.setText(date);
                         timerHandler.postDelayed(updater,1000);

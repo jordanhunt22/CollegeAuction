@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.example.collegeauction.CreationFragments.CreationFragment;
 import com.example.collegeauction.DetailFragments.BuyerDetailFragment;
+import com.example.collegeauction.DetailFragments.SellerDetailFragment;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.example.collegeauction.databinding.ActivityCreationBinding;
@@ -22,7 +23,7 @@ public class ListingDetailsActivity extends AppCompatActivity {
     final FragmentManager fragmentManager = getSupportFragmentManager();
     private Fragment fragment;
     private Listing listing;
-    private Boolean isSeller;
+    private String viewType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,17 +46,20 @@ public class ListingDetailsActivity extends AppCompatActivity {
 
         // Get whether the user is a buyer or not
         // use in listingsAdapter class --> intent.putExtra("yourBoolName", true);
-        isSeller = getIntent().getExtras().getBoolean("isSeller");
+        viewType = getIntent().getExtras().getString("viewType");
 
         // Sets the toolbar text to nothing
         getSupportActionBar().setTitle("");
         setContentView(R.layout.activity_creation);
 
-        if (isSeller){
-            // fragment = new SellerDetailFragment();
+        if (viewType.equals("seller")){
+            fragment = new SellerDetailFragment();
+        }
+        else if (viewType.equals("buyer")){
+            fragment = new BuyerDetailFragment();
         }
         else{
-            fragment = new BuyerDetailFragment();
+            // fragment = new PurchasedDetailView();
         }
 
         Bundle args = new Bundle();
