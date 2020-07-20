@@ -36,7 +36,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
                 android:background="@drawable/star"
-                android:backgroundTint="@android:color/holo_red_light" />
+                android:backgroundTint="#304FFE" />
         </RelativeLayout>
 
         <RelativeLayout
