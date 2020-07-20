@@ -1,5 +1,6 @@
 package com.example.collegeauction.Adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -107,9 +108,8 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
                         else{
                             // Open the buyer's detail view
                             Toast.makeText(context, "You already bought this item!", Toast.LENGTH_SHORT).show();
-                            return;
                             // open the buyer's detail view
-                            // Intent.putExtra("isSeller", false);
+                            intent.putExtra("viewType", "purchased");
                         }
                         // Start the DetailsActivity
                         context.startActivity(intent);
@@ -118,6 +118,7 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
             });
         }
 
+        @SuppressLint("SetTextI18n")
         public void bind(final Listing purchase) {
 
             // Bind the listing data to the view elements
@@ -151,6 +152,7 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
             if (purchase.getExpireTime() != null && !purchase.getBoolean("isSold")) {
                 dateManipulator = new DateManipulator(purchase.getExpireTime());
                 updater = new Runnable() {
+                    @SuppressLint("SetTextI18n")
                     @Override
                     public void run() {
                          if(System.currentTimeMillis() <= purchase.getExpireTime().getTime()){

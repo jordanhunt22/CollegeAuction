@@ -44,7 +44,7 @@ import java.util.Objects;
 
 public class SellerDetailFragment extends Fragment {
 
-    public static final String TAG = "BuyerDetailFragment";
+    public static final String TAG = "SellerDetailFragment";
 
     private Listing listing;
     private TextView tvName;

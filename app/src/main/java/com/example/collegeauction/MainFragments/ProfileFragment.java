@@ -43,6 +43,7 @@ public class ProfileFragment extends Fragment {
     private TextView tvUsername;
 
     private RecyclerView rvPosts;
+    private TextView tvEmpty;
     protected SwipeRefreshLayout swipeContainer;
     private PurchasesAdapter adapter;
     private List<Listing> allListings;
@@ -62,6 +63,10 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        tvEmpty = view.findViewById(R.id.tvEmpty);
+        tvEmpty.setText("You have no items listed");
+        tvEmpty.setVisibility(View.GONE);
 
         // Lookup the swipe container view
         swipeContainer = view.findViewById(R.id.swipeContainer);
@@ -165,6 +170,12 @@ public class ProfileFragment extends Fragment {
                 adapter.clear();
                 adapter.addAll(listings);
 
+                if (listings.isEmpty()){
+                    tvEmpty.setVisibility(View.VISIBLE);
+                }
+                else{
+                    tvEmpty.setVisibility(View.GONE);
+                }
                 // Save received posts to list and notify adapter of new data
                 swipeContainer.setRefreshing(false);
             }

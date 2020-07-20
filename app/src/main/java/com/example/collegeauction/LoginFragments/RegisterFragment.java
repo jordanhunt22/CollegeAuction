@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +69,8 @@ public class RegisterFragment extends Fragment {
                 createUser(username, password, phoneNumber, email);
             }
         });
+
+        etNumber.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
     }
     private void createUser(final String username, final String password, final String number, final String email) {
         // Create the ParseUser

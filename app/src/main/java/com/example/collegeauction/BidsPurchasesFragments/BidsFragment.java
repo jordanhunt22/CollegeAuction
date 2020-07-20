@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.BidsAdapter;
@@ -33,11 +34,9 @@ public class BidsFragment extends Fragment {
     public static final String TAG = "BidsFragment";
 
     private RecyclerView rvBids;
-
+    private TextView tvEmpty;
     private SwipeRefreshLayout swipeBids;
-
     private BidsAdapter bidsAdapter;
-
     private List<Bid> allBids;
 
     public BidsFragment() {
@@ -54,6 +53,10 @@ public class BidsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        tvEmpty = view.findViewById(R.id.tvEmpty);
+        tvEmpty.setVisibility(View.GONE);
+
 
         // Look up the RecyclerViews
         rvBids = view.findViewById(R.id.rvBids);
@@ -116,6 +119,13 @@ public class BidsFragment extends Fragment {
                 // Clears the adapter
                 bidsAdapter.clear();
                 bidsAdapter.addAll(bids);
+
+                if (bids.isEmpty()){
+                    tvEmpty.setVisibility(View.VISIBLE);
+                }
+                else{
+                    tvEmpty.setVisibility(View.GONE);
+                }
 
                 // Save received posts to list and notify adapter of new data
                 swipeBids.setRefreshing(false);

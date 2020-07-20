@@ -78,12 +78,4 @@
         android:text="(510)123-4567"
         android:textSize="18sp" />
 
-    <Button
-        android:id="@+id/btnDelete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:backgroundTint="#D50000"
-        android:text="Delete Listing" />
-
 </LinearLayout>

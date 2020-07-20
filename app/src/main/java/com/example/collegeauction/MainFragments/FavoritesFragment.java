@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.ListingsAdapter;
@@ -36,6 +37,7 @@ public class FavoritesFragment extends Fragment {
    public static final String TAG = "HomeFragment";
 
    private RecyclerView rvPosts;
+   private TextView tvEmpty;
    protected SwipeRefreshLayout swipeContainer;
    private ListingsAdapter adapter;
    private List<Listing> favoriteListings;
@@ -55,6 +57,10 @@ public class FavoritesFragment extends Fragment {
    @Override
    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
       super.onViewCreated(view, savedInstanceState);
+
+      tvEmpty = view.findViewById(R.id.tvEmpty);
+      tvEmpty.setText("You have no favorites");
+      tvEmpty.setVisibility(View.GONE);
 
       // Lookup the swipe container view
       swipeContainer = view.findViewById(R.id.swipeContainer);
@@ -177,6 +183,14 @@ public class FavoritesFragment extends Fragment {
                   // Clears the adapter
                   adapter.clear();
                   adapter.addAll(returnListings);
+
+                  // Shows text if the RecyclerView is empty
+                  if (favoriteListings.isEmpty()){
+                     tvEmpty.setVisibility(View.VISIBLE);
+                  }
+                  else{
+                     tvEmpty.setVisibility(View.GONE);
+                  }
 
                   // Save received posts to list and notify adapter of new data
                   swipeContainer.setRefreshing(false);

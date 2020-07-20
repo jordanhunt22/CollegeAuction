@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.example.collegeauction.CreationFragments.CreationFragment;
 import com.example.collegeauction.DetailFragments.BuyerDetailFragment;
+import com.example.collegeauction.DetailFragments.PurchasedDetailFragment;
 import com.example.collegeauction.DetailFragments.SellerDetailFragment;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
@@ -59,7 +60,7 @@ public class ListingDetailsActivity extends AppCompatActivity {
             fragment = new BuyerDetailFragment();
         }
         else{
-            // fragment = new PurchasedDetailView();
+            fragment = new PurchasedDetailFragment();
         }
 
         Bundle args = new Bundle();

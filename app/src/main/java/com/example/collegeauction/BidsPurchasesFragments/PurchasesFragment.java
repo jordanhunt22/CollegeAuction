@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.BidsAdapter;
@@ -36,11 +37,9 @@ public class PurchasesFragment extends Fragment {
     public static final String TAG = "PurchasesFragment";
 
     private RecyclerView rvPurchases;
-
+    private TextView tvEmpty;
     private SwipeRefreshLayout swipePurchases;
-
     private PurchasesAdapter purchasesAdapter;
-
     private List<Listing> allPurchases;
 
 
@@ -58,6 +57,9 @@ public class PurchasesFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        tvEmpty = view.findViewById(R.id.tvEmpty);
+        tvEmpty.setVisibility(View.GONE);
 
         // Look up the RecyclerViews
         rvPurchases = view.findViewById(R.id.rvPurchases);
@@ -140,6 +142,14 @@ public class PurchasesFragment extends Fragment {
                             public void done(List<Listing> listings, ParseException e) {
                                 purchasesAdapter.clear();
                                 purchasesAdapter.addAll(listings);
+
+                                if (listings.isEmpty()){
+                                    tvEmpty.setVisibility(View.VISIBLE);
+                                }
+                                else{
+                                    tvEmpty.setVisibility(View.GONE);
+                                }
+
                                 // Save received posts to list and notify adapter of new data
                                 swipePurchases.setRefreshing(false);
                             }

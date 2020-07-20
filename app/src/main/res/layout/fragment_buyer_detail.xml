@@ -7,11 +7,17 @@
     android:orientation="vertical"
     tools:context=".DetailFragments.BuyerDetailFragment">
 
-    <ImageView
-        android:id="@+id/ivListingImage"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        tools:src="@tools:sample/backgrounds/scenic" />
+        app:cardCornerRadius="12dp">
+
+        <ImageView
+            android:id="@+id/ivListingImage"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            tools:src="@tools:sample/backgrounds/scenic" />
+    </androidx.cardview.widget.CardView>
 
     <TextView
         android:id="@+id/tvName"
@@ -63,6 +69,7 @@
         android:textSize="18sp" />
 
     <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
@@ -70,7 +77,6 @@
         android:layout_marginEnd="12dp"
         android:ems="10"
         android:outlineProvider="bounds"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         app:prefixText="$">
 
         <com.google.android.material.textfield.TextInputEditText
