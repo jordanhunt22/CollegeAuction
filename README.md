@@ -9,7 +9,7 @@
 ## Overview
 ### Description
 
-This app creates a platform for college students to but and sell items from each other.
+This app creates a platform for college students to buy and sell items from each other.
 
 ### App Evaluation
 
