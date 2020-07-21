@@ -19,6 +19,7 @@ import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.ListingsAdapter;
 import com.example.collegeauction.Miscellaneous.EndlessRecyclerViewScrollListener;
 import com.example.collegeauction.Models.Bid;
+import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.parse.FindCallback;
@@ -123,21 +124,19 @@ public class HomeFragment extends Fragment {
 
         // Retrieves a user's favorited listings
         ParseUser user = ParseUser.getCurrentUser();
-        user.fetchInBackground(new GetCallback<ParseObject>() {
-            @Override
-            public void done(final ParseObject object, ParseException e) {
-                ParseRelation<Listing> likedPosts = object.getRelation("favoritedListings");
-                ParseQuery<Listing> q = likedPosts.getQuery();
-                q.findInBackground(new FindCallback<Listing>() {
+        ParseQuery query = ParseQuery.getQuery(Favorite.class);
+        // Includes the listing and user for every listing
+        query.include(Favorite.KEY_LISTING);
+        query.include(Favorite.KEY_USER);
+        query.whereEqualTo(Favorite.KEY_USER, user);
+        query.findInBackground(new FindCallback<Favorite>() {
                     @Override
-                    public void done(List<Listing> objects, ParseException e) {
-                        for(Listing listing : objects) {
-                            Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
+                    public void done(List<Favorite> favorites, ParseException e) {
+                        for(Favorite favorite : favorites) {
+                            Listing.listingsFavoritedByCurrentuser.add(favorite.getListing().getObjectId());
                         }
                         queryListings();
                     }
-                });
-            }
         });
     }
 

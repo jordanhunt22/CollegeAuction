@@ -14,10 +14,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.ListingsAdapter;
 import com.example.collegeauction.Miscellaneous.EndlessRecyclerViewScrollListener;
+import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.parse.FindCallback;
@@ -28,8 +30,10 @@ import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class FavoritesFragment extends Fragment {
@@ -121,87 +125,55 @@ public class FavoritesFragment extends Fragment {
 //        rvPosts.addOnScrollListener(scrollListener);
 //
 //
-      ParseUser user = ParseUser.getCurrentUser();
-      user.fetchInBackground(new GetCallback<ParseObject>() {
-         @Override
-         public void done(final ParseObject object, ParseException e) {
-            ParseRelation<Listing> likedPosts = object.getRelation("favoritedListings");
-            ParseQuery<Listing> q = likedPosts.getQuery();
-            q.findInBackground(new FindCallback<Listing>() {
-               @Override
-               public void done(List<Listing> objects, ParseException e) {
-                  for(Listing listing : objects) {
-                     Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
-                  }
-                  queryListings();
-               }
-            });
-         }
-      });
+      queryListings();
+
    }
 
    protected void queryListings() {
-      final ParseUser user = ParseUser.getCurrentUser();
-      user.fetchInBackground(new GetCallback<ParseObject>() {
+      // Retrieves a user's favorited listings
+      ParseUser user = ParseUser.getCurrentUser();
+      ParseQuery query = ParseQuery.getQuery(Favorite.class);
+      // Includes the listing and user for every listing
+      query.include(Favorite.KEY_LISTING);
+      query.include(Favorite.KEY_USER);
+      query.include("listing.mostRecentBid");
+      query.whereEqualTo(Favorite.KEY_USER, user);
+      query.addAscendingOrder("listing.expiresAt");
+      query.findInBackground(new FindCallback<Favorite>() {
          @Override
-         public void done(final ParseObject object, ParseException e) {
+         public void done(List<Favorite> favorites, ParseException e) {
             if (e != null){
-               Log.e(TAG, "Issue with getting current user", e);
-               return;
+               Toast.makeText(getContext(), "Error getting favorite posts", Toast.LENGTH_SHORT).show();
             }
-            ParseRelation<Listing> favoritedPosts = object.getRelation("favoritedListings");
-            ParseQuery<Listing> q = favoritedPosts.getQuery();
-            // Add in ascending order?
-            q.addAscendingOrder("createdAt");
-            // Does not show the current user's posts
-            q.whereNotEqualTo(Listing.KEY_USER, user);
-            // Only displays items that have not been sold yet
-            q.whereEqualTo("isSold", false);
-            // Includes the most recent bid
-            q.include(Listing.KEY_BID);
-            q.findInBackground(new FindCallback<Listing>() {
-               @Override
-               public void done(List<Listing> listings, ParseException e) {
-                  if (e != null){
-                     Log.e(TAG, "Issue with getting current user's favorite listings", e);
-                     return;
-                  }
-                  List <Listing> returnListings = new ArrayList<>();
-                  returnListings.addAll(listings);
-                  ParseRelation<ParseObject> relation = user.getRelation("purchases");
-                  for (int i = 0; i < listings.size(); i++){
-                     Listing listing = listings.get(i);
-                     if (System.currentTimeMillis() > listing.getExpireTime().getTime()){
-                        relation.add(listing);
-                        user.saveInBackground();
-                        listing.put("isSold", true);
-                        listing.saveInBackground();
-                        returnListings.removeAll(Collections.singleton(listing));
-                     }
-                  }
-
-                  // Clears the adapter
-                  adapter.clear();
-                  adapter.addAll(returnListings);
-
-                  // Shows text if the RecyclerView is empty
-                  if (favoriteListings.isEmpty()){
-                     tvEmpty.setVisibility(View.VISIBLE);
-                  }
-                  else{
-                     tvEmpty.setVisibility(View.GONE);
-                  }
-
-                  // Save received posts to list and notify adapter of new data
-                  swipeContainer.setRefreshing(false);
-                  for (Listing listing : listings){
-                     // Log.i(TAG, "Listing: " + listing.getDescription() + ", username: " + listing.getUser().getUsername());
-                  }
+            List<Listing> listings = new ArrayList<>();
+            for(Favorite favorite : favorites) {
+               Listing listing = (Listing) favorite.getListing();
+               if (listing.getExpireTime().getTime() >= System.currentTimeMillis()) {
+                  Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
+                  listings.add(listing);
                }
-            });
+            }
+
+            // Clears the adapter
+            adapter.clear();
+            adapter.addAll(listings);
+
+            // Shows text if the RecyclerView is empty
+            if (favoriteListings.isEmpty()){
+            tvEmpty.setVisibility(View.VISIBLE);
+            }
+            else{
+            tvEmpty.setVisibility(View.GONE);
+            }
+
+            // Save received posts to list and notify adapter of new data
+            swipeContainer.setRefreshing(false);
+
          }
       });
    }
+
+
 
    @Override
    public void onResume() {

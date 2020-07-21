@@ -136,6 +136,7 @@ public class PurchasesFragment extends Fragment {
                         ParseQuery<Listing> q = purchases.getQuery();
                         q.addDescendingOrder(Listing.KEY_EXPIRATION);
                         q.include(Listing.KEY_BID);
+                        q.include(Listing.KEY_USER);
                         q.setLimit(20);
                         q.findInBackground(new FindCallback<Listing>() {
                             @Override

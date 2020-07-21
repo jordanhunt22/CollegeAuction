@@ -155,7 +155,7 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void run() {
-                         if(System.currentTimeMillis() <= purchase.getExpireTime().getTime()){
+                         if(System.currentTimeMillis() >= purchase.getExpireTime().getTime()){
                              tvTime.setText("Expired " + TimeFormatter
                                      .getTimeDifference(purchase.getDate("expiresAt").toString()) + " ago");
                          }

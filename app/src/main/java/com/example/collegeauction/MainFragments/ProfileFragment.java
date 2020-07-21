@@ -151,6 +151,7 @@ public class ProfileFragment extends Fragment {
         final ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
+        query.include(Listing.KEY_USER);
         // limit query to latest 20 items
         query.setLimit(20);
         // only shows listings where the current user is the seller

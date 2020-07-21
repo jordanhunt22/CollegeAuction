@@ -50,6 +50,7 @@ public class SellerDetailFragment extends Fragment {
     private TextView tvName;
     private TextView tvDescription;
     private TextView tvLocation;
+    private TextView tvNumber;
     private TextView tvCurrentBid;
     private TextView tvTime;
     private ImageView ivListingImage;
@@ -83,6 +84,7 @@ public class SellerDetailFragment extends Fragment {
         // Resolve all of the view elements
         tvName = view.findViewById(R.id.tvName);
         tvDescription = view.findViewById(R.id.tvDescription);
+        tvNumber = view.findViewById(R.id.tvNumber);
         tvLocation = view.findViewById(R.id.tvLocation);
         tvCurrentBid = view.findViewById(R.id.tvCurrentBid);
         tvTime = view.findViewById(R.id.tvTime);
@@ -96,6 +98,8 @@ public class SellerDetailFragment extends Fragment {
 
         // Unwraps the listings
         listing = Parcels.unwrap(args.getParcelable("listing"));
+
+        tvNumber.setVisibility(View.GONE);
 
         tvName.setText(listing.getName());
         tvDescription.setText("Description: " + listing.getDescription());
@@ -145,16 +149,25 @@ public class SellerDetailFragment extends Fragment {
                                     .toString()));
                 }
                 else{
-                    minBid =(Long) listing
-                            .getLong("minPrice");
-                    tvCurrentBid
-                            .setText("$" + minBid
-                                    .toString());
+                    if (System.currentTimeMillis() >= listing.getExpireTime().getTime()){
+                        tvTime.setText("NO SALE");
+                        listing.put("isSold", true);
+                        listing.saveInBackground();
+                    }
+                    else {
+                        minBid = (Long) listing
+                                .getLong("minPrice");
+                        tvCurrentBid
+                                .setText("$" + minBid
+                                        .toString());
+                    }
                 }
 
                 if(System.currentTimeMillis() >= listing.getExpireTime().getTime()){
                     tvTime.setText("Expired " + TimeFormatter
                             .getTimeDifference(listing.getDate("expiresAt").toString()) + " ago");
+                    listing.put("isSold", true);
+                    listing.saveInBackground();
                 }
                 else {
                     String date = dateManipulator.getDate();
@@ -166,13 +179,32 @@ public class SellerDetailFragment extends Fragment {
         };
         timerHandler.post(updater);
 
+        if (listing.getBoolean("isSold")){
+            if (listing.getRecentBid() != null){
+                tvNumber.setVisibility(View.VISIBLE);
+                ParseUser buyer = null;
+                try {
+                    buyer = listing.getRecentBid().getParseUser(Bid.KEY_USER)
+                            .fetchIfNeeded();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    tvNumber.setText("Error getting number");
+                    return;
+                }
+                String buyersNumber = buyer.getString("phoneNumber");
+                tvNumber.setText(buyersNumber);
+            }
+            else{
+                tvCurrentBid.setText("NO SALE");
+            }
+        }
     }
 
     public void getCurrentBids(){
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Listing");
         query.include(Listing.KEY_BID);
         // Retrieve the object by id
-        query.getInBackground(listing.getObjectId().toString(), new GetCallback<ParseObject>() {
+        query.getInBackground(listing.getObjectId(), new GetCallback<ParseObject>() {
             public void done(ParseObject cloudListing, ParseException e) {
                 if (e == null) {
                     listing = (Listing) cloudListing;

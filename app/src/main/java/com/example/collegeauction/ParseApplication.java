@@ -3,7 +3,9 @@ package com.example.collegeauction;
 import android.app.Application;
 
 import com.example.collegeauction.Models.Bid;
+import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
+import com.example.collegeauction.Models.Purchase;
 import com.parse.Parse;
 import com.parse.ParseObject;
 
@@ -14,6 +16,8 @@ public class ParseApplication extends Application {
         // Register Parse models
         ParseObject.registerSubclass(Listing.class);
         ParseObject.registerSubclass(Bid.class);
+        ParseObject.registerSubclass(Favorite.class);
+        ParseObject.registerSubclass(Purchase.class);
 
         // Set applicationId, and server server based on the values in the Heroku settings.
         // ClientKey is not needed unless explicitly configured

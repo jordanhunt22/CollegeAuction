@@ -24,10 +24,14 @@ import com.example.collegeauction.MainFragments.HomeFragment;
 import com.example.collegeauction.Miscellaneous.DateManipulator;
 import com.example.collegeauction.Miscellaneous.TimeFormatter;
 import com.example.collegeauction.Models.Bid;
+import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
+import com.parse.FindCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
@@ -141,16 +145,27 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                         if (isFavorite(listing)) {
                             btnFav.setBackground(context.getDrawable(R.drawable.star));
                             Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(listing.getObjectId()));
-                            relation.remove(listing);
-                            Log.i(TAG, "unlike");
+                            ParseQuery query = ParseQuery.getQuery(Favorite.class);
+                            query.whereEqualTo(Favorite.KEY_USER, user);
+                            query.whereEqualTo(Favorite.KEY_LISTING, listing);
+                            query.findInBackground(new FindCallback<Favorite>() {
+                                @Override
+                                public void done(List<Favorite> favorites, ParseException e) {
+                                    for (Favorite favorite : favorites)
+                                        favorite.deleteInBackground();
+                                }
+                            });
+                            Log.i(TAG, "unfavorite");
                         }
                         else{
                             btnFav.setBackground(context.getDrawable(R.drawable.star_active));
-                            relation.add(listing);
                             Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
-                            Log.i(TAG, "like");
+                            Favorite favorite = new Favorite();
+                            favorite.setListing(listing);
+                            favorite.setUser(user);
+                            favorite.saveInBackground();
+                            Log.i(TAG, "favorite");
                         }
-                        user.saveInBackground();
                     }
                 }
             });
@@ -167,7 +182,6 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                         if(System.currentTimeMillis() >= listing.getExpireTime().getTime()){
                             listings.removeAll(Collections.singleton(listing));
                             notifyDataSetChanged();
-                            listing.put("isSold", true);
                         }
                         String date = dateManipulator.getDate();
                         tvTime.setText(date);
