@@ -26,6 +26,7 @@ import com.example.collegeauction.Miscellaneous.TimeFormatter;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
+import com.example.collegeauction.Models.Purchase;
 import com.example.collegeauction.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -180,6 +181,8 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                     @Override
                     public void run() {
                         if(System.currentTimeMillis() >= listing.getExpireTime().getTime()){
+                            listing.put("isSold", true);
+                            listing.saveInBackground();
                             listings.removeAll(Collections.singleton(listing));
                             notifyDataSetChanged();
                         }

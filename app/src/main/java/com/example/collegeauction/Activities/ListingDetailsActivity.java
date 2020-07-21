@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.example.collegeauction.CreationFragments.CreationFragment;
 import com.example.collegeauction.DetailFragments.BuyerDetailFragment;
+import com.example.collegeauction.DetailFragments.MapsFragment;
 import com.example.collegeauction.DetailFragments.PurchasedDetailFragment;
 import com.example.collegeauction.DetailFragments.SellerDetailFragment;
 import com.example.collegeauction.Models.Listing;
@@ -62,6 +63,8 @@ public class ListingDetailsActivity extends AppCompatActivity {
         else{
             fragment = new PurchasedDetailFragment();
         }
+
+//        fragment = new MapsFragment();
 
         Bundle args = new Bundle();
         args.putParcelable("listing", Parcels.wrap(listing));
