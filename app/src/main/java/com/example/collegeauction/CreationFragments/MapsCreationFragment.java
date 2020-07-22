@@ -1,4 +1,4 @@
-package com.example.collegeauction.DetailFragments;
+package com.example.collegeauction.CreationFragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -23,10 +23,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.collegeauction.Activities.ListingDetailsActivity;
+import com.example.collegeauction.DetailFragments.MapsFragment;
 import com.example.collegeauction.Miscellaneous.CustomWindowAdapter;
 import com.example.collegeauction.R;
 import com.google.android.gms.common.ConnectionResult;
@@ -58,7 +60,7 @@ import permissions.dispatcher.RuntimePermissions;
 import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 
 @RuntimePermissions
-public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickListener {
+public class MapsCreationFragment extends Fragment implements GoogleMap.OnMapLongClickListener {
 
 
     private SupportMapFragment mapFragment;
@@ -70,13 +72,21 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
 
     private final static String KEY_LOCATION = "location";
 
+    private Marker marker;
+
+    private TextView tvLocation;
+    private Button btnCancel;
+    private Button btnOK;
+
+    private Boolean justStarted;
+
     /*
      * Define a request code to send to Google Play services This code is
      * returned in Activity.onActivityResult
      */
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
-    public MapsFragment() {
+    public MapsCreationFragment() {
         // Required empty public constructor
     }
 
@@ -84,12 +94,33 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout
-        return inflater.inflate(R.layout.fragment_maps, container, false);
+        return inflater.inflate(R.layout.fragment_maps_creation, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        justStarted = true;
+
+        tvLocation = view.findViewById(R.id.tvLocation);
+        btnCancel = view.findViewById(R.id.btnCancel);
+        btnOK = view.findViewById(R.id.btnOK);
+
+        // Sends the user back to the creation page
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getActivity().onBackPressed();
+            }
+        });
+
+        btnOK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getActivity().onBackPressed();
+            }
+        });
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
             throw new IllegalStateException("You forgot to supply a Google Maps API key");
@@ -118,6 +149,7 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
         } else {
             Toast.makeText(getContext(), "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
         }
+
     }
 
     protected void loadMap(GoogleMap googleMap) {
@@ -128,8 +160,8 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
 
             // Map is ready
             Toast.makeText(getContext(), "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
-            MapsFragmentPermissionsDispatcher.getMyLocationWithPermissionCheck(this);
-            MapsFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
+            MapsCreationFragmentPermissionsDispatcher.getMyLocationWithPermissionCheck(this);
+            MapsCreationFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
         } else {
             Toast.makeText(getContext(), "Error - Map was null!!", Toast.LENGTH_SHORT).show();
         }
@@ -139,7 +171,7 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        MapsFragmentPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+        MapsCreationFragmentPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
     }
 
     @SuppressWarnings({"MissingPermission"})
@@ -199,7 +231,7 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
             // If Google Play services can provide an error dialog
             if (errorDialog != null) {
                 // Create a new DialogFragment for the error dialog
-                ErrorDialogFragment errorFragment = new ErrorDialogFragment();
+                MapsFragment.ErrorDialogFragment errorFragment = new MapsFragment.ErrorDialogFragment();
                 errorFragment.setDialog(errorDialog);
                 errorFragment.show(getActivity().getSupportFragmentManager(), "Location Updates");
             }
@@ -220,9 +252,9 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
             map.animateCamera(cameraUpdate);
         } else {
-            Toast.makeText(getContext(), "Current location was null, enable GPS on emulator!", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getContext(), "Current location was null, enable GPS on emulator!", Toast.LENGTH_SHORT).show();
         }
-        MapsFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
+        MapsCreationFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
     }
 
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
@@ -263,11 +295,16 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
         if (location == null) {
             return;
         }
-        // Report to the UI that the location was updated
 
         mCurrentLocation = location;
-        LatLng current = new LatLng(mCurrentLocation.getLatitude(),  mCurrentLocation.getLongitude());
-        map.moveCamera(CameraUpdateFactory.newLatLng(current));
+
+        if (justStarted){
+            LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
+            map.animateCamera(cameraUpdate);
+            justStarted = false;
+        }
+
 
 //        String msg = "Updated Location: " +
 //                location.getLatitude() + "," +
@@ -283,56 +320,20 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
     @Override
     public void onMapLongClick(LatLng point) {
         Toast.makeText(getContext(), "Long Press", Toast.LENGTH_SHORT).show();
-        // Custom code here...
-        // Display the alert dialog
-        showAlertDialogForPoint(point);
-    }
-
-    // Display the alert that adds the marker
-    private void showAlertDialogForPoint(final LatLng point) {
-        // inflate message_item.xml view
-        View messageView = LayoutInflater.from(getActivity()).
-                inflate(R.layout.message_item, null);
-        // Create alert dialog builder
-        AlertDialog.Builder alertDialogBuilder = new MaterialAlertDialogBuilder(getContext());
-        // set message_item.xml to AlertDialog builder
-        alertDialogBuilder.setView(messageView);
-
-        // Create alert dialog
-        final AlertDialog alertDialog = alertDialogBuilder.create();
-
-        // Configure dialog button (OK)
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Define color of marker icon
-                        BitmapDescriptor defaultMarker =
-                                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
-                        // Extract content from alert dialog
-                        String title = ((EditText) alertDialog.findViewById(R.id.etTitle)).
-                                getText().toString();
-                        String snippet = ((EditText) alertDialog.findViewById(R.id.etSnippet)).
-                                getText().toString();
-                        // Creates and adds marker to the map
-                        Marker marker = map.addMarker(new MarkerOptions()
-                                .position(point)
-                                .title(title)
-                                .snippet(snippet)
-                                .icon(defaultMarker));
-                        // Animate marker using drop effect
-                        dropPinEffect(marker);
-                    }
-                });
-
-        // Configure dialog button (Cancel)
-        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) { dialog.cancel(); }
-                });
-
-        // Display the dialog
-        alertDialog.show();
+        // Define color of marker icon
+        BitmapDescriptor defaultMarker =
+                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+        // Clears the last marker
+        map.clear();
+        // Creates and adds marker to the map
+        marker = map.addMarker(new MarkerOptions()
+                .position(point)
+                .title("Your location")
+                .icon(defaultMarker));
+        // Animate marker using drop effect
+        dropPinEffect(marker);
+        // Adds the point to the CreationFragment class
+        CreationFragment.point = point;
     }
 
     private void dropPinEffect(final Marker marker) {

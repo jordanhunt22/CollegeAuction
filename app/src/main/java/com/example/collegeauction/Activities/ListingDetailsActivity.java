@@ -64,8 +64,6 @@ public class ListingDetailsActivity extends AppCompatActivity {
             fragment = new PurchasedDetailFragment();
         }
 
-//        fragment = new MapsFragment();
-
         Bundle args = new Bundle();
         args.putParcelable("listing", Parcels.wrap(listing));
         fragment.setArguments(args);

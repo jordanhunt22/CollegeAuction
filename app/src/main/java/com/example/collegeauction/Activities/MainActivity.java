@@ -131,7 +131,8 @@ public class MainActivity extends AppCompatActivity {
                 fragmentManager
                         .beginTransaction()
                         .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
-                        .replace(R.id.flContainer, fragment).commit();
+                        .replace(R.id.flContainer, fragment)
+                        .commit();
 
             }
             startingPosition = newPosition;

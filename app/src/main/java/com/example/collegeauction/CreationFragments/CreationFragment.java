@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -33,9 +34,11 @@ import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.transition.MaterialContainerTransform;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
@@ -55,9 +58,14 @@ public class CreationFragment extends Fragment {
     private Button btnCaptureImage;
     private ImageView ivListingImage;
     private Button btnSubmit;
+    private Button btnLocation;
     private File photoFile;
     public String photoFileName = "listing.jpg";
     ProgressBar pb;
+    private FragmentManager fragmentManager;
+
+
+    public static LatLng point;
 
     public CreationFragment(){
         // Required empty public constructor
@@ -75,12 +83,17 @@ public class CreationFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         // Find all of the views
         etDescription = view.findViewById(R.id.etDescription);
         btnCaptureImage = view.findViewById(R.id.btnCaptureImage);
+        btnLocation = view.findViewById(R.id.btnLocation);
         ivListingImage = view.findViewById(R.id.ivListingImage);
         etBid = view.findViewById(R.id.etBid);
         etName = view.findViewById(R.id.etName);
+
+        // Sets up fragment manager for transition to choose location
+        fragmentManager = getFragmentManager();
 
         btnSubmit = view.findViewById(R.id.btnSubmit);
         pb = view.findViewById(R.id.pbLoading);
@@ -93,9 +106,28 @@ public class CreationFragment extends Fragment {
             }
         });
 
+        // On click listener to add a location
+        btnLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Fragment fragment = new MapsCreationFragment();
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+        });
+
+        // On click listener for the submit button
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (point == null){
+                    Toast.makeText(getContext(), "You did not enter a location", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                ParseGeoPoint returnPoint = new ParseGeoPoint();
+                returnPoint.setLatitude(point.latitude);
+                returnPoint.setLongitude(point.longitude);
                 // Here I will save the listing to Parse
                 String name = etName.getText().toString();
                 String description = etDescription.getText().toString();
@@ -121,12 +153,12 @@ public class CreationFragment extends Fragment {
                 }
                 // on some click or some loading we need to wait for...
                 pb.setVisibility(ProgressBar.VISIBLE);
-                saveListing(name, description, bid, photoFile);
+                saveListing(name, description, bid, photoFile, returnPoint);
             }
         });
     }
 
-    private void saveListing(String name, String description, Long minPrice, File photoFile) {
+    private void saveListing(String name, String description, Long minPrice, File photoFile, ParseGeoPoint finalPoint) {
         ParseUser currentUser = ParseUser.getCurrentUser();
         // Sets expire date to 3 days after the current date
         Date currentDate = new Date();
@@ -141,6 +173,7 @@ public class CreationFragment extends Fragment {
         listing.setUser((currentUser));
         listing.put("minPrice", minPrice);
         listing.setExpireTime(expireDate);
+        listing.put("location", finalPoint);
         // Set isSold equal to false
         listing.saveInBackground(new SaveCallback() {
             @Override
@@ -180,6 +213,14 @@ public class CreationFragment extends Fragment {
         // Start the image capture intent to take photo
         startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
         // }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        // Resets the point to null whenever the view is destroyed
+        point = null;
     }
 
     @Override
