@@ -96,10 +96,18 @@ public class SellerDetailFragment extends Fragment {
         // Gets the bundle with listing that was passed in
         Bundle args = getArguments();
 
-        // Unwraps the listings
+        // Unwraps the listing
         listing = Parcels.unwrap(args.getParcelable("listing"));
 
         tvNumber.setVisibility(View.GONE);
+
+        if (listing.getString("locationName") != null){
+            String location = listing.getString("locationName");
+            tvLocation.setText("Location: " + location);
+        }
+        else{
+            tvLocation.setText("Location: Not Available");
+        }
 
         tvName.setText(listing.getName());
         tvDescription.setText("Description: " + listing.getDescription());

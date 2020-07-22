@@ -41,6 +41,7 @@ public class CreationActivity extends AppCompatActivity {
         fragment = new CreationFragment();
 
         fragmentManager.beginTransaction().replace(R.id.flContainer, fragment).commit();
+        
     }
 
     @Override

@@ -90,6 +90,14 @@ public class PurchasedDetailFragment extends Fragment {
         // Gets the bundle with listing that was passed in
         Bundle args = getArguments();
 
+        if (listing.getString("locationName") != null){
+            String location = listing.getString("locationName");
+            tvLocation.setText("Location: " + location);
+        }
+        else{
+            tvLocation.setText("Location: Not Available");
+        }
+
         // Unwraps the listings
         listing = Parcels.unwrap(args.getParcelable("listing"));
 
