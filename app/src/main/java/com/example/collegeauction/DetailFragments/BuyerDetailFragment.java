@@ -103,6 +103,13 @@ public class BuyerDetailFragment extends Fragment {
                 .transform(new CenterCrop())
                 .into(ivListingImage);
 
+        if (listing.getString("locationName") != null){
+            String location = listing.getString("locationName");
+            tvLocation.setText("Location: " + location);
+        }
+        else{
+            tvLocation.setText("Location: Not Available");
+        }
         // Set an onClickListener for when the user submits a bid
         btnBid.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,6 +149,27 @@ public class BuyerDetailFragment extends Fragment {
                             etBid.setText("");
                         }
                     });
+                }
+            }
+        });
+
+        tvLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (listing.getLocation() != null){
+                    Fragment fragment = new MapsFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("listing", Parcels.wrap(listing));
+                    fragment.setArguments(bundle);
+
+                    getFragmentManager()
+                            .beginTransaction()
+                            .addToBackStack(null)
+                            .replace(R.id.flContainer, fragment)
+                            .commit();
+                }
+                else{
+                    Toast.makeText(getContext(), "This listing has no location", Toast.LENGTH_SHORT).show();
                 }
             }
         });

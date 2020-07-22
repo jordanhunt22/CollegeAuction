@@ -111,6 +111,7 @@ public class MapsCreationFragment extends Fragment implements GoogleMap.OnMapLon
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                CreationFragment.point = null;
                 getActivity().onBackPressed();
             }
         });
@@ -249,7 +250,7 @@ public class MapsCreationFragment extends Fragment implements GoogleMap.OnMapLon
         if (mCurrentLocation != null) {
             Toast.makeText(getContext(), "GPS location was found!", Toast.LENGTH_SHORT).show();
             LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
             map.animateCamera(cameraUpdate);
         } else {
             // Toast.makeText(getContext(), "Current location was null, enable GPS on emulator!", Toast.LENGTH_SHORT).show();
@@ -300,16 +301,11 @@ public class MapsCreationFragment extends Fragment implements GoogleMap.OnMapLon
 
         if (justStarted){
             LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 15);
             map.animateCamera(cameraUpdate);
             justStarted = false;
         }
 
-
-//        String msg = "Updated Location: " +
-//                location.getLatitude() + "," +
-//                location.getLongitude();
-//        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -329,6 +325,7 @@ public class MapsCreationFragment extends Fragment implements GoogleMap.OnMapLon
         marker = map.addMarker(new MarkerOptions()
                 .position(point)
                 .title("Your location")
+                .snippet("")
                 .icon(defaultMarker));
         // Animate marker using drop effect
         dropPinEffect(marker);

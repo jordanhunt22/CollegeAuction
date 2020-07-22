@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -28,6 +29,7 @@ import android.widget.Toast;
 
 import com.example.collegeauction.Activities.ListingDetailsActivity;
 import com.example.collegeauction.Miscellaneous.CustomWindowAdapter;
+import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -46,11 +48,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.parse.ParseGeoPoint;
+
+import org.parceler.Parcels;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
@@ -67,6 +73,9 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
     Location mCurrentLocation;
     private long UPDATE_INTERVAL = 60000;  /* 60 secs */
     private long FASTEST_INTERVAL = 5000; /* 5 secs */
+    private LatLng mListingLocation;
+
+    private Listing listing;
 
     private final static String KEY_LOCATION = "location";
 
@@ -90,6 +99,16 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Gets the bundle with listing that was passed in
+        Bundle args = getArguments();
+
+        // Unwraps the listings
+        listing = Parcels.unwrap(args.getParcelable("listing"));
+
+        // Gets the location from the listing
+        ParseGeoPoint point = listing.getLocation();
+        mListingLocation = new LatLng(point.getLatitude(), point.getLongitude());
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
             throw new IllegalStateException("You forgot to supply a Google Maps API key");
@@ -130,6 +149,19 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
             Toast.makeText(getContext(), "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
             MapsFragmentPermissionsDispatcher.getMyLocationWithPermissionCheck(this);
             MapsFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(mListingLocation, 10);
+            map.animateCamera(cameraUpdate);
+            // Define color of marker icon
+            BitmapDescriptor defaultMarker =
+                    BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+            // Creates and adds marker to the map
+            Marker marker = map.addMarker(new MarkerOptions()
+                    .position(mListingLocation)
+                    .title(listing.getName())
+                    .snippet("")
+                    .icon(defaultMarker));
+            // Animate marker using drop effect
+            dropPinEffect(marker);
         } else {
             Toast.makeText(getContext(), "Error - Map was null!!", Toast.LENGTH_SHORT).show();
         }
@@ -217,8 +249,6 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
         if (mCurrentLocation != null) {
             Toast.makeText(getContext(), "GPS location was found!", Toast.LENGTH_SHORT).show();
             LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
-            map.animateCamera(cameraUpdate);
         } else {
             Toast.makeText(getContext(), "Current location was null, enable GPS on emulator!", Toast.LENGTH_SHORT).show();
         }
@@ -243,8 +273,10 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
             // TODO: Consider calling
             //    ActivityCompat#requestPermissions
             // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
+            // public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                                     // int[] grantResults){
+
+            // }
             // to handle the case where the user grants the permission. See the documentation
             // for ActivityCompat#requestPermissions for more details.
             return;
@@ -266,13 +298,6 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
         // Report to the UI that the location was updated
 
         mCurrentLocation = location;
-        LatLng current = new LatLng(mCurrentLocation.getLatitude(),  mCurrentLocation.getLongitude());
-        map.moveCamera(CameraUpdateFactory.newLatLng(current));
-
-//        String msg = "Updated Location: " +
-//                location.getLatitude() + "," +
-//                location.getLongitude();
-//        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -282,58 +307,10 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
 
     @Override
     public void onMapLongClick(LatLng point) {
-        Toast.makeText(getContext(), "Long Press", Toast.LENGTH_SHORT).show();
-        // Custom code here...
-        // Display the alert dialog
-        showAlertDialogForPoint(point);
+        // Nothing needs to be done here
     }
 
-    // Display the alert that adds the marker
-    private void showAlertDialogForPoint(final LatLng point) {
-        // inflate message_item.xml view
-        View messageView = LayoutInflater.from(getActivity()).
-                inflate(R.layout.message_item, null);
-        // Create alert dialog builder
-        AlertDialog.Builder alertDialogBuilder = new MaterialAlertDialogBuilder(getContext());
-        // set message_item.xml to AlertDialog builder
-        alertDialogBuilder.setView(messageView);
 
-        // Create alert dialog
-        final AlertDialog alertDialog = alertDialogBuilder.create();
-
-        // Configure dialog button (OK)
-        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Define color of marker icon
-                        BitmapDescriptor defaultMarker =
-                                BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
-                        // Extract content from alert dialog
-                        String title = ((EditText) alertDialog.findViewById(R.id.etTitle)).
-                                getText().toString();
-                        String snippet = ((EditText) alertDialog.findViewById(R.id.etSnippet)).
-                                getText().toString();
-                        // Creates and adds marker to the map
-                        Marker marker = map.addMarker(new MarkerOptions()
-                                .position(point)
-                                .title(title)
-                                .snippet(snippet)
-                                .icon(defaultMarker));
-                        // Animate marker using drop effect
-                        dropPinEffect(marker);
-                    }
-                });
-
-        // Configure dialog button (Cancel)
-        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) { dialog.cancel(); }
-                });
-
-        // Display the dialog
-        alertDialog.show();
-    }
 
     private void dropPinEffect(final Marker marker) {
         // Handler allows us to repeat a code block after a specified delay

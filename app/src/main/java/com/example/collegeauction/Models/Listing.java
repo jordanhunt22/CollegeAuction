@@ -3,6 +3,7 @@ package com.example.collegeauction.Models;
 
 import com.parse.ParseClassName;
 import com.parse.ParseFile;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 
@@ -25,6 +26,7 @@ public class Listing extends ParseObject {
     public static final String KEY_EXPIRATION = "expiresAt";
     public static final String KEY_MINPRICE = "minPrice";
     public static final String KEY_FAVS = "favorites";
+    public static final String  KEY_LOCATION = "location";
 
     public static ArrayList<String> listingsFavoritedByCurrentuser = new ArrayList<String>();
 
@@ -79,5 +81,12 @@ public class Listing extends ParseObject {
     }
 
     public void setMinPrice(Long price){ put(KEY_MINPRICE, price); }
+
+    public ParseGeoPoint getLocation(){
+        return getParseGeoPoint(KEY_LOCATION);
+    }
+
+    public void setLocation(ParseGeoPoint point){ put(KEY_LOCATION, point);}
+
 }
 

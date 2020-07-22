@@ -17,6 +17,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,6 +33,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.example.collegeauction.Miscellaneous.MapHelper;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
@@ -66,6 +69,7 @@ public class CreationFragment extends Fragment {
 
 
     public static LatLng point;
+    private String location;
 
     public CreationFragment(){
         // Required empty public constructor
@@ -171,6 +175,7 @@ public class CreationFragment extends Fragment {
         listing.setImage(new ParseFile(photoFile));
         listing.setName(name);
         listing.setUser((currentUser));
+        listing.put("locationName", location);
         listing.put("minPrice", minPrice);
         listing.setExpireTime(expireDate);
         listing.put("location", finalPoint);
@@ -248,6 +253,17 @@ public class CreationFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+
+
+        if (point != null){
+            MapHelper.getAddressFromLocation(point, getContext(), new GeocoderHandler());
+        }
+    }
+
     // Returns the File for a photo stored on disk given the fileName
     public File getPhotoFileUri(String fileName) {
         // Get safe storage directory for photos
@@ -262,6 +278,23 @@ public class CreationFragment extends Fragment {
 
         // Return the file target for the photo based on filename
         return new File(mediaStorageDir.getPath() + File.separator + fileName);
+    }
+
+    private class GeocoderHandler extends Handler {
+        @Override
+        public void handleMessage(Message message) {
+            String result;
+            switch (message.what) {
+                case 1:
+                    Bundle bundle = message.getData();
+                    result = bundle.getString("address");
+                    break;
+                default:
+                    result = null;
+            }
+            // replace by what you need to do
+            location = result;
+        }
     }
 
 
