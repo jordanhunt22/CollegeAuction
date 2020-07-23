@@ -135,7 +135,7 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
                 }
             });
         } else {
-            Toast.makeText(getContext(), "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getContext(), "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -146,7 +146,6 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
             map.setOnMapLongClickListener(this);
 
             // Map is ready
-            Toast.makeText(getContext(), "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
             MapsFragmentPermissionsDispatcher.getMyLocationWithPermissionCheck(this);
             MapsFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(mListingLocation, 10);
@@ -163,7 +162,7 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
             // Animate marker using drop effect
             dropPinEffect(marker);
         } else {
-            Toast.makeText(getContext(), "Error - Map was null!!", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getContext(), "Error - Map was null!!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -245,13 +244,6 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
         super.onResume();
 
         // Display the connection status
-
-        if (mCurrentLocation != null) {
-            Toast.makeText(getContext(), "GPS location was found!", Toast.LENGTH_SHORT).show();
-            LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-        } else {
-            Toast.makeText(getContext(), "Current location was null, enable GPS on emulator!", Toast.LENGTH_SHORT).show();
-        }
         MapsFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
     }
 

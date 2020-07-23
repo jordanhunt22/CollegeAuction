@@ -1,19 +1,23 @@
 package com.example.collegeauction.HomeFragments;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.ListingsAdapter;
@@ -22,9 +26,18 @@ import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
@@ -34,9 +47,22 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SoonHomeFragment extends Fragment {
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.RuntimePermissions;
 
-    public static final String TAG = "SoonHomeFragment";
+import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
+
+@RuntimePermissions
+public class NearbyHomeFragment extends Fragment {
+
+    public static final String TAG = "NearbyHomeFragment";
+
+    private LocationRequest mLocationRequest;
+    Location mCurrentLocation;
+    private long UPDATE_INTERVAL = 60000;  /* 60 secs */
+    private long FASTEST_INTERVAL = 5000; /* 5 secs */
+
+    private Boolean onStart;
 
     private RecyclerView rvPosts;
     private TextView tvEmpty;
@@ -45,7 +71,7 @@ public class SoonHomeFragment extends Fragment {
     private List<Listing> allListings;
     private EndlessRecyclerViewScrollListener scrollListener;
 
-    public SoonHomeFragment() {
+    public NearbyHomeFragment() {
         // Required empty public constructor
     }
 
@@ -59,6 +85,10 @@ public class SoonHomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+       NearbyHomeFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
+
+        onStart = true;
 
         tvEmpty = view.findViewById(R.id.tvEmpty);
         tvEmpty.setVisibility(View.GONE);
@@ -130,13 +160,13 @@ public class SoonHomeFragment extends Fragment {
         query.include(Favorite.KEY_USER);
         query.whereEqualTo(Favorite.KEY_USER, user);
         query.findInBackground(new FindCallback<Favorite>() {
-                    @Override
-                    public void done(List<Favorite> favorites, ParseException e) {
-                        for(Favorite favorite : favorites) {
-                            Listing.listingsFavoritedByCurrentuser.add(favorite.getListing().getObjectId());
-                        }
-                        queryListings();
-                    }
+            @Override
+            public void done(List<Favorite> favorites, ParseException e) {
+                for(Favorite favorite : favorites) {
+                    Listing.listingsFavoritedByCurrentuser.add(favorite.getListing().getObjectId());
+                }
+                // queryListings();
+            }
         });
     }
 
@@ -148,10 +178,13 @@ public class SoonHomeFragment extends Fragment {
         query.setLimit(20);
         // Only displays items that have not been sold yet
         query.whereEqualTo("isSold", false);
-        // order posts by creation date (newest first)
-        query.addAscendingOrder(Listing.KEY_EXPIRATION);
         // Does not show the current user's posts
         query.whereNotEqualTo(Listing.KEY_USER, currentUser);
+        // Queries the items that are closest to the user
+        ParseGeoPoint returnPoint = new ParseGeoPoint();
+        returnPoint.setLatitude(mCurrentLocation.getLatitude());
+        returnPoint.setLongitude(mCurrentLocation.getLongitude());
+        query.whereNear("location", returnPoint);
         // start an asynchronous call for posts
         query.findInBackground(new FindCallback<Listing>() {
             @Override
@@ -201,6 +234,56 @@ public class SoonHomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        queryListings();
+        // queryListings();
+    }
+
+    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+    protected void startLocationUpdates() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(mLocationRequest);
+        LocationSettingsRequest locationSettingsRequest = builder.build();
+
+        SettingsClient settingsClient = LocationServices.getSettingsClient(getContext());
+        settingsClient.checkLocationSettings(locationSettingsRequest);
+        //noinspection MissingPermission
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            // public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            // int[] grantResults){
+
+            // }
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        getFusedLocationProviderClient(getContext()).requestLocationUpdates(mLocationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        onLocationChanged(locationResult.getLastLocation());
+                    }
+                },
+                Looper.myLooper());
+    }
+
+    public void onLocationChanged(Location location) {
+        // GPS may be turned off
+        if (location == null) {
+            return;
+        }
+        // Report to the UI that the location was updated
+        mCurrentLocation = location;
+
+        if (onStart){
+            queryListings();
+            onStart = false;
+        }
     }
 }
+

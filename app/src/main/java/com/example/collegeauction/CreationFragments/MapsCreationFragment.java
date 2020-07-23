@@ -160,11 +160,10 @@ public class MapsCreationFragment extends Fragment implements GoogleMap.OnMapLon
             map.setOnMapLongClickListener(this);
 
             // Map is ready
-            Toast.makeText(getContext(), "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
             MapsCreationFragmentPermissionsDispatcher.getMyLocationWithPermissionCheck(this);
             MapsCreationFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
         } else {
-            Toast.makeText(getContext(), "Error - Map was null!!", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getContext(), "Error - Map was null!!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -248,7 +247,7 @@ public class MapsCreationFragment extends Fragment implements GoogleMap.OnMapLon
         // Display the connection status
 
         if (mCurrentLocation != null) {
-            Toast.makeText(getContext(), "GPS location was found!", Toast.LENGTH_SHORT).show();
+            // Toast.makeText(getContext(), "GPS location was found!", Toast.LENGTH_SHORT).show();
             LatLng latLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
             map.animateCamera(cameraUpdate);
@@ -315,7 +314,6 @@ public class MapsCreationFragment extends Fragment implements GoogleMap.OnMapLon
 
     @Override
     public void onMapLongClick(LatLng point) {
-        Toast.makeText(getContext(), "Long Press", Toast.LENGTH_SHORT).show();
         // Define color of marker icon
         BitmapDescriptor defaultMarker =
                 BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);

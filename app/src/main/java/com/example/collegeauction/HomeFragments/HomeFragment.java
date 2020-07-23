@@ -50,11 +50,9 @@ public class HomeFragment extends Fragment {
             public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
                 if (position == 0){
                     tab.setText("Expires soon").setIcon(R.drawable.clock);
-                    Toast.makeText(getContext(), "Expires Soon", Toast.LENGTH_SHORT).show();
                 }
                 else{
                     tab.setText("Nearby").setIcon(R.drawable.nearby);
-                    Toast.makeText(getContext(), "Nearby" , Toast.LENGTH_SHORT).show();
                 }
             }
         });

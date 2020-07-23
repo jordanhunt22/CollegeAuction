@@ -125,5 +125,27 @@ public class PurchasedDetailFragment extends Fragment {
         sellersNumber = listing.getUser().getString("phoneNumber");
 
         tvNumber.setText("Seller's Number: " + sellersNumber);
+
+        // Allows the user to see the location
+        tvLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (listing.getLocation() != null){
+                    Fragment fragment = new MapsFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("listing", Parcels.wrap(listing));
+                    fragment.setArguments(bundle);
+
+                    getFragmentManager()
+                            .beginTransaction()
+                            .addToBackStack(null)
+                            .replace(R.id.flContainer, fragment)
+                            .commit();
+                }
+                else{
+                    Toast.makeText(getContext(), "This listing has no location", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }

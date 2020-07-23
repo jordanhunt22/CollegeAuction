@@ -10,6 +10,7 @@ import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.adapter.FragmentViewHolder;
 
+import com.example.collegeauction.HomeFragments.NearbyHomeFragment;
 import com.example.collegeauction.HomeFragments.SoonHomeFragment;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class HomeAdapter extends FragmentStateAdapter {
             return new SoonHomeFragment();
         }
         else{
-            return new SoonHomeFragment();
+            return new NearbyHomeFragment();
         }
     }
 

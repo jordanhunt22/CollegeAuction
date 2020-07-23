@@ -206,6 +206,28 @@ public class SellerDetailFragment extends Fragment {
                 tvCurrentBid.setText("NO SALE");
             }
         }
+
+        // Allows the user to see the location they chose
+        tvLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (listing.getLocation() != null){
+                    Fragment fragment = new MapsFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable("listing", Parcels.wrap(listing));
+                    fragment.setArguments(bundle);
+
+                    getFragmentManager()
+                            .beginTransaction()
+                            .addToBackStack(null)
+                            .replace(R.id.flContainer, fragment)
+                            .commit();
+                }
+                else{
+                    Toast.makeText(getContext(), "This listing has no location", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     public void getCurrentBids(){
