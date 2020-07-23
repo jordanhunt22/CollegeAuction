@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,11 +20,14 @@ import android.widget.Toast;
 
 import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.BidsAdapter;
+import com.example.collegeauction.Adapters.BidsPurchasesAdapter;
+import com.example.collegeauction.Adapters.HomeAdapter;
 import com.example.collegeauction.Adapters.PurchasesAdapter;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -37,10 +41,10 @@ public class BidsPurchasesFragment extends Fragment {
     public static final String TAG = "BidsPurchasesFragment";
 
     private FragmentManager fragmentManager;
-
     private TabLayout tabLayout;
-
-    Fragment fragment;
+    private TabLayoutMediator tabLayoutMediator;
+    private ViewPager2 viewPager;
+    private BidsPurchasesAdapter adapter;
 
     public BidsPurchasesFragment() {
         // Required empty public constructor
@@ -61,36 +65,29 @@ public class BidsPurchasesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Sets up the tabs
         tabLayout = view.findViewById(R.id.tabLayout);
-
-        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        viewPager = view.findViewById(R.id.viewPager);
+        adapter = new BidsPurchasesAdapter(this);
+        viewPager.setAdapter(adapter);
+        tabLayoutMediator = new TabLayoutMediator(tabLayout, viewPager, new TabLayoutMediator.TabConfigurationStrategy() {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.equals(tabLayout.getTabAt(0))){
-                    fragment = new BidsFragment();
+            public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
+                if (position == 0){
+                    tab.setText("Bids").setIcon(R.drawable.bids);
                 }
-                else {
-                    fragment = new PurchasesFragment();
+                else{
+                    tab.setText("Purchases").setIcon(R.drawable.purchases);
                 }
-                fragmentManager.beginTransaction().replace(R.id.flBidsPurchases, fragment).commit();
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
             }
         });
+        viewPager.setCurrentItem(0);
+        tabLayoutMediator.attach();
 
         // Makes the fab visible whenever a new fragment starts
         MainActivity.fab.show();
 
-        fragment = new BidsFragment();
-        fragmentManager.beginTransaction().replace(R.id.flBidsPurchases, fragment).commit();
+
 
     }
 
