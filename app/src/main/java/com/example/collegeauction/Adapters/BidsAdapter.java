@@ -15,16 +15,21 @@ import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.ViewHolder> {
 
     private Context context;
     private List<Bid> bids;
+    public List<String> bidIds;
 
     public BidsAdapter(Context context, List<Bid> bids){
         this.context = context;
         this.bids = bids;
+        this.bidIds = new ArrayList<>();
     }
 
     @NonNull
@@ -63,6 +68,8 @@ public class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.ViewHolder> {
 
         @SuppressLint("SetTextI18n")
         public void bind(Bid bid) {
+            bidIds.removeAll(Collections.singleton(bid.getObjectId()));
+            bidIds.add(bid.getObjectId());
             tvTime.setText(TimeFormatter.getTimeDifference(bid.getCreatedAt().toString()));
             tvName.setText(bid.getListing().getString(Listing.KEY_NAME));
             tvPrice.setText("$" + bid.getPrice().toString());

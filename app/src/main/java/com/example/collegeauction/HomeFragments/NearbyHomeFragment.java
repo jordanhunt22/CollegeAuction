@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -137,18 +138,19 @@ public class NearbyHomeFragment extends Fragment {
         });
 
         // Implement ScrollListener for infinite scroll
-//        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
-//            @Override
-//            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-//                // Triggered only when new data needs to be appended to the list
-//                // Add whatever code is needed to append new items to the bottom of the list
-//            }
-//        };
+        scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                loadMoreData();
+            }
+        };
 
         // Adds the scroll listener to the RecyclerView
-//        rvPosts.addOnScrollListener(scrollListener);
-//
-//
+        rvPosts.addOnScrollListener(scrollListener);
+
+
         // Makes the fab visible whenever a new fragment starts
         MainActivity.fab.show();
 
@@ -163,9 +165,50 @@ public class NearbyHomeFragment extends Fragment {
             @Override
             public void done(List<Favorite> favorites, ParseException e) {
                 for(Favorite favorite : favorites) {
+                    Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(favorite.getListing().getObjectId()));
                     Listing.listingsFavoritedByCurrentuser.add(favorite.getListing().getObjectId());
                 }
-                // queryListings();
+            }
+        });
+    }
+
+    private void loadMoreData() {
+        final ParseUser currentUser = ParseUser.getCurrentUser();
+        ParseQuery query = ParseQuery.getQuery(Listing.class);
+        query.include(Listing.KEY_BID);
+        // limit query to latest 20 items
+        query.setLimit(20);
+        // Does not query items that are already in the adapter
+        query.setLimit(adapter.getItemCount());
+        // Only displays items that have not been sold yet
+        query.whereEqualTo("isSold", false);
+        // Does not show the current user's posts
+        query.whereNotEqualTo(Listing.KEY_USER, currentUser);
+        // Queries the items that are closest to the user
+        ParseGeoPoint returnPoint = new ParseGeoPoint();
+        returnPoint.setLatitude(mCurrentLocation.getLatitude());
+        returnPoint.setLongitude(mCurrentLocation.getLongitude());
+        query.whereNear("location", returnPoint);
+        // start an asynchronous call for posts
+        query.findInBackground(new FindCallback<Listing>() {
+            @Override
+            public void done(List<Listing> listings, ParseException e) {
+                if (e != null){
+                    Log.e(TAG, "Issue with getting listings", e);
+                    return;
+                }
+                List <Listing> returnListings = new ArrayList<>();
+                for (Listing listing : listings){
+                    if (!adapter.listingIds.contains(listing.getObjectId())){
+                        returnListings.add(listing);
+                    }
+                }
+
+                // Clears the adapter
+                adapter.addAll(returnListings);
+
+                // Save received posts to list and notify adapter of new data
+                swipeContainer.setRefreshing(false);
             }
         });
     }
@@ -224,9 +267,6 @@ public class NearbyHomeFragment extends Fragment {
 
                 // Save received posts to list and notify adapter of new data
                 swipeContainer.setRefreshing(false);
-                for (Listing listing : listings){
-                    // Log.i(TAG, "Listing: " + listing.getDescription() + ", username: " + listing.getUser().getUsername());
-                }
             }
         });
     }
@@ -234,7 +274,9 @@ public class NearbyHomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        // queryListings();
+        if (mCurrentLocation != null){
+            queryListings();
+        }
     }
 
     @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})

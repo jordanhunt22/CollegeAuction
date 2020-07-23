@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.BidsAdapter;
 import com.example.collegeauction.Adapters.PurchasesAdapter;
+import com.example.collegeauction.Miscellaneous.EndlessRecyclerViewScrollListener;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
@@ -41,6 +42,7 @@ public class PurchasesFragment extends Fragment {
     private SwipeRefreshLayout swipePurchases;
     private PurchasesAdapter purchasesAdapter;
     private List<Listing> allPurchases;
+    private EndlessRecyclerViewScrollListener scrollListener;
 
 
     public PurchasesFragment() {
@@ -96,7 +98,82 @@ public class PurchasesFragment extends Fragment {
             }
         });
 
+        // Implement ScrollListener for infinite scroll
+        scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                loadMoreData();
+            }
+        };
+
+        // Adds the scroll listener to the RecyclerView
+        rvPurchases.addOnScrollListener(scrollListener);
+
         queryPurchases();
+    }
+
+    private void loadMoreData() {
+        final ParseUser currentUser = ParseUser.getCurrentUser();
+        ParseQuery query = ParseQuery.getQuery(Bid.class);
+        // Only gets the currentUser's bids
+        query.whereEqualTo("user", currentUser);
+        // Includes the attached listing
+        query.include(Bid.KEY_LISTING);
+        // Only displays items that have not been sold
+        query.whereEqualTo("isCurrent", true);
+        // Order posts by creation date (newest first)
+        query.addDescendingOrder("listing.expiresAt");
+        // Start an asynchronous call for posts
+        // Updates the user's purchases
+        query.findInBackground(new FindCallback<Bid>() {
+            @Override
+            public void done(List<Bid> bids, ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "Issue with getting listings", e);
+                    return;
+                }
+                ParseRelation<ParseObject> relation = currentUser.getRelation("purchases");
+                for (Bid bid : bids){
+                    Listing listing = (Listing) bid.getListing();
+                    if (listing.getBoolean("isSold")){
+                        relation.add(listing);
+                    }
+                }
+                currentUser.saveInBackground();
+
+                // Returns the purchases relation
+                currentUser.fetchInBackground(new GetCallback<ParseObject>() {
+                    @Override
+                    public void done(final ParseObject object, ParseException e) {
+                        ParseRelation<Listing> purchases = object.getRelation("purchases");
+                        ParseQuery<Listing> q = purchases.getQuery();
+                        q.addDescendingOrder(Listing.KEY_EXPIRATION);
+                        q.include(Listing.KEY_BID);
+                        q.include(Listing.KEY_USER);
+                        q.setLimit(20);
+                        q.findInBackground(new FindCallback<Listing>() {
+                            @Override
+                            public void done(List<Listing> listings, ParseException e) {
+                                
+                                List <Listing> returnListings = new ArrayList<>();
+                                for (Listing listing : listings){
+                                    if (!purchasesAdapter.purchaseIds.contains(listing.getObjectId())){
+                                        returnListings.add(listing);
+                                    }
+                                }
+                                purchasesAdapter.addAll(returnListings);
+
+                                // Save received posts to list and notify adapter of new data
+                                swipePurchases.setRefreshing(false);
+                            }
+                        });
+                    }
+                });
+
+            }
+        });
     }
 
     private void queryPurchases() {

@@ -113,26 +113,74 @@ public class FavoritesFragment extends Fragment {
       });
 
       // Implement ScrollListener for infinite scroll
-//        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
-//            @Override
-//            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-//                // Triggered only when new data needs to be appended to the list
-//                // Add whatever code is needed to append new items to the bottom of the list
-//            }
-//        };
+        scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+               loadMoreData();
+            }
+        };
 
       // Adds the scroll listener to the RecyclerView
-//        rvPosts.addOnScrollListener(scrollListener);
-//
-//
+      rvPosts.addOnScrollListener(scrollListener);
+
       queryListings();
 
+   }
+
+   private void loadMoreData() {
+      // Retrieves a user's favorited listings
+      ParseUser user = ParseUser.getCurrentUser();
+      ParseQuery query = ParseQuery.getQuery(Favorite.class);
+      // Skips the number of items that are in the adapter currently
+      query.setSkip(adapter.getItemCount());
+      // Sets query limit to 20
+      query.setLimit(20);
+      // Includes the listing and user for every listing
+      query.include(Favorite.KEY_LISTING);
+      query.include(Favorite.KEY_USER);
+      query.include("listing.mostRecentBid");
+      query.whereEqualTo(Favorite.KEY_USER, user);
+      query.addAscendingOrder("listing.expiresAt");
+      query.findInBackground(new FindCallback<Favorite>() {
+         @Override
+         public void done(List<Favorite> favorites, ParseException e) {
+            if (e != null){
+               Toast.makeText(getContext(), "Error getting favorite posts", Toast.LENGTH_SHORT).show();
+            }
+            List<Listing> listings = new ArrayList<>();
+            for(Favorite favorite : favorites) {
+               Listing listing = (Listing) favorite.getListing();
+               if (listing.getExpireTime().getTime() >= System.currentTimeMillis()) {
+                  Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(listing.getObjectId()));
+                  Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
+                  listings.add(listing);
+               }
+            }
+            List<Listing> returnListings = new ArrayList<>();
+            for (Listing listing : listings){
+               if (!adapter.listingIds.contains(listing.getObjectId())){
+                  returnListings.add(listing);
+               }
+            }
+
+            // Clears the adapter
+            adapter.addAll(returnListings);
+
+            // Save received posts to list and notify adapter of new data
+            swipeContainer.setRefreshing(false);
+
+         }
+      });
    }
 
    protected void queryListings() {
       // Retrieves a user's favorited listings
       ParseUser user = ParseUser.getCurrentUser();
       ParseQuery query = ParseQuery.getQuery(Favorite.class);
+      // Sets query limit to 20
+      query.setLimit(20);
       // Includes the listing and user for every listing
       query.include(Favorite.KEY_LISTING);
       query.include(Favorite.KEY_USER);

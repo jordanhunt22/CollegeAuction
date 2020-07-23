@@ -3,6 +3,7 @@ package com.example.collegeauction.Adapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.database.AbstractWindowedCursor;
 import android.os.Handler;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -37,6 +38,7 @@ import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -45,11 +47,13 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
 
     public static final String TAG = "ListingsAdapter";
     private Context context;
-    private List<Listing> listings;
+    public List<Listing> listings;
+    public List<String> listingIds;
 
     public ListingsAdapter(Context context, List<Listing> listings) {
         this.context = context;
         this.listings = listings;
+        this.listingIds = new ArrayList<>();
     }
 
     @NonNull
@@ -153,6 +157,9 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
 
         @SuppressLint("SetTextI18n")
         public void bind(final Listing listing) {
+            // Adds objectId of the listing to a list
+            listingIds.removeAll(Collections.singleton(listing.getObjectId()));
+            listingIds.add(listing.getObjectId());
             // Create instance of date manipulator
             if (listing.getExpireTime() != null) {
                 dateManipulator = new DateManipulator(listing.getExpireTime());

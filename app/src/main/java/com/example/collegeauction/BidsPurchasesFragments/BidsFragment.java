@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.BidsAdapter;
 import com.example.collegeauction.Adapters.PurchasesAdapter;
+import com.example.collegeauction.Miscellaneous.EndlessRecyclerViewScrollListener;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
@@ -38,6 +39,7 @@ public class BidsFragment extends Fragment {
     private SwipeRefreshLayout swipeBids;
     private BidsAdapter bidsAdapter;
     private List<Bid> allBids;
+    private EndlessRecyclerViewScrollListener scrollListener;
 
     public BidsFragment() {
         // Required empty public constructor
@@ -95,7 +97,70 @@ public class BidsFragment extends Fragment {
             }
         });
 
+        // Makes the fab disappear when scrolling
+        rvBids.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0 && MainActivity.fab.getVisibility() == View.VISIBLE) {
+                    MainActivity.fab.hide();
+                } else if (dy < 0 && MainActivity.fab.getVisibility() != View.VISIBLE) {
+                    MainActivity.fab.show();
+                }
+            }
+        });
+
+        // Implement ScrollListener for infinite scroll
+        scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                loadMoreData();
+            }
+        };
+
+        // Adds scrollListener to the RecyclerView
+        rvBids.addOnScrollListener(scrollListener);
+
         queryBids();
+    }
+
+    private void loadMoreData() {
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        ParseQuery query = ParseQuery.getQuery(Bid.class);
+        query.include(Bid.KEY_LISTING);
+        // limit query to latest 20 items
+        query.setLimit(20);
+        // Skips the number of items that are already in the adapter
+        query.setSkip(bidsAdapter.getItemCount());
+        // Only displays items that have not been sold yet
+        query.whereEqualTo("user", currentUser);
+        // order posts by creation date (newest first)t
+        query.addDescendingOrder(Listing.KEY_CREATED);
+        // start an asynchronous call for posts
+        query.findInBackground(new FindCallback<Bid>() {
+            @Override
+            public void done(List<Bid> bids, ParseException e) {
+                if (e != null){
+                    Log.e(TAG, "Issue with getting listings", e);
+                    return;
+                }
+
+                List <Bid> returnBids = new ArrayList<>();
+                for (Bid bid : bids){
+                    if (!bidsAdapter.bidIds.contains(bid.getObjectId())){
+                        returnBids.add(bid);
+                    }
+                }
+
+                // Clears the adapter
+                bidsAdapter.addAll(bids);
+
+                // Save received posts to list and notify adapter of new data
+                swipeBids.setRefreshing(false);
+            }
+        });
     }
 
     private void queryBids() {

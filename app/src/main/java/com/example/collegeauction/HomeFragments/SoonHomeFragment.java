@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.ListingsAdapter;
@@ -107,18 +108,19 @@ public class SoonHomeFragment extends Fragment {
         });
 
         // Implement ScrollListener for infinite scroll
-//        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
-//            @Override
-//            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-//                // Triggered only when new data needs to be appended to the list
-//                // Add whatever code is needed to append new items to the bottom of the list
-//            }
-//        };
+        scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                loadMoreData();
+            }
+        };
 
         // Adds the scroll listener to the RecyclerView
-//        rvPosts.addOnScrollListener(scrollListener);
-//
-//
+        rvPosts.addOnScrollListener(scrollListener);
+
+
         // Makes the fab visible whenever a new fragment starts
         MainActivity.fab.show();
 
@@ -133,10 +135,49 @@ public class SoonHomeFragment extends Fragment {
                     @Override
                     public void done(List<Favorite> favorites, ParseException e) {
                         for(Favorite favorite : favorites) {
+                            Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(favorite.getListing().getObjectId()));
                             Listing.listingsFavoritedByCurrentuser.add(favorite.getListing().getObjectId());
                         }
                         queryListings();
                     }
+        });
+    }
+
+    private void loadMoreData() {
+        final ParseUser currentUser = ParseUser.getCurrentUser();
+        ParseQuery query = ParseQuery.getQuery(Listing.class);
+        query.include(Listing.KEY_BID);
+        // limit query to latest 20 items
+        query.setLimit(20);
+        // Only displays items that have not been sold yet
+        query.whereEqualTo("isSold", false);
+        // order posts by creation date (newest first)
+        query.addAscendingOrder(Listing.KEY_EXPIRATION);
+        // Does not show the current user's posts
+        query.whereNotEqualTo(Listing.KEY_USER, currentUser);
+        // Skips the items that are already in the adapter
+        query.setSkip(adapter.getItemCount());
+        // start an asynchronous call for posts
+        query.findInBackground(new FindCallback<Listing>() {
+            @Override
+            public void done(List<Listing> listings, ParseException e) {
+                if (e != null){
+                    Log.e(TAG, "Issue with getting listings", e);
+                    return;
+                }
+                List <Listing> returnListings = new ArrayList<>();
+                for (Listing listing : listings){
+                    if (!adapter.listingIds.contains(listing.getObjectId())){
+                        returnListings.add(listing);
+                    }
+                }
+
+                // Clears the adapter
+                adapter.addAll(returnListings);
+
+                // Save received posts to list and notify adapter of new data
+                swipeContainer.setRefreshing(false);
+            }
         });
     }
 
@@ -191,9 +232,6 @@ public class SoonHomeFragment extends Fragment {
 
                 // Save received posts to list and notify adapter of new data
                 swipeContainer.setRefreshing(false);
-                for (Listing listing : listings){
-                    // Log.i(TAG, "Listing: " + listing.getDescription() + ", username: " + listing.getUser().getUsername());
-                }
             }
         });
     }

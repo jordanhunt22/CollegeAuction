@@ -31,6 +31,8 @@ import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -39,10 +41,12 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
 
     private Context context;
     private List<Listing> purchases;
+    public List<String> purchaseIds;
 
     public PurchasesAdapter(Context context, List<Listing> purchases){
         this.context = context;
         this.purchases = purchases;
+        this.purchaseIds = new ArrayList<>();
     }
 
     @NonNull
@@ -122,6 +126,10 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
 
         @SuppressLint("SetTextI18n")
         public void bind(final Listing purchase) {
+
+            // Adds to object Id to list
+            purchaseIds.removeAll(Collections.singleton(purchase.getObjectId()));
+            purchaseIds.add(purchase.getObjectId());
 
             // Bind the listing data to the view elements
             tvName.setText(purchase.getName());

@@ -115,18 +115,17 @@ public class ProfileFragment extends Fragment {
         });
 
         // Implement ScrollListener for infinite scroll
-//        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
-//            @Override
-//            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-//                // Triggered only when new data needs to be appended to the list
-//                // Add whatever code is needed to append new items to the bottom of the list
-//            }
-//        };
+        scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                loadMoreData();
+            }
+        };
 
         // Adds the scroll listener to the RecyclerView
-//        rvPosts.addOnScrollListener(scrollListener);
-//
-//
+        rvPosts.addOnScrollListener(scrollListener);
 
         // Sets the TextView at the top to the current user's username
         tvUsername = view.findViewById(R.id.tvUsername);
@@ -144,6 +143,44 @@ public class ProfileFragment extends Fragment {
         });
 
         queryUsersListings();
+    }
+
+    private void loadMoreData() {
+        final ParseUser currentUser = ParseUser.getCurrentUser();
+        ParseQuery query = ParseQuery.getQuery(Listing.class);
+        query.include(Listing.KEY_BID);
+        query.include(Listing.KEY_USER);
+        // limit query to latest 20 items
+        query.setLimit(20);
+        // Skips all the items that are already in the adapter
+        query.setSkip(adapter.getItemCount());
+        // only shows listings where the current user is the seller
+        query.whereEqualTo("user", currentUser);
+        // order posts by creation date (oldest first)
+        query.addDescendingOrder(Listing.KEY_EXPIRATION);
+        // start an asynchronous call for posts
+        query.findInBackground(new FindCallback<Listing>() {
+            @Override
+            public void done(List<Listing> listings, ParseException e) {
+                if (e != null){
+                    Log.e(TAG, "Issue with getting listings", e);
+                    return;
+                }
+
+                List <Listing> returnListings = new ArrayList<>();
+                for (Listing listing : listings){
+                    if (!adapter.purchaseIds.contains(listing.getObjectId())){
+                        returnListings.add(listing);
+                    }
+                }
+
+                // Adds new listings to the adapter
+                adapter.addAll(returnListings);
+
+                // Save received posts to list and notify adapter of new data
+                swipeContainer.setRefreshing(false);
+            }
+        });
     }
 
 
