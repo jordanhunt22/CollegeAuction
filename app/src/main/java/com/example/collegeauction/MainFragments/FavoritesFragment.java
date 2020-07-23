@@ -55,7 +55,7 @@ public class FavoritesFragment extends Fragment {
    @Override
    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
       // Inflate the layout in this fragment
-      return inflater.inflate(R.layout.fragment_home, container, false);
+      return inflater.inflate(R.layout.fragment_home_all, container, false);
    }
 
    @Override

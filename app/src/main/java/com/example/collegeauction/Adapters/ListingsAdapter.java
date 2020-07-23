@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.GestureDetectorCompat;
@@ -21,15 +20,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.example.collegeauction.Activities.ListingDetailsActivity;
-import com.example.collegeauction.MainFragments.HomeFragment;
 import com.example.collegeauction.Miscellaneous.DateManipulator;
-import com.example.collegeauction.Miscellaneous.TimeFormatter;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
-import com.example.collegeauction.Models.Purchase;
 import com.example.collegeauction.R;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -42,7 +37,6 @@ import com.parse.ParseUser;
 
 import org.parceler.Parcels;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;

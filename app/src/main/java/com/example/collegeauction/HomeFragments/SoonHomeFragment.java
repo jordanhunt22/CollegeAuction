@@ -1,4 +1,4 @@
-package com.example.collegeauction.MainFragments;
+package com.example.collegeauction.HomeFragments;
 
 import android.os.Bundle;
 
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class HomeFragment extends Fragment {
+public class SoonHomeFragment extends Fragment {
 
     public static final String TAG = "HomeFragment";
 
@@ -45,7 +45,7 @@ public class HomeFragment extends Fragment {
     private List<Listing> allListings;
     private EndlessRecyclerViewScrollListener scrollListener;
 
-    public HomeFragment() {
+    public SoonHomeFragment() {
         // Required empty public constructor
     }
 
@@ -53,7 +53,7 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // Inflate the layout in this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        return inflater.inflate(R.layout.fragment_home_all, container, false);
     }
 
     @Override

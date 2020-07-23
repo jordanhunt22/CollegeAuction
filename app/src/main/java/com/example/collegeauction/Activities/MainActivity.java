@@ -14,8 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.example.collegeauction.BidsPurchasesFragments.BidsPurchasesFragment;
+import com.example.collegeauction.HomeFragments.HomeFragment;
 import com.example.collegeauction.MainFragments.FavoritesFragment;
-import com.example.collegeauction.MainFragments.HomeFragment;
+import com.example.collegeauction.HomeFragments.SoonHomeFragment;
 import com.example.collegeauction.MainFragments.ProfileFragment;
 import com.example.collegeauction.R;
 import com.example.collegeauction.databinding.ActivityMainBinding;

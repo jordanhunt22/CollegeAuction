@@ -9,10 +9,8 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.collegeauction.CreationFragments.CreationFragment;
-import com.example.collegeauction.MainFragments.HomeFragment;
 import com.example.collegeauction.R;
 import com.example.collegeauction.databinding.ActivityCreationBinding;
-import com.example.collegeauction.databinding.ActivityMainBinding;
 
 public class CreationActivity extends AppCompatActivity {
 
