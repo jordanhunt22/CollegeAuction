@@ -24,6 +24,8 @@ import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.google.android.material.textfield.TextInputEditText;
+import com.parse.GetCallback;
+import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseUser;
 
@@ -163,6 +165,18 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
                              String date = dateManipulator.getDate();
                              tvTime.setText(date);
                          }
+
+                        purchase.fetchInBackground();
+                        if (purchase.getRecentBid() != null) {
+                            purchase.getRecentBid().fetchIfNeededInBackground(new GetCallback<Bid>() {
+                                @Override
+                                public void done(Bid bid, ParseException e) {
+                                    tvBid.setText("$" + Objects.requireNonNull(bid.getNumber(Bid.KEY_PRICE)).toString());
+                                }
+                            });
+                        } else {
+                            tvBid.setText("$" + purchase.getNumber("minPrice").toString());
+                        }
                         timerHandler.postDelayed(updater,1000);
                     }
                 };

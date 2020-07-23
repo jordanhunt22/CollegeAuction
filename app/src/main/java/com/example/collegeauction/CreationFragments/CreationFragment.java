@@ -257,8 +257,6 @@ public class CreationFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-
-
         if (point != null){
             MapHelper.getAddressFromLocation(point, getContext(), new GeocoderHandler());
         }

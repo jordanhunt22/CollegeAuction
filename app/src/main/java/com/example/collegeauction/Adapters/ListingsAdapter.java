@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.GestureDetectorCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -29,6 +32,7 @@ import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.Models.Purchase;
 import com.example.collegeauction.R;
 import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseObject;
@@ -49,7 +53,7 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
     private Context context;
     private List<Listing> listings;
 
-    public ListingsAdapter(Context context, List<Listing> listings){
+    public ListingsAdapter(Context context, List<Listing> listings) {
         this.context = context;
         this.listings = listings;
     }
@@ -74,9 +78,11 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
     }
 
     @Override
-    public int getItemCount() { return listings.size(); }
+    public int getItemCount() {
+        return listings.size();
+    }
 
-    class ViewHolder extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         private ImageView ivImage;
         private TextView tvName;
@@ -85,12 +91,16 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
         private ImageButton btnFav;
         private Runnable updater;
         final Handler timerHandler = new Handler();
+        private GestureDetectorCompat gestureDetector;
 
         private Listing listing;
         private DateManipulator dateManipulator;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+
+            // Creates the gesture detector
+            gestureDetector = new GestureDetectorCompat(context, new MyGestureListener());
 
             // Resolves the views
             ivImage = itemView.findViewById(R.id.ivImage);
@@ -99,35 +109,11 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
             tvBid = itemView.findViewById(R.id.tvBid);
             btnFav = itemView.findViewById(R.id.btnFav);
 
-            itemView.setOnClickListener(new View.OnClickListener() {
+            itemView.setOnTouchListener(new View.OnTouchListener() {
                 @Override
-                public void onClick(View view) {
-                    ParseUser currentUser = ParseUser.getCurrentUser();
-                    // Gets item position
-                    int position = getAdapterPosition();
-                    // Make sure the position is valid, i.e. actually exists in the view
-                    if (position != RecyclerView.NO_POSITION){
-                        // Get the listing at the position, this won't work if the class is static
-                        listing = listings.get(position);
-
-                        // Create a new intent
-                        Intent intent = new Intent(context, ListingDetailsActivity.class);
-
-                        // Serialize the Post using parceler, use its short name as a key
-                        intent.putExtra(Listing.class.getSimpleName(), Parcels.wrap(listing));
-
-//                        if (currentUser.getObjectId().equals(listing.getUser().getObjectId())){
-//                            // Open the seller's detail view
-//                            Toast.makeText(context, "You are the seller!", Toast.LENGTH_SHORT).show();
-//                            intent.putExtra("viewType", "seller");
-//                        }
-//                        else{
-                            // open the buyer's detail view
-                            intent.putExtra("viewType", "buyer");
-//                        }
-                        // Start the DetailsActivity
-                        context.startActivity(intent);
-                    }
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    gestureDetector.onTouchEvent(motionEvent);
+                    return true;
                 }
             });
 
@@ -157,8 +143,7 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                                 }
                             });
                             Log.i(TAG, "unfavorite");
-                        }
-                        else{
+                        } else {
                             btnFav.setBackground(context.getDrawable(R.drawable.star_active));
                             Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
                             Favorite favorite = new Favorite();
@@ -180,15 +165,26 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                 updater = new Runnable() {
                     @Override
                     public void run() {
-                        if(System.currentTimeMillis() >= listing.getExpireTime().getTime()){
+                        if (System.currentTimeMillis() >= listing.getExpireTime().getTime()) {
                             listing.put("isSold", true);
                             listing.saveInBackground();
                             listings.removeAll(Collections.singleton(listing));
                             notifyDataSetChanged();
                         }
+                        listing.fetchInBackground();
+                        if (listing.getRecentBid() != null) {
+                            listing.getRecentBid().fetchIfNeededInBackground(new GetCallback<Bid>() {
+                                @Override
+                                public void done(Bid bid, ParseException e) {
+                                    tvBid.setText("$" + Objects.requireNonNull(bid.getNumber(Bid.KEY_PRICE)).toString());
+                                }
+                            });
+                        } else {
+                            tvBid.setText("$" + listing.getNumber("minPrice").toString());
+                        }
                         String date = dateManipulator.getDate();
                         tvTime.setText(date);
-                        timerHandler.postDelayed(updater,1000);
+                        timerHandler.postDelayed(updater, 1000);
                     }
                 };
                 timerHandler.post(updater);
@@ -197,8 +193,7 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
             tvName.setText(listing.getName());
             if (listing.getRecentBid() != null) {
                 tvBid.setText("$" + Objects.requireNonNull(listing.getRecentBid().getNumber(Bid.KEY_PRICE)).toString());
-            }
-            else{
+            } else {
                 tvBid.setText("$" + listing.getNumber("minPrice").toString());
             }
             ParseFile image = listing.getImage();
@@ -214,21 +209,95 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                         .into(ivImage);
             }
 
-            if (isFavorite(listing)){
+            if (isFavorite(listing)) {
                 btnFav.setBackground(context.getDrawable(R.drawable.star_active));
-            }
-            else{
+            } else {
                 btnFav.setBackground(context.getDrawable(R.drawable.star));
             }
         }
+        class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+            private static final String DEBUG_TAG = "Gestures";
+
+            @Override
+            public boolean onDown(MotionEvent e) {
+                Log.i(TAG, "Down Tap");
+                return true;
+            }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                Log.i(TAG, "Double Tap");
+                // Gets item position
+                int position = getAdapterPosition();
+                // Make sure the position is valid, i.e. actually exists in the view
+                if (position != RecyclerView.NO_POSITION) {
+                    ParseUser user = ParseUser.getCurrentUser();
+                    ParseRelation<ParseObject> relation = user.getRelation("favoritedListings");
+                    // Get the listing at the position, this won't work if the class is static
+                    listing = listings.get(position);
+                    // Checks to see if the clicked listing is favorited
+                    if (isFavorite(listing)) {
+                        btnFav.setBackground(context.getDrawable(R.drawable.star));
+                        Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(listing.getObjectId()));
+                        ParseQuery query = ParseQuery.getQuery(Favorite.class);
+                        query.whereEqualTo(Favorite.KEY_USER, user);
+                        query.whereEqualTo(Favorite.KEY_LISTING, listing);
+                        query.findInBackground(new FindCallback<Favorite>() {
+                            @Override
+                            public void done(List<Favorite> favorites, ParseException e) {
+                                for (Favorite favorite : favorites)
+                                    favorite.deleteInBackground();
+                            }
+                        });
+                        Log.i(TAG, "unfavorite");
+                    } else {
+                        btnFav.setBackground(context.getDrawable(R.drawable.star_active));
+                        Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
+                        Favorite favorite = new Favorite();
+                        favorite.setListing(listing);
+                        favorite.setUser(user);
+                        favorite.saveInBackground();
+                        Log.i(TAG, "favorite");
+                    }
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                Log.i(TAG, "Single Tap");
+                ParseUser currentUser = ParseUser.getCurrentUser();
+                // Gets item position
+                int position = getAdapterPosition();
+                // Make sure the position is valid, i.e. actually exists in the view
+                if (position != RecyclerView.NO_POSITION) {
+                    // Get the listing at the position, this won't work if the class is static
+                    listing = listings.get(position);
+
+                    // Create a new intent
+                    Intent intent = new Intent(context, ListingDetailsActivity.class);
+
+                    // Serialize the Post using parceler, use its short name as a key
+                    intent.putExtra(Listing.class.getSimpleName(), Parcels.wrap(listing));
+
+                    // open the buyer's detail view
+                    intent.putExtra("viewType", "buyer");
+                    // Start the DetailsActivity
+                    context.startActivity(intent);
+                }
+                return true;
+            }
+        }
+
     }
 
     // Checks to see if the current user has favorited this post
-    public boolean isFavorite(Listing listing){
-        if (Listing.listingsFavoritedByCurrentuser.contains(listing.getObjectId())){
+    public boolean isFavorite(Listing listing) {
+        if (Listing.listingsFavoritedByCurrentuser.contains(listing.getObjectId())) {
             return true;
+        } else {
+            return false;
         }
-        else { return false; }
     }
 
     // Clean all elements of the recyclerview
