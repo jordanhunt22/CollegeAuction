@@ -114,23 +114,6 @@ public class MainActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                // Query the listings that contain the string in either the name or the description
-                if (query != null && getVisibleFragment() instanceof HomeFragment){
-                    Fragment fragment = getVisibleFragment();
-                    ((HomeFragment) fragment).queryString(query);
-                    searchView.clearFocus();
-                }
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
         return true;
     }
 

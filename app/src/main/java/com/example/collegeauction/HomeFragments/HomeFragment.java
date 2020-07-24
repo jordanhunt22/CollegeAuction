@@ -65,13 +65,6 @@ public class HomeFragment extends Fragment {
         tabLayoutMediator.attach();
     }
 
-    public void queryString(String query){
-        if (adapter.fragment instanceof SoonHomeFragment){
-            SoonHomeFragment fragment = (SoonHomeFragment) adapter.fragment;
-            fragment.queryListingsFromSearch(query);
-        }
-    }
-
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         this.menu = menu;

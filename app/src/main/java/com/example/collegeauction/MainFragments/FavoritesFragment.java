@@ -216,7 +216,6 @@ public class FavoritesFragment extends Fragment {
 
             // Save received posts to list and notify adapter of new data
             swipeContainer.setRefreshing(false);
-
          }
       });
    }

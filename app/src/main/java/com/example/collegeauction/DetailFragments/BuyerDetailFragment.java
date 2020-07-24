@@ -43,6 +43,8 @@ public class BuyerDetailFragment extends Fragment {
 
     public static final String TAG = "BuyerDetailFragment";
 
+    // Add handling for when an item is sold
+
     private Listing listing;
     private TextView tvName;
     private TextView tvDescription;
@@ -216,7 +218,7 @@ public class BuyerDetailFragment extends Fragment {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Listing");
         query.include(Listing.KEY_BID);
         // Retrieve the object by id
-        query.getInBackground(listing.getObjectId().toString(), new GetCallback<ParseObject>() {
+        query.getInBackground(listing.getObjectId(), new GetCallback<ParseObject>() {
             public void done(ParseObject cloudListing, ParseException e) {
                 if (e == null) {
                     listing = (Listing) cloudListing;

@@ -163,6 +163,7 @@ public class CreationFragment extends Fragment {
                 Long bid = null;
                 if (name.isEmpty()) {
                     Toast.makeText(getContext(), "The item name cannot be empty. Try again", Toast.LENGTH_SHORT).show();
+                    return;
                 }
                 if (description.isEmpty()) {
                     Toast.makeText(getContext(), "The item description cannot be empty", Toast.LENGTH_SHORT).show();

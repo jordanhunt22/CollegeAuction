@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,6 +13,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -53,6 +58,8 @@ public class SoonHomeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        //  Sets hasOptionMenu to true
+        setHasOptionsMenu(true);
         // Inflate the layout in this fragment
         return inflater.inflate(R.layout.fragment_home_all, container, false);
     }
@@ -237,6 +244,7 @@ public class SoonHomeFragment extends Fragment {
     }
 
     public void queryListingsFromSearch(String queryString){
+        rvPosts.scrollToPosition(0);
         final ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
@@ -283,7 +291,7 @@ public class SoonHomeFragment extends Fragment {
 
                 adapter.notifyDataSetChanged();
 
-                if (allListings.isEmpty()){
+                if (returnListings.isEmpty()){
                     tvEmpty.setVisibility(View.VISIBLE);
                 }
                 else{
@@ -300,5 +308,26 @@ public class SoonHomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         queryListings();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+
+        MenuItem item = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) MenuItemCompat.getActionView(item);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                queryListingsFromSearch(query);
+                searchView.clearFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
     }
 }
