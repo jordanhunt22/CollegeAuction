@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
@@ -25,6 +27,8 @@ public class HomeFragment extends Fragment {
     private ViewPager2 viewPager;
     private HomeAdapter adapter;
 
+    private Menu menu;
+
     public HomeFragment() {
         // Required empty public constructor
     }
@@ -32,6 +36,7 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_home, container, false);
     }
@@ -58,5 +63,27 @@ public class HomeFragment extends Fragment {
         });
         viewPager.setCurrentItem(0);
         tabLayoutMediator.attach();
+    }
+
+    public void queryString(String query){
+        if (adapter.fragment instanceof SoonHomeFragment){
+            SoonHomeFragment fragment = (SoonHomeFragment) adapter.fragment;
+            fragment.queryListingsFromSearch(query);
+        }
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        this.menu = menu;
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    public void collapseMenuItem(){
+        if (menu != null)
+        {
+            MenuItem item = menu.findItem(R.id.action_search);
+            if(item!=null)
+                item.collapseActionView();
+        }
     }
 }

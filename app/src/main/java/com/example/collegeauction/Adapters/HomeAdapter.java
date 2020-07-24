@@ -17,6 +17,8 @@ import java.util.List;
 
 public class HomeAdapter extends FragmentStateAdapter {
 
+    public Fragment fragment;
+
     public HomeAdapter(@NonNull Fragment fragment) {
         super(fragment);
     }
@@ -25,10 +27,12 @@ public class HomeAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         if (position == 0){
-            return new SoonHomeFragment();
+            fragment = new SoonHomeFragment();
+            return fragment;
         }
         else{
-            return new NearbyHomeFragment();
+            fragment = new NearbyHomeFragment();
+            return fragment;
         }
     }
 

@@ -179,6 +179,9 @@ public class SoonHomeFragment extends Fragment {
     }
 
     public void queryListings() {
+        // Collapses the SearchView if it is open
+        HomeFragment parentFrag = ((HomeFragment)SoonHomeFragment.this.getParentFragment());
+        parentFrag.collapseMenuItem();
         final ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
@@ -219,6 +222,66 @@ public class SoonHomeFragment extends Fragment {
                 // Clears the adapter
                 adapter.clear();
                 adapter.addAll(returnListings);
+
+                if (allListings.isEmpty()){
+                    tvEmpty.setVisibility(View.VISIBLE);
+                }
+                else{
+                    tvEmpty.setVisibility(View.GONE);
+                }
+
+                // Save received posts to list and notify adapter of new data
+                swipeContainer.setRefreshing(false);
+            }
+        });
+    }
+
+    public void queryListingsFromSearch(String queryString){
+        final ParseUser currentUser = ParseUser.getCurrentUser();
+        ParseQuery query = ParseQuery.getQuery(Listing.class);
+        query.include(Listing.KEY_BID);
+        // limit query to latest 20 items
+        query.setLimit(20);
+        // Only displays items that have not been sold yet
+        query.whereEqualTo("isSold", false);
+        // order posts by creation date (newest first)
+        query.addAscendingOrder(Listing.KEY_EXPIRATION);
+        // Query only returns items which have the search string in its name or description
+        query.whereContains(Listing.KEY_NAME, queryString);
+        query.whereContains(Listing.KEY_DESCRIPTION, queryString);
+        // Does not show the current user's posts
+        query.whereNotEqualTo(Listing.KEY_USER, currentUser);
+        // start an asynchronous call for posts
+        query.findInBackground(new FindCallback<Listing>() {
+            @Override
+            public void done(List<Listing> listings, ParseException e) {
+                if (e != null){
+                    Log.e(TAG, "Issue with getting listings", e);
+                    return;
+                }
+                List <Listing> returnListings = new ArrayList<>();
+                returnListings.addAll(listings);
+                ParseRelation<ParseObject> relation = currentUser.getRelation("purchases");
+                for (int i = 0; i < listings.size(); i++){
+                    Listing listing = listings.get(i);
+                    if(listing.getRecentBid() != null) {
+                        if (listing.getRecentBid().getParseUser(Bid.KEY_USER).equals(currentUser)) {
+                            relation.add(listing);
+                            currentUser.saveInBackground();
+                        }
+                    }
+                    if (System.currentTimeMillis() > listing.getExpireTime().getTime()){
+                        listing.put("isSold", true);
+                        listing.saveInBackground();
+                        returnListings.removeAll(Collections.singleton(listing));
+                    }
+                }
+
+                // Clears the adapter
+                adapter.clear();
+                adapter.addAll(returnListings);
+
+                adapter.notifyDataSetChanged();
 
                 if (allListings.isEmpty()){
                     tvEmpty.setVisibility(View.VISIBLE);

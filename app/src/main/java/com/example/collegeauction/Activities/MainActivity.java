@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -25,11 +26,12 @@ import com.example.collegeauction.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     public static FloatingActionButton fab;
     final FragmentManager fragmentManager = getSupportFragmentManager();
-    private Fragment fragment;
     private Context context;
     private int startingPosition;
     private SearchView searchView;
@@ -92,9 +94,6 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.action_profile:
                         fragment = new ProfileFragment();
                         newPosition = 4;
-//                        Bundle args = new Bundle();
-//                        args.putParcelable("user", Parcels.wrap(ParseUser.getCurrentUser()));
-//                        fragment.setArguments(args);
                         break;
                     default:
                         throw new IllegalStateException("Unexpected value: " + item.getItemId());
@@ -118,12 +117,12 @@ public class MainActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // perform query here
-
-                // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
-                // see https://code.google.com/p/android/issues/detail?id=24599
-                searchView.clearFocus();
-
+                // Query the listings that contain the string in either the name or the description
+                if (query != null && getVisibleFragment() instanceof HomeFragment){
+                    Fragment fragment = getVisibleFragment();
+                    ((HomeFragment) fragment).queryString(query);
+                    searchView.clearFocus();
+                }
                 return true;
             }
 
@@ -163,5 +162,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return false;
+    }
+
+    private Fragment getVisibleFragment() {
+        FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
+        List<Fragment> fragments = fragmentManager.getFragments();
+        for (Fragment fragment : fragments) {
+            if (fragment != null && fragment.isVisible())
+                return fragment;
+        }
+        return null;
     }
 }

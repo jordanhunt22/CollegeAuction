@@ -234,7 +234,7 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        MenuItem item=menu.findItem(R.id.action_search);
+        MenuItem item = menu.findItem(R.id.action_search);
         if(item!=null)
             item.setVisible(false);
     }
