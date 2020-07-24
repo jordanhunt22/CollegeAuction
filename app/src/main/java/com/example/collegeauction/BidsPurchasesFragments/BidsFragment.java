@@ -75,6 +75,8 @@ public class BidsFragment extends Fragment {
             }
         });
 
+        swipeBids.setRefreshing(true);
+
 
         allBids = new ArrayList<>();
         bidsAdapter = new BidsAdapter(getContext(), allBids);

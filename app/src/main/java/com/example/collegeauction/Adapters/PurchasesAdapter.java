@@ -59,7 +59,7 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
     @Override
     public void onBindViewHolder(@NonNull PurchasesAdapter.ViewHolder holder, int position) {
         Listing purchase = purchases.get(position);
-        holder.bind(purchase);
+        holder.bind(position);
     }
 
     @Override
@@ -107,14 +107,10 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
 
                         if (currentUser.getObjectId().equals(purchase.getUser().getObjectId())){
                             // Open the seller's detail view
-                            Toast.makeText(context, "You are the seller!", Toast.LENGTH_SHORT).show();
-                            // I still need to make a seller detail view
                             intent.putExtra("viewType", "seller");
                         }
                         else{
                             // Open the buyer's detail view
-                            Toast.makeText(context, "You already bought this item!", Toast.LENGTH_SHORT).show();
-                            // open the buyer's detail view
                             intent.putExtra("viewType", "purchased");
                         }
                         // Start the DetailsActivity
@@ -125,7 +121,10 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
         }
 
         @SuppressLint("SetTextI18n")
-        public void bind(final Listing purchase) {
+        public void bind(int position) {
+
+            // Gets the lisitng at the position of the ViewHolder
+            purchase = purchases.get(position);
 
             // Adds to object Id to list
             purchaseIds.removeAll(Collections.singleton(purchase.getObjectId()));
@@ -151,7 +150,6 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
                         .transform(new CenterCrop())
                         .into(ivImage);
             } else {
-                //ivImage.setImageResource(android.R.color.transparent);
                 Glide.with(context)
                         .load(R.drawable.ic_launcher_background)
                         .transform(new CenterCrop())
@@ -168,13 +166,14 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
                          if(System.currentTimeMillis() >= purchase.getExpireTime().getTime()){
                              tvTime.setText("Expired " + TimeFormatter
                                      .getTimeDifference(purchase.getDate("expiresAt").toString()) + " ago");
+                             return;
                          }
                          else {
                              String date = dateManipulator.getDate();
                              tvTime.setText(date);
                          }
 
-                        purchase.fetchInBackground();
+                        // purchase.fetchInBackground();
                         if (purchase.getRecentBid() != null) {
                             purchase.getRecentBid().fetchIfNeededInBackground(new GetCallback<Bid>() {
                                 @Override

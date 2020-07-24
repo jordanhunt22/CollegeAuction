@@ -5,6 +5,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -79,6 +80,7 @@ public class MapsCreationFragment extends Fragment implements GoogleMap.OnMapLon
     private Button btnOK;
 
     private Boolean justStarted;
+    private LatLng tempPoint;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -111,7 +113,6 @@ public class MapsCreationFragment extends Fragment implements GoogleMap.OnMapLon
         btnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CreationFragment.point = null;
                 getActivity().onBackPressed();
             }
         });
@@ -119,6 +120,7 @@ public class MapsCreationFragment extends Fragment implements GoogleMap.OnMapLon
         btnOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                CreationFragment.point = tempPoint;
                 getActivity().onBackPressed();
             }
         });
@@ -328,7 +330,7 @@ public class MapsCreationFragment extends Fragment implements GoogleMap.OnMapLon
         // Animate marker using drop effect
         dropPinEffect(marker);
         // Adds the point to the CreationFragment class
-        CreationFragment.point = point;
+        tempPoint = point;
     }
 
     private void dropPinEffect(final Marker marker) {

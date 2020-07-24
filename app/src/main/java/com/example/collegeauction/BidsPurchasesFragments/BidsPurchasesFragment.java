@@ -13,6 +13,8 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -57,6 +59,7 @@ public class BidsPurchasesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_bids_purchases, container, false);
     }
@@ -87,10 +90,13 @@ public class BidsPurchasesFragment extends Fragment {
         // Makes the fab visible whenever a new fragment starts
         MainActivity.fab.show();
 
-
-
     }
 
-
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem item=menu.findItem(R.id.action_search);
+        if(item!=null)
+            item.setVisible(false);
+    }
 
 }

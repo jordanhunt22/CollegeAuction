@@ -72,7 +72,7 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ListingsAdapter.ViewHolder holder, int position) {
         Listing listing = listings.get(position);
-        holder.bind(listing);
+        holder.bind(position);
     }
 
     @Override
@@ -156,7 +156,11 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
         }
 
         @SuppressLint("SetTextI18n")
-        public void bind(final Listing listing) {
+        public void bind(int position) {
+
+            // Gets the listing at that position
+            listing = listings.get(position);
+
             // Adds objectId of the listing to a list
             listingIds.removeAll(Collections.singleton(listing.getObjectId()));
             listingIds.add(listing.getObjectId());

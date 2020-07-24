@@ -1,13 +1,16 @@
 package com.example.collegeauction.CreationFragments;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
 import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -29,6 +32,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -45,7 +49,12 @@ import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
 import com.parse.SaveCallback;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -60,18 +69,24 @@ public class CreationFragment extends Fragment {
     private EditText etName;
     private Button btnCaptureImage;
     private ImageView ivListingImage;
+    private TextView tvLocation;
     private Button btnSubmit;
     private Button btnLocation;
+    private Button btnGallery;
     private File photoFile;
     public String photoFileName = "listing.jpg";
     ProgressBar pb;
     private FragmentManager fragmentManager;
+    private int imageRotated;
+    private Uri photoUri;
 
+    // PICK_PHOTO_CODE is a constant integer
+    public final static int PICK_PHOTO_CODE = 1000;
 
     public static LatLng point;
     private String location;
 
-    public CreationFragment(){
+    public CreationFragment() {
         // Required empty public constructor
     }
 
@@ -92,6 +107,8 @@ public class CreationFragment extends Fragment {
         etDescription = view.findViewById(R.id.etDescription);
         btnCaptureImage = view.findViewById(R.id.btnCaptureImage);
         btnLocation = view.findViewById(R.id.btnLocation);
+        btnGallery = view.findViewById(R.id.btnGallery);
+        tvLocation = view.findViewById(R.id.tvLocation);
         ivListingImage = view.findViewById(R.id.ivListingImage);
         etBid = view.findViewById(R.id.etBid);
         etName = view.findViewById(R.id.etName);
@@ -121,11 +138,19 @@ public class CreationFragment extends Fragment {
             }
         });
 
+        // On click listener for going to the gallery
+        btnGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onPickPhoto();
+            }
+        });
+
         // On click listener for the submit button
         btnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (point == null){
+                if (point == null) {
                     Toast.makeText(getContext(), "You did not enter a location", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -136,10 +161,10 @@ public class CreationFragment extends Fragment {
                 String name = etName.getText().toString();
                 String description = etDescription.getText().toString();
                 Long bid = null;
-                if (name.isEmpty()){
+                if (name.isEmpty()) {
                     Toast.makeText(getContext(), "The item name cannot be empty. Try again", Toast.LENGTH_SHORT).show();
                 }
-                if (description.isEmpty()){
+                if (description.isEmpty()) {
                     Toast.makeText(getContext(), "The item description cannot be empty", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -151,7 +176,7 @@ public class CreationFragment extends Fragment {
                     return;
                 }
 
-                if (photoFile == null || ivListingImage.getDrawable() == null){
+                if (photoFile == null || ivListingImage.getDrawable() == null) {
                     Toast.makeText(getContext(), "There is no image", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -165,6 +190,7 @@ public class CreationFragment extends Fragment {
     private void saveListing(String name, String description, Long minPrice, File photoFile, ParseGeoPoint finalPoint) {
         ParseUser currentUser = ParseUser.getCurrentUser();
         // Sets expire date to 3 days after the current date
+        // ParseFile image = new ParseFile(photoFile);
         Date currentDate = new Date();
         Calendar c = Calendar.getInstance();
         c.setTime(currentDate);
@@ -179,13 +205,14 @@ public class CreationFragment extends Fragment {
         listing.put("minPrice", minPrice);
         listing.setExpireTime(expireDate);
         listing.put("location", finalPoint);
-        // Set isSold equal to false
+        listing.put("isSold", false);
         listing.saveInBackground(new SaveCallback() {
             @Override
             public void done(ParseException e) {
-                if (e != null){
+                if (e != null) {
                     Log.e(TAG, "Error while saving!", e);
                     Toast.makeText(getContext(), "Error while saving!", Toast.LENGTH_SHORT).show();
+                    return;
                 }
                 Log.i(TAG, "Post save was successful!");
                 etDescription.setText("");
@@ -233,9 +260,9 @@ public class CreationFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
+                imageRotated = 1;
                 // by this point we have the camera photo on disk
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
-                // RESIZE BITMAP, see section below
                 // Load the taken image into a preview
                 Matrix matrix = new Matrix();
                 matrix.postRotate(90);
@@ -245,11 +272,24 @@ public class CreationFragment extends Fragment {
                         .load(imageDrawable)
                         .transform(new CenterCrop())
                         .into(ivListingImage);
-                // ivListingImage.setImageBitmap(takenImage);
                 Toast.makeText(getContext(), "Image was taken!", Toast.LENGTH_SHORT).show();
             } else { // Result was a failure
                 Toast.makeText(getContext(), "Picture wasn't taken!", Toast.LENGTH_SHORT).show();
             }
+        } else if ((data != null) && requestCode == PICK_PHOTO_CODE) {
+
+            imageRotated = 2;
+
+            photoUri = data.getData();
+
+            // Load the image located at photoUri into selectedImage
+            Bitmap selectedImage = loadFromUri(photoUri);
+
+            // Load the selected image into a preview
+            ivListingImage.setImageBitmap(selectedImage);
+            ivListingImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+            persistImage(selectedImage, "listing");
         }
     }
 
@@ -257,9 +297,31 @@ public class CreationFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        if (point != null){
+        if (point != null) {
             MapHelper.getAddressFromLocation(point, getContext(), new GeocoderHandler());
         }
+
+
+        if (imageRotated == 1) {
+            Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+            // Load the taken image into a preview
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            Bitmap rotatedBitmap = Bitmap.createBitmap(takenImage, 0, 0, takenImage.getWidth(), takenImage.getHeight(), matrix, true);
+            Drawable imageDrawable = new BitmapDrawable(getResources(), rotatedBitmap);
+            Glide.with(getContext())
+                    .load(imageDrawable)
+                    .transform(new CenterCrop())
+                    .into(ivListingImage);
+        } else if (imageRotated == 2) {
+            // Load the image located at photoUri into selectedImage
+            Bitmap selectedImage = loadFromUri(photoUri);
+
+            // Load the selected image into a preview
+            ivListingImage.setImageBitmap(selectedImage);
+            ivListingImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        }
+
     }
 
     // Returns the File for a photo stored on disk given the fileName
@@ -270,7 +332,7 @@ public class CreationFragment extends Fragment {
         File mediaStorageDir = new File(getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES), TAG);
 
         // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()){
+        if (!mediaStorageDir.exists() && !mediaStorageDir.mkdirs()) {
             Log.d(TAG, "failed to create directory");
         }
 
@@ -292,8 +354,56 @@ public class CreationFragment extends Fragment {
             }
             // replace by what you need to do
             location = result;
+            tvLocation.setText("Location: " + location);
+            btnLocation.setText("Change Location");
         }
     }
 
+    // Trigger gallery selection for a photo
+    public void onPickPhoto() {
+        // Create intent for picking a photo from the gallery
+        Intent intent = new Intent(Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+        // If you call startActivityForResult() using an intent that no app can handle, your app will crash.
+        // So as long as the result is not null, it's safe to use the intent.
+        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+            // Bring up gallery to select a photo
+            startActivityForResult(intent, PICK_PHOTO_CODE);
+        }
+    }
+
+    public Bitmap loadFromUri(Uri photoUri) {
+        Bitmap image = null;
+        try {
+            // check version of Android on device
+            if (Build.VERSION.SDK_INT > 27) {
+                // on newer versions of Android, use the new decodeBitmap method
+                ImageDecoder.Source source = ImageDecoder.createSource(getContext().getContentResolver(), photoUri);
+                image = ImageDecoder.decodeBitmap(source);
+            } else {
+                // support older versions of Android by using getBitmap
+                image = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), photoUri);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return image;
+    }
+
+    private void persistImage(Bitmap bitmap, String name) {
+        File filesDir = getContext().getFilesDir();
+        photoFile = new File(filesDir, name + ".jpg");
+
+        OutputStream os;
+        try {
+            os = new FileOutputStream(photoFile);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
+            os.flush();
+            os.close();
+        } catch (Exception e) {
+            Log.e(getClass().getSimpleName(), "Error writing bitmap", e);
+        }
+    }
 
 }

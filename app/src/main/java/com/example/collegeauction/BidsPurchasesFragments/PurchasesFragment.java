@@ -77,6 +77,8 @@ public class PurchasesFragment extends Fragment {
             }
         });
 
+        swipePurchases.setRefreshing(true);
+
         allPurchases = new ArrayList<>();
         purchasesAdapter = new PurchasesAdapter(getContext(), allPurchases);
 
@@ -152,11 +154,12 @@ public class PurchasesFragment extends Fragment {
                         q.addDescendingOrder(Listing.KEY_EXPIRATION);
                         q.include(Listing.KEY_BID);
                         q.include(Listing.KEY_USER);
+                        q.setSkip(purchasesAdapter.getItemCount());
                         q.setLimit(20);
                         q.findInBackground(new FindCallback<Listing>() {
                             @Override
                             public void done(List<Listing> listings, ParseException e) {
-                                
+
                                 List <Listing> returnListings = new ArrayList<>();
                                 for (Listing listing : listings){
                                     if (!purchasesAdapter.purchaseIds.contains(listing.getObjectId())){

@@ -106,7 +106,6 @@ public class RegisterFragment extends Fragment {
                     return;
                 }
                 goMainActivity();
-                Toast.makeText(getContext(), "Success!", Toast.LENGTH_SHORT).show();
             }
         });
     }

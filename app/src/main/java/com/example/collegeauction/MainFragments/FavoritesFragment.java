@@ -11,6 +11,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -54,6 +56,7 @@ public class FavoritesFragment extends Fragment {
    @Nullable
    @Override
    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+      setHasOptionsMenu(true);
       // Inflate the layout in this fragment
       return inflater.inflate(R.layout.fragment_home_all, container, false);
    }
@@ -78,11 +81,8 @@ public class FavoritesFragment extends Fragment {
             queryListings();
          }
       });
-      // Configure the refreshing colors
-      swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-              android.R.color.holo_green_light,
-              android.R.color.holo_orange_light,
-              android.R.color.holo_red_light);
+
+      swipeContainer.setRefreshing(true);
 
       rvPosts = view.findViewById(R.id.rvPosts);
 
@@ -221,11 +221,16 @@ public class FavoritesFragment extends Fragment {
       });
    }
 
-
-
    @Override
    public void onResume() {
       super.onResume();
       queryListings();
+   }
+
+   @Override
+   public void onPrepareOptionsMenu(Menu menu) {
+      MenuItem item=menu.findItem(R.id.action_search);
+      if(item!=null)
+         item.setVisible(false);
    }
 }

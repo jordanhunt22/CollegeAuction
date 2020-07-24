@@ -44,7 +44,7 @@
                     android:layout_marginStart="4dp"
                     android:layout_marginEnd="4dp"
                     android:background="#FFFFFF"
-                    android:text="$15"
+                    android:text="$50"
                     android:textColor="#304FFE"
                     android:textSize="22sp" />
             </androidx.cardview.widget.CardView>
