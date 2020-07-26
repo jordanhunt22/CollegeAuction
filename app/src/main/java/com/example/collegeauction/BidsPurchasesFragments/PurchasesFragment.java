@@ -21,6 +21,7 @@ import com.example.collegeauction.Adapters.PurchasesAdapter;
 import com.example.collegeauction.Miscellaneous.EndlessRecyclerViewScrollListener;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
+import com.example.collegeauction.Models.Purchase;
 import com.example.collegeauction.R;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -41,7 +42,7 @@ public class PurchasesFragment extends Fragment {
     private TextView tvEmpty;
     private SwipeRefreshLayout swipePurchases;
     private PurchasesAdapter purchasesAdapter;
-    private List<Listing> allPurchases;
+    private List<Purchase> allPurchases;
     private EndlessRecyclerViewScrollListener scrollListener;
 
 
@@ -118,62 +119,39 @@ public class PurchasesFragment extends Fragment {
 
     private void loadMoreData() {
         final ParseUser currentUser = ParseUser.getCurrentUser();
-        ParseQuery query = ParseQuery.getQuery(Bid.class);
-        // Only gets the currentUser's bids
-        query.whereEqualTo("user", currentUser);
-        // Includes the attached listing
-        query.include(Bid.KEY_LISTING);
-        // Only displays items that have not been sold
-        query.whereEqualTo("isCurrent", true);
-        // Order posts by creation date (newest first)
-        query.addDescendingOrder("listing.expiresAt");
-        // Start an asynchronous call for posts
-        // Updates the user's purchases
-        query.findInBackground(new FindCallback<Bid>() {
+        ParseQuery query = ParseQuery.getQuery(Purchase.class);
+        query.include("listing");
+        query.include("listing.user");
+        query.include("finalBid");
+        query.setSkip(purchasesAdapter.getItemCount());
+        query.include("listing.mostRecentBid");
+        query.setLimit(20);
+        query.whereEqualTo("buyer", currentUser);
+        query.addDescendingOrder("createdAt");
+        query.findInBackground(new FindCallback<Purchase>() {
             @Override
-            public void done(List<Bid> bids, ParseException e) {
+            public void done(List<Purchase> purchases, ParseException e) {
+
                 if (e != null) {
-                    Log.e(TAG, "Issue with getting listings", e);
+                    Log.e(TAG, "Error with getting purchases: " + e);
+                    e.printStackTrace();
                     return;
                 }
-                ParseRelation<ParseObject> relation = currentUser.getRelation("purchases");
-                for (Bid bid : bids){
-                    Listing listing = (Listing) bid.getListing();
-                    if (listing.getBoolean("isSold")){
-                        relation.add(listing);
+
+                List<Purchase> returnPurchases = new ArrayList<>();
+                for (Purchase purchase : purchases) {
+                    if (!purchasesAdapter.purchaseIds.contains(purchase.getObjectId())){
+                        returnPurchases.add(purchase);
                     }
                 }
-                currentUser.saveInBackground();
 
-                // Returns the purchases relation
-                currentUser.fetchInBackground(new GetCallback<ParseObject>() {
-                    @Override
-                    public void done(final ParseObject object, ParseException e) {
-                        ParseRelation<Listing> purchases = object.getRelation("purchases");
-                        ParseQuery<Listing> q = purchases.getQuery();
-                        q.addDescendingOrder(Listing.KEY_EXPIRATION);
-                        q.include(Listing.KEY_BID);
-                        q.include(Listing.KEY_USER);
-                        q.setSkip(purchasesAdapter.getItemCount());
-                        q.setLimit(20);
-                        q.findInBackground(new FindCallback<Listing>() {
-                            @Override
-                            public void done(List<Listing> listings, ParseException e) {
+                purchasesAdapter.addAll(returnPurchases);
 
-                                List <Listing> returnListings = new ArrayList<>();
-                                for (Listing listing : listings){
-                                    if (!purchasesAdapter.purchaseIds.contains(listing.getObjectId())){
-                                        returnListings.add(listing);
-                                    }
-                                }
-                                purchasesAdapter.addAll(returnListings);
+                // Save received posts to list and notify adapter of new data
+                swipePurchases.setRefreshing(false);
 
-                                // Save received posts to list and notify adapter of new data
-                                swipePurchases.setRefreshing(false);
-                            }
-                        });
-                    }
-                });
+                // Save received posts to list and notify adapter of new data
+                swipePurchases.setRefreshing(false);
 
             }
         });
@@ -181,62 +159,39 @@ public class PurchasesFragment extends Fragment {
 
     private void queryPurchases() {
         final ParseUser currentUser = ParseUser.getCurrentUser();
-        ParseQuery query = ParseQuery.getQuery(Bid.class);
-        // Only gets the currentUser's bids
-        query.whereEqualTo("user", currentUser);
-        // Includes the attached listing
-        query.include(Bid.KEY_LISTING);
-        // Only displays items that have not been sold
-        query.whereEqualTo("isCurrent", true);
-        // Order posts by creation date (newest first)
-        query.addDescendingOrder("listing.expiresAt");
-        // Start an asynchronous call for posts
-        // Updates the user's purchases
-        query.findInBackground(new FindCallback<Bid>() {
+        ParseQuery query = ParseQuery.getQuery(Purchase.class);
+        query.include("listing");
+        query.include("listing.user");
+        query.include("finalBid");
+        query.include("listing.mostRecentBid");
+        query.setLimit(20);
+        query.whereEqualTo("buyer", currentUser);
+        query.addDescendingOrder("createdAt");
+        query.findInBackground(new FindCallback<Purchase>() {
             @Override
-            public void done(List<Bid> bids, ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Issue with getting listings", e);
+            public void done(List<Purchase> purchases, ParseException e) {
+
+                if (e != null){
+                    Log.e(TAG, "Error with getting purchases: " + e);
+                    e.printStackTrace();
                     return;
                 }
-                ParseRelation<ParseObject> relation = currentUser.getRelation("purchases");
-                for (Bid bid : bids){
-                    Listing listing = (Listing) bid.getListing();
-                    if (listing.getBoolean("isSold")){
-                        relation.add(listing);
-                    }
+
+                purchasesAdapter.clear();
+                purchasesAdapter.addAll(purchases);
+
+                // Save received posts to list and notify adapter of new data
+                swipePurchases.setRefreshing(false);
+
+                if (purchases.isEmpty()){
+                    tvEmpty.setVisibility(View.VISIBLE);
                 }
-                currentUser.saveInBackground();
+                else{
+                    tvEmpty.setVisibility(View.GONE);
+                }
 
-                // Returns the purchases relation
-                currentUser.fetchInBackground(new GetCallback<ParseObject>() {
-                    @Override
-                    public void done(final ParseObject object, ParseException e) {
-                        ParseRelation<Listing> purchases = object.getRelation("purchases");
-                        ParseQuery<Listing> q = purchases.getQuery();
-                        q.addDescendingOrder(Listing.KEY_EXPIRATION);
-                        q.include(Listing.KEY_BID);
-                        q.include(Listing.KEY_USER);
-                        q.setLimit(20);
-                        q.findInBackground(new FindCallback<Listing>() {
-                            @Override
-                            public void done(List<Listing> listings, ParseException e) {
-                                purchasesAdapter.clear();
-                                purchasesAdapter.addAll(listings);
-
-                                if (listings.isEmpty()){
-                                    tvEmpty.setVisibility(View.VISIBLE);
-                                }
-                                else{
-                                    tvEmpty.setVisibility(View.GONE);
-                                }
-
-                                // Save received posts to list and notify adapter of new data
-                                swipePurchases.setRefreshing(false);
-                            }
-                        });
-                    }
-                });
+                // Save received posts to list and notify adapter of new data
+                swipePurchases.setRefreshing(false);
 
             }
         });

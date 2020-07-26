@@ -22,7 +22,6 @@ import com.example.collegeauction.Miscellaneous.DateManipulator;
 import com.example.collegeauction.Miscellaneous.TimeFormatter;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
-import com.example.collegeauction.Models.Purchase;
 import com.example.collegeauction.R;
 import com.google.android.material.textfield.TextInputEditText;
 import com.parse.GetCallback;
@@ -38,13 +37,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.ViewHolder> {
+public class CurrentUserListingsAdapter extends RecyclerView.Adapter<CurrentUserListingsAdapter.ViewHolder> {
 
     private Context context;
-    private List<Purchase> purchases;
+    private List<Listing> purchases;
     public List<String> purchaseIds;
 
-    public PurchasesAdapter(Context context, List<Purchase> purchases){
+    public CurrentUserListingsAdapter(Context context, List<Listing> purchases){
         this.context = context;
         this.purchases = purchases;
         this.purchaseIds = new ArrayList<>();
@@ -52,13 +51,13 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
 
     @NonNull
     @Override
-    public PurchasesAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public CurrentUserListingsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_purchase, parent, false);
-        return new PurchasesAdapter.ViewHolder(view);
+        return new CurrentUserListingsAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PurchasesAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         holder.bind(position);
     }
 
@@ -73,8 +72,7 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
         private TextView tvBid;
         private ImageView ivImage;
 
-        private Purchase purchase;
-        private Listing listing;
+        private Listing purchase;
 
         private Runnable updater;
         final Handler timerHandler = new Handler();
@@ -104,9 +102,9 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
                         Intent intent = new Intent(context, ListingDetailsActivity.class);
 
                         // Serialize the Post using parceler, use its short name as a key
-                        intent.putExtra(Listing.class.getSimpleName(), Parcels.wrap(purchase.getListing()));
+                        intent.putExtra(Listing.class.getSimpleName(), Parcels.wrap(purchase));
 
-                        if (currentUser.getObjectId().equals(purchase.getSeller().getObjectId())){
+                        if (currentUser.getObjectId().equals(purchase.getUser().getObjectId())){
                             // Open the seller's detail view
                             intent.putExtra("viewType", "seller");
                         }
@@ -124,29 +122,27 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
         @SuppressLint("SetTextI18n")
         public void bind(int position) {
 
-            // Gets the listing at the position of the ViewHolder
+            // Gets the lisitng at the position of the ViewHolder
             purchase = purchases.get(position);
-
-            listing = (Listing) purchase.getListing();
 
             // Adds to object Id to list
             purchaseIds.removeAll(Collections.singleton(purchase.getObjectId()));
             purchaseIds.add(purchase.getObjectId());
 
             // Bind the listing data to the view elements
-            tvName.setText(listing.getName());
+            tvName.setText(purchase.getName());
 
-            if (purchase.getBid() != null){
-                tvBid.setText("$" + purchase.getBid().getNumber(Bid.KEY_PRICE).toString());
+            if (purchase.getRecentBid() != null){
+                tvBid.setText("$" + purchase.getRecentBid().getNumber(Bid.KEY_PRICE).toString());
             }
-            else if(System.currentTimeMillis() <= listing.getExpireTime().getTime()){
-                tvBid.setText("$" + listing.getMinPrice().toString());
+            else if(System.currentTimeMillis() <= purchase.getExpireTime().getTime()){
+                tvBid.setText("$" + purchase.getMinPrice().toString());
             }
             else{
                 tvBid.setText("NO SALE");
             }
 
-            ParseFile image = listing.getImage();
+            ParseFile image = purchase.getImage();
             if (image != null) {
                 Glide.with(context)
                         .load(image.getUrl())
@@ -160,32 +156,32 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
             }
 
             // Create instance of date manipulator
-            if (listing.getExpireTime() != null && !listing.getBoolean("isSold")) {
-                dateManipulator = new DateManipulator(listing.getExpireTime());
+            if (purchase.getExpireTime() != null && !purchase.getBoolean("isSold")) {
+                dateManipulator = new DateManipulator(purchase.getExpireTime());
                 updater = new Runnable() {
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void run() {
-                         if(System.currentTimeMillis() >= listing.getExpireTime().getTime()){
-                             tvTime.setText("Expired " + TimeFormatter
-                                     .getTimeDifference(listing.getExpireTime().toString()) + " ago");
-                             return;
-                         }
-                         else {
-                             String date = dateManipulator.getDate();
-                             tvTime.setText(date);
-                         }
+                        if(System.currentTimeMillis() >= purchase.getExpireTime().getTime()){
+                            tvTime.setText("Expired " + TimeFormatter
+                                    .getTimeDifference(purchase.getDate("expiresAt").toString()) + " ago");
+                            return;
+                        }
+                        else {
+                            String date = dateManipulator.getDate();
+                            tvTime.setText(date);
+                        }
 
                         // purchase.fetchInBackground();
-                        if (purchase.getBid() != null) {
-                            purchase.getBid().fetchIfNeededInBackground(new GetCallback<Bid>() {
+                        if (purchase.getRecentBid() != null) {
+                            purchase.getRecentBid().fetchIfNeededInBackground(new GetCallback<Bid>() {
                                 @Override
                                 public void done(Bid bid, ParseException e) {
                                     tvBid.setText("$" + Objects.requireNonNull(bid.getNumber(Bid.KEY_PRICE)).toString());
                                 }
                             });
                         } else {
-                            tvBid.setText("$" + listing.getNumber("minPrice").toString());
+                            tvBid.setText("$" + purchase.getNumber("minPrice").toString());
                         }
                         timerHandler.postDelayed(updater,1000);
                     }
@@ -195,7 +191,7 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
             // If the listing is sold,
             else{
                 tvTime.setText("Expired " + TimeFormatter
-                        .getTimeDifference(listing.getExpireTime().toString()) + " ago");
+                        .getTimeDifference(purchase.getDate("expiresAt").toString()) + " ago");
             }
         }
     }
@@ -207,9 +203,8 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
     }
 
     // Add a list of items -- change to type used
-    public void addAll(List<Purchase> allPurchases) {
+    public void addAll(List<Listing> allPurchases) {
         purchases.addAll(allPurchases);
         notifyDataSetChanged();
     }
 }
-

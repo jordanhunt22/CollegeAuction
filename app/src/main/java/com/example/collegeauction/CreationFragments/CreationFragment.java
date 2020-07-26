@@ -195,7 +195,9 @@ public class CreationFragment extends Fragment {
         Date currentDate = new Date();
         Calendar c = Calendar.getInstance();
         c.setTime(currentDate);
-        c.add(Calendar.DATE, 3);
+        // c.add(Calendar.DATE, 3);
+        c.add(Calendar.MINUTE, 5);
+        // c.set(Calendar.MINUTE, 0);
         Date expireDate = c.getTime();
         Listing listing = new Listing();
         listing.setDescription(description);

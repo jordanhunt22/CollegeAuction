@@ -20,11 +20,13 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.collegeauction.Activities.MainActivity;
+import com.example.collegeauction.Adapters.CurrentUserListingsAdapter;
 import com.example.collegeauction.Adapters.ListingsAdapter;
 import com.example.collegeauction.Activities.LoginActivity;
 import com.example.collegeauction.Adapters.PurchasesAdapter;
 import com.example.collegeauction.Miscellaneous.EndlessRecyclerViewScrollListener;
 import com.example.collegeauction.Models.Listing;
+import com.example.collegeauction.Models.Purchase;
 import com.example.collegeauction.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -47,7 +49,7 @@ public class ProfileFragment extends Fragment {
     private RecyclerView rvPosts;
     private TextView tvEmpty;
     protected SwipeRefreshLayout swipeContainer;
-    private PurchasesAdapter adapter;
+    private CurrentUserListingsAdapter adapter;
     private List<Listing> allListings;
     private EndlessRecyclerViewScrollListener scrollListener;
 
@@ -89,7 +91,7 @@ public class ProfileFragment extends Fragment {
         rvPosts = view.findViewById(R.id.rvPosts);
 
         allListings = new ArrayList<>();
-        adapter = new PurchasesAdapter(getContext(), allListings);
+        adapter = new CurrentUserListingsAdapter(getContext(), allListings);
 
         // Set the adapter on the recycler view
         rvPosts.setAdapter(adapter);

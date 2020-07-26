@@ -4,7 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_centerHorizontal="true"
+    android:layout_centerVertical="false"
+    android:layout_gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:layout_centerHorizontal="true">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -74,20 +78,27 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-
-    <androidx.cardview.widget.CardView
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="275dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        app:cardCornerRadius="12dp">
+        android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/ivListingImage"
-            android:layout_width="match_parent"
+        <androidx.cardview.widget.CardView
+            android:layout_width="wrap_content"
             android:layout_height="275dp"
-            tools:srcCompat="@tools:sample/avatars" />
-    </androidx.cardview.widget.CardView>
+            android:layout_centerInParent="true"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="4dp"
+            app:cardCornerRadius="12dp">
+
+            <ImageView
+                android:id="@+id/ivListingImage"
+                android:layout_width="275dp"
+                android:layout_height="275dp"
+                tools:srcCompat="@tools:sample/avatars" />
+        </androidx.cardview.widget.CardView>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
