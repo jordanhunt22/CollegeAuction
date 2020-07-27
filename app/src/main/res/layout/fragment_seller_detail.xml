@@ -85,6 +85,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
         android:backgroundTint="#D50000"
-        android:text="Delete Listing" />
+        android:text="Delete Listing"
+        app:cornerRadius="8dp" />
 
 </LinearLayout>

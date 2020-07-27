@@ -91,7 +91,7 @@ public class SellerDetailFragment extends Fragment {
         ivListingImage = view.findViewById(R.id.ivListingImage);
         btnDelete = view.findViewById(R.id.btnDelete);
 
-         builder = new MaterialAlertDialogBuilder(getContext());
+        builder = new MaterialAlertDialogBuilder(getContext());
 
         // Gets the bundle with listing that was passed in
         Bundle args = getArguments();
@@ -159,8 +159,6 @@ public class SellerDetailFragment extends Fragment {
                 else{
                     if (System.currentTimeMillis() >= listing.getExpireTime().getTime()){
                         tvTime.setText("NO SALE");
-                        listing.put("isSold", true);
-                        listing.saveInBackground();
                     }
                     else {
                         minBid = (Long) listing
@@ -174,8 +172,6 @@ public class SellerDetailFragment extends Fragment {
                 if(System.currentTimeMillis() >= listing.getExpireTime().getTime()){
                     tvTime.setText("Expired " + TimeFormatter
                             .getTimeDifference(listing.getDate("expiresAt").toString()) + " ago");
-                    listing.put("isSold", true);
-                    listing.saveInBackground();
                 }
                 else {
                     String date = dateManipulator.getDate();

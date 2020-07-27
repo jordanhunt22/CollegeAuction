@@ -40,196 +40,203 @@ import java.util.List;
 
 public class FavoritesFragment extends Fragment {
 
-   public static final String TAG = "HomeFragment";
+    public static final String TAG = "HomeFragment";
 
-   private RecyclerView rvPosts;
-   private TextView tvEmpty;
-   protected SwipeRefreshLayout swipeContainer;
-   private ListingsAdapter adapter;
-   private List<Listing> favoriteListings;
-   private EndlessRecyclerViewScrollListener scrollListener;
+    private RecyclerView rvPosts;
+    private TextView tvEmpty;
+    protected SwipeRefreshLayout swipeContainer;
+    private ListingsAdapter adapter;
+    private List<Listing> favoriteListings;
+    private EndlessRecyclerViewScrollListener scrollListener;
 
-   public FavoritesFragment() {
-      // Required empty public constructor
-   }
+    public FavoritesFragment() {
+        // Required empty public constructor
+    }
 
-   @Nullable
-   @Override
-   public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-      setHasOptionsMenu(true);
-      // Inflate the layout in this fragment
-      return inflater.inflate(R.layout.fragment_home_all, container, false);
-   }
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+        // Inflate the layout in this fragment
+        return inflater.inflate(R.layout.fragment_home_all, container, false);
+    }
 
-   @Override
-   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-      super.onViewCreated(view, savedInstanceState);
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-      tvEmpty = view.findViewById(R.id.tvEmpty);
-      tvEmpty.setText("You have no favorites");
-      tvEmpty.setVisibility(View.GONE);
+        tvEmpty = view.findViewById(R.id.tvEmpty);
+        tvEmpty.setText("You have no favorites");
+        tvEmpty.setVisibility(View.GONE);
 
-      // Lookup the swipe container view
-      swipeContainer = view.findViewById(R.id.swipeContainer);
-      // Setup refresh listener which triggers new data loading
-      swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-         @Override
-         public void onRefresh() {
-            // Your code to refresh the list here.
-            // Make sure you call swipeContainer.setRefreshing(false)
-            // once the network request has completed successfully.
-            queryListings();
-         }
-      });
-
-      swipeContainer.setRefreshing(true);
-
-      rvPosts = view.findViewById(R.id.rvPosts);
-
-      favoriteListings = new ArrayList<>();
-      adapter = new ListingsAdapter(getContext(), favoriteListings);
-
-      // Set the adapter on the recycler view
-      rvPosts.setAdapter(adapter);
-
-      // set the layout manager on the recycler view
-      GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
-      rvPosts.setLayoutManager(gridLayoutManager);
-
-      // Makes the fab visible whenever a new fragment starts
-      MainActivity.fab.show();
-
-      // Makes the fab disappear when scrolling
-      rvPosts.addOnScrollListener(new RecyclerView.OnScrollListener() {
-         @Override
-         public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-            super.onScrolled(recyclerView, dx, dy);
-            if (dy > 0 && MainActivity.fab.getVisibility() == View.VISIBLE) {
-               MainActivity.fab.hide();
-            } else if (dy < 0 && MainActivity.fab.getVisibility() != View.VISIBLE) {
-               MainActivity.fab.show();
+        // Lookup the swipe container view
+        swipeContainer = view.findViewById(R.id.swipeContainer);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+                queryListings();
             }
-         }
-      });
+        });
 
-      // Implement ScrollListener for infinite scroll
+        swipeContainer.setRefreshing(true);
+
+        rvPosts = view.findViewById(R.id.rvPosts);
+
+        favoriteListings = new ArrayList<>();
+        adapter = new ListingsAdapter(getContext(), favoriteListings);
+
+        // Set the adapter on the recycler view
+        rvPosts.setAdapter(adapter);
+
+        // set the layout manager on the recycler view
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
+        rvPosts.setLayoutManager(gridLayoutManager);
+
+        // Makes the fab visible whenever a new fragment starts
+        MainActivity.fab.show();
+
+        // Makes the fab disappear when scrolling
+        rvPosts.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0 && MainActivity.fab.getVisibility() == View.VISIBLE) {
+                    MainActivity.fab.hide();
+                } else if (dy < 0 && MainActivity.fab.getVisibility() != View.VISIBLE) {
+                    MainActivity.fab.show();
+                }
+            }
+        });
+
+        // Implement ScrollListener for infinite scroll
         scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 // Triggered only when new data needs to be appended to the list
                 // Add whatever code is needed to append new items to the bottom of the list
-               loadMoreData();
+                loadMoreData();
             }
         };
 
-      // Adds the scroll listener to the RecyclerView
-      rvPosts.addOnScrollListener(scrollListener);
+        // Adds the scroll listener to the RecyclerView
+        rvPosts.addOnScrollListener(scrollListener);
 
-      queryListings();
+        queryListings();
 
-   }
+    }
 
-   private void loadMoreData() {
-      // Retrieves a user's favorited listings
-      ParseUser user = ParseUser.getCurrentUser();
-      ParseQuery query = ParseQuery.getQuery(Favorite.class);
-      // Skips the number of items that are in the adapter currently
-      query.setSkip(adapter.getItemCount());
-      // Sets query limit to 20
-      query.setLimit(20);
-      // Includes the listing and user for every listing
-      query.include(Favorite.KEY_LISTING);
-      query.include(Favorite.KEY_USER);
-      query.include("listing.mostRecentBid");
-      query.whereEqualTo(Favorite.KEY_USER, user);
-      query.addAscendingOrder("listing.expiresAt");
-      query.findInBackground(new FindCallback<Favorite>() {
-         @Override
-         public void done(List<Favorite> favorites, ParseException e) {
-            if (e != null){
-               Toast.makeText(getContext(), "Error getting favorite posts", Toast.LENGTH_SHORT).show();
+    private void loadMoreData() {
+        // Retrieves a user's favorited listings
+        ParseUser user = ParseUser.getCurrentUser();
+        Date queryDate = new Date();
+        ParseQuery query = ParseQuery.getQuery(Favorite.class);
+        // Skips the number of items that are in the adapter currently
+        query.setSkip(adapter.getItemCount());
+        // Includes the listing and user for every listing
+        query.include(Favorite.KEY_LISTING);
+        query.include(Favorite.KEY_USER);
+        query.whereEqualTo(Favorite.KEY_USER, user);
+        query.include("listing.mostRecentBid");
+        // Only shows items that have not expired yet
+        query.whereGreaterThanOrEqualTo("expiresAt", queryDate);
+        query.addAscendingOrder("expiresAt");
+        query.findInBackground(new FindCallback<Favorite>() {
+            @Override
+            public void done(List<Favorite> favorites, ParseException e) {
+                if (e != null) {
+                    Toast.makeText(getContext(), "Error getting favorite posts", Toast.LENGTH_SHORT).show();
+                }
+                List<Listing> listings = new ArrayList<>();
+                for (Favorite favorite : favorites) {
+                    Listing listing = (Listing) favorite.getListing();
+                    if (listing.getExpireTime().getTime() >= System.currentTimeMillis()) {
+                        Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(listing.getObjectId()));
+                        Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
+                        listings.add(listing);
+                    }
+                }
+                List<Listing> returnListings = new ArrayList<>();
+                for (Listing listing : listings) {
+                    if (!adapter.listingIds.contains(listing.getObjectId())) {
+                        returnListings.add(listing);
+                    }
+                }
+
+                // Clears the adapter
+                adapter.addAll(returnListings);
+
+                // Save received posts to list and notify adapter of new data
+                swipeContainer.setRefreshing(false);
+
             }
-            List<Listing> listings = new ArrayList<>();
-            for(Favorite favorite : favorites) {
-               Listing listing = (Listing) favorite.getListing();
-               if (listing.getExpireTime().getTime() >= System.currentTimeMillis()) {
-                  Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(listing.getObjectId()));
-                  Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
-                  listings.add(listing);
-               }
+        });
+    }
+
+    protected void queryListings() {
+        // Checks to see if there are new purchases
+        MainActivity main = (MainActivity) getActivity();
+        assert main != null;
+        main.queryBuys();
+        main.querySales();
+        // Retrieves a user's favorited listings
+        ParseUser user = ParseUser.getCurrentUser();
+        Date queryDate = new Date();
+        ParseQuery query = ParseQuery.getQuery(Favorite.class);
+        // Sets query limit to 10
+        query.setLimit(10);
+        // Includes the listing and user for every listing
+        query.include(Favorite.KEY_LISTING);
+        query.include(Favorite.KEY_USER);
+        query.whereEqualTo(Favorite.KEY_USER, user);
+        query.include("listing.mostRecentBid");
+        // Only shows items that have not expired yet
+        query.whereGreaterThanOrEqualTo("expiresAt", queryDate);
+        query.addAscendingOrder("expiresAt");
+        query.findInBackground(new FindCallback<Favorite>() {
+            @Override
+            public void done(List<Favorite> favorites, ParseException e) {
+                if (e != null) {
+                    Toast.makeText(getContext(), "Error getting favorite posts", Toast.LENGTH_SHORT).show();
+                }
+                List<Listing> listings = new ArrayList<>();
+                for (Favorite favorite : favorites) {
+                    Listing listing = (Listing) favorite.getListing();
+                    Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(listing.getObjectId()));
+                    Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
+                    listings.add(listing);
+                }
+
+                // Clears the adapter
+                adapter.clear();
+                adapter.addAll(listings);
+
+                // Shows text if the RecyclerView is empty
+                if (favoriteListings.isEmpty()) {
+                    tvEmpty.setVisibility(View.VISIBLE);
+                } else {
+                    tvEmpty.setVisibility(View.GONE);
+                }
+
+                // Save received posts to list and notify adapter of new data
+                swipeContainer.setRefreshing(false);
             }
-            List<Listing> returnListings = new ArrayList<>();
-            for (Listing listing : listings){
-               if (!adapter.listingIds.contains(listing.getObjectId())){
-                  returnListings.add(listing);
-               }
-            }
+        });
+    }
 
-            // Clears the adapter
-            adapter.addAll(returnListings);
+    @Override
+    public void onResume() {
+        super.onResume();
+        queryListings();
+    }
 
-            // Save received posts to list and notify adapter of new data
-            swipeContainer.setRefreshing(false);
-
-         }
-      });
-   }
-
-   protected void queryListings() {
-      // Retrieves a user's favorited listings
-      ParseUser user = ParseUser.getCurrentUser();
-      ParseQuery query = ParseQuery.getQuery(Favorite.class);
-      // Sets query limit to 20
-      query.setLimit(20);
-      // Includes the listing and user for every listing
-      query.include(Favorite.KEY_LISTING);
-      query.include(Favorite.KEY_USER);
-      query.include("listing.mostRecentBid");
-      query.whereEqualTo(Favorite.KEY_USER, user);
-      query.addAscendingOrder("listing.expiresAt");
-      query.findInBackground(new FindCallback<Favorite>() {
-         @Override
-         public void done(List<Favorite> favorites, ParseException e) {
-            if (e != null){
-               Toast.makeText(getContext(), "Error getting favorite posts", Toast.LENGTH_SHORT).show();
-            }
-            List<Listing> listings = new ArrayList<>();
-            for(Favorite favorite : favorites) {
-               Listing listing = (Listing) favorite.getListing();
-               if (listing.getExpireTime().getTime() >= System.currentTimeMillis()) {
-                  Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
-                  listings.add(listing);
-               }
-            }
-
-            // Clears the adapter
-            adapter.clear();
-            adapter.addAll(listings);
-
-            // Shows text if the RecyclerView is empty
-            if (favoriteListings.isEmpty()){
-            tvEmpty.setVisibility(View.VISIBLE);
-            }
-            else{
-            tvEmpty.setVisibility(View.GONE);
-            }
-
-            // Save received posts to list and notify adapter of new data
-            swipeContainer.setRefreshing(false);
-         }
-      });
-   }
-
-   @Override
-   public void onResume() {
-      super.onResume();
-      queryListings();
-   }
-
-   @Override
-   public void onPrepareOptionsMenu(Menu menu) {
-      MenuItem item = menu.findItem(R.id.action_search);
-      if(item!=null)
-         item.setVisible(false);
-   }
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.findItem(R.id.action_search);
+        if (item != null)
+            item.setVisible(false);
+    }
 }

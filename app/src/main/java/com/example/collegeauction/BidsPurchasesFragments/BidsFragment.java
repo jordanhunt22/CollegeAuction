@@ -166,6 +166,11 @@ public class BidsFragment extends Fragment {
     }
 
     private void queryBids() {
+        // Checks to see if there are new purchases
+        MainActivity main = (MainActivity) getActivity();
+        assert main != null;
+        main.queryBuys();
+        main.querySales();
         ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = ParseQuery.getQuery(Bid.class);
         query.include(Bid.KEY_LISTING);

@@ -71,13 +71,18 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ListingsAdapter.ViewHolder holder, int position) {
-        Listing listing = listings.get(position);
         holder.bind(position);
     }
 
     @Override
     public int getItemCount() {
         return listings.size();
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        holder.timerHandler.removeCallbacks(holder.updater);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -90,6 +95,8 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
         private Runnable updater;
         final Handler timerHandler = new Handler();
         private GestureDetectorCompat gestureDetector;
+
+        private int counter;
 
         private Listing listing;
         private DateManipulator dateManipulator;
@@ -123,7 +130,6 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                     // Make sure the position is valid, i.e. actually exists in the view
                     if (position != RecyclerView.NO_POSITION) {
                         ParseUser user = ParseUser.getCurrentUser();
-                        ParseRelation<ParseObject> relation = user.getRelation("favoritedListings");
                         // Get the listing at the position, this won't work if the class is static
                         listing = listings.get(position);
                         // Checks to see if the clicked listing is favorited
@@ -147,6 +153,7 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                             Favorite favorite = new Favorite();
                             favorite.setListing(listing);
                             favorite.setUser(user);
+                            favorite.put("expiresAt", listing.getExpireTime());
                             favorite.saveInBackground();
                             Log.i(TAG, "favorite");
                         }
@@ -164,28 +171,36 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
             // Adds objectId of the listing to a list
             listingIds.removeAll(Collections.singleton(listing.getObjectId()));
             listingIds.add(listing.getObjectId());
+
+            counter = 3;
+
             // Create instance of date manipulator
             if (listing.getExpireTime() != null) {
                 dateManipulator = new DateManipulator(listing.getExpireTime());
                 updater = new Runnable() {
                     @Override
                     public void run() {
-                        if (System.currentTimeMillis() >= listing.getExpireTime().getTime()) {
-                            listing.put("isSold", true);
-                            listing.saveInBackground();
-                            listings.removeAll(Collections.singleton(listing));
-                            notifyDataSetChanged();
+                        if (counter >= 3){
+                            if (System.currentTimeMillis() >= listing.getExpireTime().getTime()) {
+                                listings.removeAll(Collections.singleton(listing));
+                                notifyDataSetChanged();
+                                return;
+                            }
+                            listing.fetchInBackground();
+                            if (listing.getRecentBid() != null) {
+                                listing.getRecentBid().fetchIfNeededInBackground(new GetCallback<Bid>() {
+                                    @Override
+                                    public void done(Bid bid, ParseException e) {
+                                        tvBid.setText("$" + Objects.requireNonNull(bid.getNumber(Bid.KEY_PRICE)).toString());
+                                    }
+                                });
+                            } else {
+                                tvBid.setText("$" + listing.getNumber("minPrice").toString());
+                            }
+                            counter = 0;
                         }
-                        listing.fetchInBackground();
-                        if (listing.getRecentBid() != null) {
-                            listing.getRecentBid().fetchIfNeededInBackground(new GetCallback<Bid>() {
-                                @Override
-                                public void done(Bid bid, ParseException e) {
-                                    tvBid.setText("$" + Objects.requireNonNull(bid.getNumber(Bid.KEY_PRICE)).toString());
-                                }
-                            });
-                        } else {
-                            tvBid.setText("$" + listing.getNumber("minPrice").toString());
+                        else{
+                            counter += 1;
                         }
                         String date = dateManipulator.getDate();
                         tvTime.setText(date);
@@ -237,7 +252,6 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                 // Make sure the position is valid, i.e. actually exists in the view
                 if (position != RecyclerView.NO_POSITION) {
                     ParseUser user = ParseUser.getCurrentUser();
-                    ParseRelation<ParseObject> relation = user.getRelation("favoritedListings");
                     // Get the listing at the position, this won't work if the class is static
                     listing = listings.get(position);
                     // Checks to see if the clicked listing is favorited
@@ -261,6 +275,7 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                         Favorite favorite = new Favorite();
                         favorite.setListing(listing);
                         favorite.setUser(user);
+                        favorite.put("expiresAt", listing.getExpireTime());
                         favorite.saveInBackground();
                         Log.i(TAG, "favorite");
                     }

@@ -125,7 +125,7 @@ public class PurchasesFragment extends Fragment {
         query.include("finalBid");
         query.setSkip(purchasesAdapter.getItemCount());
         query.include("listing.mostRecentBid");
-        query.setLimit(20);
+        query.setLimit(10);
         query.whereEqualTo("buyer", currentUser);
         query.addDescendingOrder("createdAt");
         query.findInBackground(new FindCallback<Purchase>() {
@@ -164,7 +164,7 @@ public class PurchasesFragment extends Fragment {
         query.include("listing.user");
         query.include("finalBid");
         query.include("listing.mostRecentBid");
-        query.setLimit(20);
+        query.setLimit(10);
         query.whereEqualTo("buyer", currentUser);
         query.addDescendingOrder("createdAt");
         query.findInBackground(new FindCallback<Purchase>() {

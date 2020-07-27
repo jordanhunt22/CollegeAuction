@@ -1,5 +1,6 @@
 package com.example.collegeauction.HomeFragments;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -38,6 +39,7 @@ import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class SoonHomeFragment extends Fragment {
@@ -136,25 +138,26 @@ public class SoonHomeFragment extends Fragment {
         query.include(Favorite.KEY_USER);
         query.whereEqualTo(Favorite.KEY_USER, user);
         query.findInBackground(new FindCallback<Favorite>() {
-                    @Override
-                    public void done(List<Favorite> favorites, ParseException e) {
-                        for(Favorite favorite : favorites) {
-                            Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(favorite.getListing().getObjectId()));
-                            Listing.listingsFavoritedByCurrentuser.add(favorite.getListing().getObjectId());
-                        }
-                        queryListings();
-                    }
+            @Override
+            public void done(List<Favorite> favorites, ParseException e) {
+                for (Favorite favorite : favorites) {
+                    Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(favorite.getListing().getObjectId()));
+                    Listing.listingsFavoritedByCurrentuser.add(favorite.getListing().getObjectId());
+                }
+                queryListings();
+            }
         });
     }
 
     private void loadMoreData() {
         final ParseUser currentUser = ParseUser.getCurrentUser();
+        Date queryDate = new Date();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
-        // limit query to latest 20 items
-        query.setLimit(20);
-        // Only displays items that have not been sold yet
-        query.whereEqualTo("isSold", false);
+        // limit query to latest 10 items
+        query.setLimit(10);
+        // Only shows items that have not expired yet
+        query.whereGreaterThanOrEqualTo(Listing.KEY_EXPIRATION, queryDate);
         // order posts by creation date (newest first)
         query.addAscendingOrder(Listing.KEY_EXPIRATION);
         // Does not show the current user's posts
@@ -165,13 +168,13 @@ public class SoonHomeFragment extends Fragment {
         query.findInBackground(new FindCallback<Listing>() {
             @Override
             public void done(List<Listing> listings, ParseException e) {
-                if (e != null){
+                if (e != null) {
                     Log.e(TAG, "Issue with getting listings", e);
                     return;
                 }
-                List <Listing> returnListings = new ArrayList<>();
-                for (Listing listing : listings){
-                    if (!adapter.listingIds.contains(listing.getObjectId())){
+                List<Listing> returnListings = new ArrayList<>();
+                for (Listing listing : listings) {
+                    if (!adapter.listingIds.contains(listing.getObjectId())) {
                         returnListings.add(listing);
                     }
                 }
@@ -186,16 +189,23 @@ public class SoonHomeFragment extends Fragment {
     }
 
     public void queryListings() {
+        // Checks to see if there are new purchases
+        MainActivity main = (MainActivity) getActivity();
+        assert main != null;
+        main.queryBuys();
+        main.querySales();
         // Collapses the SearchView if it is open
-        HomeFragment parentFrag = ((HomeFragment)SoonHomeFragment.this.getParentFragment());
+        HomeFragment parentFrag = ((HomeFragment) SoonHomeFragment.this.getParentFragment());
+        assert parentFrag != null;
         parentFrag.collapseMenuItem();
         final ParseUser currentUser = ParseUser.getCurrentUser();
+        Date queryDate = new Date();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
-        // limit query to latest 20 items
-        query.setLimit(20);
-        // Only displays items that have not been sold yet
-        query.whereEqualTo("isSold", false);
+        // limit query to latest 10 items
+        query.setLimit(10);
+        // Only shows items that have not expired yet
+        query.whereGreaterThanOrEqualTo(Listing.KEY_EXPIRATION, queryDate);
         // order posts by creation date (newest first)
         query.addAscendingOrder(Listing.KEY_EXPIRATION);
         // Does not show the current user's posts
@@ -204,36 +214,18 @@ public class SoonHomeFragment extends Fragment {
         query.findInBackground(new FindCallback<Listing>() {
             @Override
             public void done(List<Listing> listings, ParseException e) {
-                if (e != null){
+                if (e != null) {
                     Log.e(TAG, "Issue with getting listings", e);
                     return;
-                }
-                List <Listing> returnListings = new ArrayList<>();
-                returnListings.addAll(listings);
-                ParseRelation<ParseObject> relation = currentUser.getRelation("purchases");
-                for (int i = 0; i < listings.size(); i++){
-                    Listing listing = listings.get(i);
-                    if(listing.getRecentBid() != null) {
-                        if (listing.getRecentBid().getParseUser(Bid.KEY_USER).equals(currentUser)) {
-                            relation.add(listing);
-                            currentUser.saveInBackground();
-                        }
-                    }
-                    if (System.currentTimeMillis() > listing.getExpireTime().getTime()){
-                        listing.put("isSold", true);
-                        listing.saveInBackground();
-                        returnListings.removeAll(Collections.singleton(listing));
-                    }
                 }
 
                 // Clears the adapter
                 adapter.clear();
-                adapter.addAll(returnListings);
+                adapter.addAll(listings);
 
-                if (allListings.isEmpty()){
+                if (listings.isEmpty()) {
                     tvEmpty.setVisibility(View.VISIBLE);
-                }
-                else{
+                } else {
                     tvEmpty.setVisibility(View.GONE);
                 }
 
@@ -243,15 +235,16 @@ public class SoonHomeFragment extends Fragment {
         });
     }
 
-    public void queryListingsFromSearch(String queryString){
+    public void queryListingsFromSearch(String queryString) {
         rvPosts.scrollToPosition(0);
         final ParseUser currentUser = ParseUser.getCurrentUser();
+        Date queryDate = new Date();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
         // limit query to latest 20 items
         query.setLimit(20);
-        // Only displays items that have not been sold yet
-        query.whereEqualTo("isSold", false);
+        // Only shows items that have not expired yet
+        query.whereGreaterThanOrEqualTo(Listing.KEY_EXPIRATION, queryDate);
         // order posts by creation date (newest first)
         query.addAscendingOrder(Listing.KEY_EXPIRATION);
         // Query only returns items which have the search string in its name or description
@@ -263,38 +256,20 @@ public class SoonHomeFragment extends Fragment {
         query.findInBackground(new FindCallback<Listing>() {
             @Override
             public void done(List<Listing> listings, ParseException e) {
-                if (e != null){
+                if (e != null) {
                     Log.e(TAG, "Issue with getting listings", e);
                     return;
-                }
-                List <Listing> returnListings = new ArrayList<>();
-                returnListings.addAll(listings);
-                ParseRelation<ParseObject> relation = currentUser.getRelation("purchases");
-                for (int i = 0; i < listings.size(); i++){
-                    Listing listing = listings.get(i);
-                    if(listing.getRecentBid() != null) {
-                        if (listing.getRecentBid().getParseUser(Bid.KEY_USER).equals(currentUser)) {
-                            relation.add(listing);
-                            currentUser.saveInBackground();
-                        }
-                    }
-                    if (System.currentTimeMillis() > listing.getExpireTime().getTime()){
-                        listing.put("isSold", true);
-                        listing.saveInBackground();
-                        returnListings.removeAll(Collections.singleton(listing));
-                    }
                 }
 
                 // Clears the adapter
                 adapter.clear();
-                adapter.addAll(returnListings);
+                adapter.addAll(listings);
 
                 adapter.notifyDataSetChanged();
 
-                if (returnListings.isEmpty()){
+                if (listings.isEmpty()) {
                     tvEmpty.setVisibility(View.VISIBLE);
-                }
-                else{
+                } else {
                     tvEmpty.setVisibility(View.GONE);
                 }
 

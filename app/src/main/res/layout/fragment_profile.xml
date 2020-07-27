@@ -24,7 +24,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
-        android:text="logout" />
+        android:text="logout"
+        app:cornerRadius="8dp" />
 
     <TextView
         android:id="@+id/tvMyListings"

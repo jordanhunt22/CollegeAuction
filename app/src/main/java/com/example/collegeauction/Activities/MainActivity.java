@@ -1,6 +1,7 @@
 package com.example.collegeauction.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -10,21 +11,32 @@ import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.collegeauction.BidsPurchasesFragments.BidsPurchasesFragment;
 import com.example.collegeauction.HomeFragments.HomeFragment;
 import com.example.collegeauction.MainFragments.FavoritesFragment;
 import com.example.collegeauction.HomeFragments.SoonHomeFragment;
 import com.example.collegeauction.MainFragments.ProfileFragment;
+import com.example.collegeauction.Models.Purchase;
 import com.example.collegeauction.R;
 import com.example.collegeauction.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.parse.DeleteCallback;
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.List;
 
@@ -35,10 +47,16 @@ public class MainActivity extends AppCompatActivity {
     private Context context;
     private int startingPosition;
     private SearchView searchView;
+    private String dialogueText;
+    public static final String TAG = "MainActivity";
+
+    private AlertDialog.Builder builder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        builder = new MaterialAlertDialogBuilder(this);
 
         context = this;
 
@@ -147,13 +165,96 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    private Fragment getVisibleFragment() {
-        FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
-        List<Fragment> fragments = fragmentManager.getFragments();
-        for (Fragment fragment : fragments) {
-            if (fragment != null && fragment.isVisible())
-                return fragment;
-        }
-        return null;
+    public void queryBuys(){
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        ParseQuery query = new ParseQuery(Purchase.class);
+        query.whereEqualTo("buyer", currentUser);
+        query.whereEqualTo("seenByBuyer", false);
+        query.findInBackground(new FindCallback<Purchase>() {
+            @Override
+            public void done(List<Purchase> purchases, ParseException e) {
+                if (e != null){
+                    Log.e(TAG, "Issue with getting purchases", e);
+                    e.printStackTrace();
+                    return;
+                }
+
+                for (Purchase purchase : purchases){
+                    purchase.put("seenByBuyer", true);
+                    purchase.saveInBackground();
+                }
+
+                if (purchases.isEmpty()){
+                    return;
+                }
+
+                else{
+                    if (purchases.size() == 1){
+                        dialogueText = "You have a new purchase.";
+                    }
+                    else {
+                        dialogueText = "You have " + purchases.size() + " new purchases.";
+                    }
+                    builder
+                            // Add customization options here
+                            .setTitle(dialogueText)
+//                            .setNegativeButton("YES", new DialogInterface.OnClickListener() {
+//
+//                                @Override
+//                                public void onClick(DialogInterface dialogInterface, int i) {
+//
+//                                }
+//                            })
+                            .setPositiveButton("OK", null)
+                            .show();
+                }
+            }
+        });
+    }
+
+    public void querySales(){
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        ParseQuery query = new ParseQuery(Purchase.class);
+        query.whereEqualTo("seller", currentUser);
+        query.whereEqualTo("seenBySeller", false);
+        query.findInBackground(new FindCallback<Purchase>() {
+            @Override
+            public void done(List<Purchase> purchases, ParseException e) {
+                if (e != null){
+                    Log.e(TAG, "Issue with getting sales", e);
+                    e.printStackTrace();
+                    return;
+                }
+
+                for (Purchase purchase : purchases){
+                    purchase.put("seenBySeller", true);
+                    purchase.saveInBackground();
+                }
+
+                if (purchases.isEmpty()){
+                    return;
+                }
+                else{
+                    if (purchases.size() == 1){
+                        dialogueText = "You have a new sale.";
+                    }
+                    else {
+                        dialogueText = "You have " + purchases.size() + " new sales.";
+                    }
+                    builder
+                            // Add customization options here
+                            .setTitle(dialogueText)
+//                            .setNegativeButton("YES", new DialogInterface.OnClickListener() {
+//
+//                                @Override
+//                                public void onClick(DialogInterface dialogInterface, int i) {
+//
+//                                }
+//                            })
+                            .setPositiveButton("OK", null)
+                            .show();
+                }
+            }
+        });
     }
 }

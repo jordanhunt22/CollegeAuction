@@ -11,9 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,9 +22,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.collegeauction.Activities.MainActivity;
-import com.example.collegeauction.Adapters.ListingsAdapter;
+import com.example.collegeauction.Adapters.NearbyAdapter;
 import com.example.collegeauction.Miscellaneous.EndlessRecyclerViewScrollListener;
-import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
@@ -36,19 +33,15 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.LatLng;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import permissions.dispatcher.NeedsPermission;
@@ -71,7 +64,7 @@ public class NearbyHomeFragment extends Fragment {
     private RecyclerView rvPosts;
     private TextView tvEmpty;
     protected SwipeRefreshLayout swipeContainer;
-    private ListingsAdapter adapter;
+    private NearbyAdapter adapter;
     private List<Listing> allListings;
     private EndlessRecyclerViewScrollListener scrollListener;
 
@@ -91,7 +84,7 @@ public class NearbyHomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-       NearbyHomeFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
+        NearbyHomeFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
 
         onStart = true;
 
@@ -116,40 +109,6 @@ public class NearbyHomeFragment extends Fragment {
         rvPosts = view.findViewById(R.id.rvPosts);
 
         allListings = new ArrayList<>();
-        adapter = new ListingsAdapter(getContext(), allListings);
-
-        // Set the adapter on the recycler view
-        rvPosts.setAdapter(adapter);
-
-        // set the layout manager on the recycler view
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
-        rvPosts.setLayoutManager(gridLayoutManager);
-
-        // Makes the fab disappear when scrolling
-        rvPosts.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (dy > 0 && MainActivity.fab.getVisibility() == View.VISIBLE) {
-                    MainActivity.fab.hide();
-                } else if (dy < 0 && MainActivity.fab.getVisibility() != View.VISIBLE) {
-                    MainActivity.fab.show();
-                }
-            }
-        });
-
-        // Implement ScrollListener for infinite scroll
-        scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                // Triggered only when new data needs to be appended to the list
-                // Add whatever code is needed to append new items to the bottom of the list
-                loadMoreData();
-            }
-        };
-
-        // Adds the scroll listener to the RecyclerView
-        rvPosts.addOnScrollListener(scrollListener);
 
 
         // Makes the fab visible whenever a new fragment starts
@@ -165,24 +124,26 @@ public class NearbyHomeFragment extends Fragment {
         query.findInBackground(new FindCallback<Favorite>() {
             @Override
             public void done(List<Favorite> favorites, ParseException e) {
-                for(Favorite favorite : favorites) {
+                for (Favorite favorite : favorites) {
                     Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(favorite.getListing().getObjectId()));
                     Listing.listingsFavoritedByCurrentuser.add(favorite.getListing().getObjectId());
                 }
+                queryListings();
             }
         });
     }
 
     private void loadMoreData() {
         final ParseUser currentUser = ParseUser.getCurrentUser();
+        Date queryDate = new Date();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
-        // limit query to latest 20 items
-        query.setLimit(20);
+        // limit query to latest 10 items
+        query.setLimit(10);
         // Does not query items that are already in the adapter
         query.setLimit(adapter.getItemCount());
-        // Only displays items that have not been sold yet
-        query.whereEqualTo("isSold", false);
+        // Only shows items that have not expired yet
+        query.whereGreaterThanOrEqualTo(Listing.KEY_EXPIRATION, queryDate);
         // Does not show the current user's posts
         query.whereNotEqualTo(Listing.KEY_USER, currentUser);
         // Queries the items that are closest to the user
@@ -194,13 +155,13 @@ public class NearbyHomeFragment extends Fragment {
         query.findInBackground(new FindCallback<Listing>() {
             @Override
             public void done(List<Listing> listings, ParseException e) {
-                if (e != null){
+                if (e != null) {
                     Log.e(TAG, "Issue with getting listings", e);
                     return;
                 }
-                List <Listing> returnListings = new ArrayList<>();
-                for (Listing listing : listings){
-                    if (!adapter.listingIds.contains(listing.getObjectId())){
+                List<Listing> returnListings = new ArrayList<>();
+                for (Listing listing : listings) {
+                    if (!adapter.listingIds.contains(listing.getObjectId())) {
                         returnListings.add(listing);
                     }
                 }
@@ -216,14 +177,15 @@ public class NearbyHomeFragment extends Fragment {
 
     public void queryListings() {
         final ParseUser currentUser = ParseUser.getCurrentUser();
+        Date queryDate = new Date();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
-        // limit query to latest 20 items
-        query.setLimit(20);
-        // Only displays items that have not been sold yet
-        query.whereEqualTo("isSold", false);
+        // limit query to latest 10 items
+        query.setLimit(10);
         // Does not show the current user's posts
         query.whereNotEqualTo(Listing.KEY_USER, currentUser);
+        // Only shows items that have not expired yet
+        query.whereGreaterThanOrEqualTo(Listing.KEY_EXPIRATION, queryDate);
         // Queries the items that are closest to the user
         ParseGeoPoint returnPoint = new ParseGeoPoint();
         returnPoint.setLatitude(mCurrentLocation.getLatitude());
@@ -233,36 +195,18 @@ public class NearbyHomeFragment extends Fragment {
         query.findInBackground(new FindCallback<Listing>() {
             @Override
             public void done(List<Listing> listings, ParseException e) {
-                if (e != null){
+                if (e != null) {
                     Log.e(TAG, "Issue with getting listings", e);
                     return;
-                }
-                List <Listing> returnListings = new ArrayList<>();
-                returnListings.addAll(listings);
-                ParseRelation<ParseObject> relation = currentUser.getRelation("purchases");
-                for (int i = 0; i < listings.size(); i++){
-                    Listing listing = listings.get(i);
-                    if(listing.getRecentBid() != null) {
-                        if (listing.getRecentBid().getParseUser(Bid.KEY_USER).equals(currentUser)) {
-                            relation.add(listing);
-                            currentUser.saveInBackground();
-                        }
-                    }
-                    if (System.currentTimeMillis() > listing.getExpireTime().getTime()){
-                        listing.put("isSold", true);
-                        listing.saveInBackground();
-                        returnListings.removeAll(Collections.singleton(listing));
-                    }
                 }
 
                 // Clears the adapter
                 adapter.clear();
-                adapter.addAll(returnListings);
+                adapter.addAll(listings);
 
-                if (allListings.isEmpty()){
+                if (listings.isEmpty()) {
                     tvEmpty.setVisibility(View.VISIBLE);
-                }
-                else{
+                } else {
                     tvEmpty.setVisibility(View.GONE);
                 }
 
@@ -275,7 +219,7 @@ public class NearbyHomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (mCurrentLocation != null){
+        if (mCurrentLocation != null) {
             queryListings();
         }
     }
@@ -295,15 +239,6 @@ public class NearbyHomeFragment extends Fragment {
         settingsClient.checkLocationSettings(locationSettingsRequest);
         //noinspection MissingPermission
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            // public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            // int[] grantResults){
-
-            // }
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
         getFusedLocationProviderClient(getContext()).requestLocationUpdates(mLocationRequest, new LocationCallback() {
@@ -323,16 +258,49 @@ public class NearbyHomeFragment extends Fragment {
         // Report to the UI that the location was updated
         mCurrentLocation = location;
 
-        if (onStart){
-            queryListings();
+        if (onStart) {
+            adapter = new NearbyAdapter(getContext(), allListings, mCurrentLocation);
+            // Set the adapter on the recycler view
+            rvPosts.setAdapter(adapter);
+
+            // set the layout manager on the recycler view
+            GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
+            rvPosts.setLayoutManager(gridLayoutManager);
+
+            // Makes the fab disappear when scrolling
+            rvPosts.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    if (dy > 0 && MainActivity.fab.getVisibility() == View.VISIBLE) {
+                        MainActivity.fab.hide();
+                    } else if (dy < 0 && MainActivity.fab.getVisibility() != View.VISIBLE) {
+                        MainActivity.fab.show();
+                    }
+                }
+            });
+
+            // Implement ScrollListener for infinite scroll
+            scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
+                @Override
+                public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                    // Triggered only when new data needs to be appended to the list
+                    // Add whatever code is needed to append new items to the bottom of the list
+                    loadMoreData();
+                }
+            };
+
+            // Adds the scroll listener to the RecyclerView
+            rvPosts.addOnScrollListener(scrollListener);
             onStart = false;
+            queryListings();
         }
     }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        MenuItem item=menu.findItem(R.id.action_search);
-        if(item!=null)
+        MenuItem item = menu.findItem(R.id.action_search);
+        if (item != null)
             item.setVisible(false);
     }
 }

@@ -61,8 +61,6 @@ public class BuyerDetailFragment extends Fragment {
     private Long numberBid;
     private DateManipulator dateManipulator;
 
-    private Boolean isSold = false;
-
     // For the runnable that updates the current bid
     Runnable updater;
     final Handler timerHandler = new Handler();
@@ -184,7 +182,6 @@ public class BuyerDetailFragment extends Fragment {
             @Override
             public void run() {
                 if (System.currentTimeMillis() >= listing.getExpireTime().getTime()){
-                    isSold = true;
                     return;
                 }
                 getCurrentBids();

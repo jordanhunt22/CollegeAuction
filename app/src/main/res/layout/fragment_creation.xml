@@ -113,7 +113,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Take a photo" />
+            android:text="Take a photo"
+            app:cornerRadius="8dp" />
 
         <Button
             android:id="@+id/btnGallery"
@@ -122,6 +123,7 @@
             android:layout_marginStart="8dp"
             android:layout_weight="1"
             android:text="select a photo"
+            app:cornerRadius="8dp"
             tools:layout_weight="1" />
 
     </LinearLayout>
@@ -143,7 +145,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:text="Add Location" />
+        android:text="Add Location"
+        app:cornerRadius="8dp" />
 
     <Button
         android:id="@+id/btnSubmit"
@@ -151,7 +154,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:text="Submit" />
+        android:text="Submit"
+        app:cornerRadius="8dp"
+        tools:cornerRadius="6dp" />
 
     <ProgressBar
         android:id="@+id/pbLoading"

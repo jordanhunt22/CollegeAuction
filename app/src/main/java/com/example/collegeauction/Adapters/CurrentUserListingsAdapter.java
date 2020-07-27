@@ -74,6 +74,7 @@ public class CurrentUserListingsAdapter extends RecyclerView.Adapter<CurrentUser
 
         private Listing purchase;
 
+        private int counter;
         private Runnable updater;
         final Handler timerHandler = new Handler();
         private DateManipulator dateManipulator;
@@ -155,6 +156,8 @@ public class CurrentUserListingsAdapter extends RecyclerView.Adapter<CurrentUser
                         .into(ivImage);
             }
 
+            counter = 3;
+
             // Create instance of date manipulator
             if (purchase.getExpireTime() != null && !purchase.getBoolean("isSold")) {
                 dateManipulator = new DateManipulator(purchase.getExpireTime());
@@ -172,16 +175,17 @@ public class CurrentUserListingsAdapter extends RecyclerView.Adapter<CurrentUser
                             tvTime.setText(date);
                         }
 
-                        // purchase.fetchInBackground();
-                        if (purchase.getRecentBid() != null) {
-                            purchase.getRecentBid().fetchIfNeededInBackground(new GetCallback<Bid>() {
-                                @Override
-                                public void done(Bid bid, ParseException e) {
-                                    tvBid.setText("$" + Objects.requireNonNull(bid.getNumber(Bid.KEY_PRICE)).toString());
-                                }
-                            });
-                        } else {
-                            tvBid.setText("$" + purchase.getNumber("minPrice").toString());
+                        if (counter >= 3){
+                            if (purchase.getRecentBid() != null) {
+                                purchase.getRecentBid().fetchIfNeededInBackground(new GetCallback<Bid>() {
+                                    @Override
+                                    public void done(Bid bid, ParseException e) {
+                                        tvBid.setText("$" + Objects.requireNonNull(bid.getNumber(Bid.KEY_PRICE)).toString());
+                                    }
+                                });
+                            } else {
+                                tvBid.setText("$" + purchase.getNumber("minPrice").toString());
+                            }
                         }
                         timerHandler.postDelayed(updater,1000);
                     }

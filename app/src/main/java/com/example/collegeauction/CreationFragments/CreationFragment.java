@@ -1,6 +1,8 @@
 package com.example.collegeauction.CreationFragments;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,18 +11,22 @@ import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
+import android.location.Location;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -37,10 +43,17 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.example.collegeauction.Miscellaneous.BitmapScaler;
 import com.example.collegeauction.Miscellaneous.MapHelper;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.transition.MaterialContainerTransform;
 import com.parse.ParseException;
@@ -51,6 +64,7 @@ import com.parse.SaveCallback;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -58,8 +72,13 @@ import java.net.URI;
 import java.util.Calendar;
 import java.util.Date;
 
-import static android.app.Activity.RESULT_OK;
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.RuntimePermissions;
 
+import static android.app.Activity.RESULT_OK;
+import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
+
+@RuntimePermissions
 public class CreationFragment extends Fragment {
 
     public static final String TAG = "ComposeFragment";
@@ -79,17 +98,28 @@ public class CreationFragment extends Fragment {
     private FragmentManager fragmentManager;
     private int imageRotated;
     private Uri photoUri;
+    private Boolean onStart;
 
     // PICK_PHOTO_CODE is a constant integer
     public final static int PICK_PHOTO_CODE = 1000;
 
     public static LatLng point;
     private String location;
+    Location mCurrentLocation;
+
+    private LocationRequest mLocationRequest;
+    private long UPDATE_INTERVAL = 60000;  /* 60 secs */
+    private long FASTEST_INTERVAL = 5000; /* 5 secs */
 
     public CreationFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        onStart = true;
+    }
 
     @Nullable
     @Override
@@ -102,6 +132,9 @@ public class CreationFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        // Starts checking for the location so I can autofill the city
+        CreationFragmentPermissionsDispatcher.startLocationUpdatesWithPermissionCheck(this);
 
         // Find all of the views
         etDescription = view.findViewById(R.id.etDescription);
@@ -184,6 +217,7 @@ public class CreationFragment extends Fragment {
                 // on some click or some loading we need to wait for...
                 pb.setVisibility(ProgressBar.VISIBLE);
                 saveListing(name, description, bid, photoFile, returnPoint);
+                // getActivity().finish();
             }
         });
     }
@@ -196,8 +230,9 @@ public class CreationFragment extends Fragment {
         Calendar c = Calendar.getInstance();
         c.setTime(currentDate);
         // c.add(Calendar.DATE, 3);
-        c.add(Calendar.MINUTE, 5);
+        // c.add(Calendar.MINUTE, 45);
         // c.set(Calendar.MINUTE, 0);
+        c.add(Calendar.HOUR, 8);
         Date expireDate = c.getTime();
         Listing listing = new Listing();
         listing.setDescription(description);
@@ -218,13 +253,10 @@ public class CreationFragment extends Fragment {
                     return;
                 }
                 Log.i(TAG, "Post save was successful!");
-                etDescription.setText("");
-                etBid.setText("");
-                etName.setText("");
-                ivListingImage.setImageResource(0);
                 // run a background job and once complete
                 pb.setVisibility(ProgressBar.INVISIBLE);
-                Toast.makeText(getContext(), "Your listing was posted successfully!", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getContext(), "Your listing was posted successfully!", Toast.LENGTH_SHORT).show();
+                getActivity().finish();
             }
         });
 
@@ -265,11 +297,35 @@ public class CreationFragment extends Fragment {
             if (resultCode == RESULT_OK) {
                 imageRotated = 1;
                 // by this point we have the camera photo on disk
+                Bitmap rawTakenImage = BitmapFactory.decodeFile(photoFile.getPath());
+                // See BitmapScaler.java: https://gist.github.com/nesquena/3885707fd3773c09f1bb
+                Matrix altMatrix = new Matrix();
+                altMatrix.postRotate(90);
+                Bitmap altRotatedBitmap = Bitmap
+                        .createBitmap(rawTakenImage, 0, 0, rawTakenImage.getWidth(), rawTakenImage.getHeight(), altMatrix, true);
+                Bitmap resizedBitmap = BitmapScaler.scaleToFitWidth(altRotatedBitmap, 1500);
+                // Configure byte output stream
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                // Compress the image further
+                resizedBitmap.compress(Bitmap.CompressFormat.JPEG, 40, bytes);
+                // Rewrite the bitmap to the current file
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(photoFile);
+                    // Write the bytes of the bitmap to file
+                    fos.write(bytes.toByteArray());
+                    fos.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
                 // Load the taken image into a preview
                 Matrix matrix = new Matrix();
                 matrix.postRotate(90);
-                Bitmap rotatedBitmap = Bitmap.createBitmap(takenImage, 0, 0, takenImage.getWidth(), takenImage.getHeight(), matrix, true);
+                Bitmap rotatedBitmap = Bitmap
+                        .createBitmap(takenImage, 0, 0, takenImage.getWidth(), takenImage.getHeight(), matrix, true);
                 Drawable imageDrawable = new BitmapDrawable(getResources(), rotatedBitmap);
                 Glide.with(getContext())
                         .load(imageDrawable)
@@ -308,10 +364,7 @@ public class CreationFragment extends Fragment {
         if (imageRotated == 1) {
             Bitmap takenImage = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
             // Load the taken image into a preview
-            Matrix matrix = new Matrix();
-            matrix.postRotate(90);
-            Bitmap rotatedBitmap = Bitmap.createBitmap(takenImage, 0, 0, takenImage.getWidth(), takenImage.getHeight(), matrix, true);
-            Drawable imageDrawable = new BitmapDrawable(getResources(), rotatedBitmap);
+            Drawable imageDrawable = new BitmapDrawable(getResources(), takenImage);
             Glide.with(getContext())
                     .load(imageDrawable)
                     .transform(new CenterCrop())
@@ -401,11 +454,53 @@ public class CreationFragment extends Fragment {
         OutputStream os;
         try {
             os = new FileOutputStream(photoFile);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 25, os);
             os.flush();
             os.close();
         } catch (Exception e) {
             Log.e(getClass().getSimpleName(), "Error writing bitmap", e);
+        }
+    }
+
+    @NeedsPermission({Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION})
+    protected void startLocationUpdates() {
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(mLocationRequest);
+        LocationSettingsRequest locationSettingsRequest = builder.build();
+
+        SettingsClient settingsClient = LocationServices.getSettingsClient(getContext());
+        settingsClient.checkLocationSettings(locationSettingsRequest);
+        //noinspection MissingPermission
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        getFusedLocationProviderClient(getContext()).requestLocationUpdates(mLocationRequest, new LocationCallback() {
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        onLocationChanged(locationResult.getLastLocation());
+                    }
+                },
+                Looper.myLooper());
+    }
+
+    public void onLocationChanged(Location location) {
+        // GPS may be turned off
+        if (location == null) {
+            return;
+        }
+        // Report to the UI that the location was updated
+        mCurrentLocation = location;
+
+        if (onStart){
+            point = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+            MapHelper.getAddressFromLocation(point, getContext(), new GeocoderHandler());
+            onStart = false;
+            btnLocation.setText("Change Location");
         }
     }
 

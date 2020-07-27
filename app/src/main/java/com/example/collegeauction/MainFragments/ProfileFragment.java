@@ -152,8 +152,8 @@ public class ProfileFragment extends Fragment {
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
         query.include(Listing.KEY_USER);
-        // limit query to latest 20 items
-        query.setLimit(20);
+        // limit query to latest 10 items
+        query.setLimit(10);
         // Skips all the items that are already in the adapter
         query.setSkip(adapter.getItemCount());
         // only shows listings where the current user is the seller
@@ -187,12 +187,17 @@ public class ProfileFragment extends Fragment {
 
 
     private void queryUsersListings() {
+        // Checks to see if there are new purchases
+        MainActivity main = (MainActivity) getActivity();
+        assert main != null;
+        main.queryBuys();
+        main.querySales();
         final ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
         query.include(Listing.KEY_USER);
-        // limit query to latest 20 items
-        query.setLimit(20);
+        // limit query to latest 10 items
+        query.setLimit(10);
         // only shows listings where the current user is the seller
         query.whereEqualTo("user", currentUser);
         // order posts by creation date (oldest first)
