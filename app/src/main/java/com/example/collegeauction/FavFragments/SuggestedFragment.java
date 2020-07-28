@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Adapters.ListingsAdapter;
@@ -23,6 +24,8 @@ import com.example.collegeauction.Miscellaneous.EndlessRecyclerViewScrollListene
 import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -43,6 +46,7 @@ public class SuggestedFragment extends Fragment {
     private ListingsAdapter adapter;
     private List<Listing> allListings;
     private EndlessRecyclerViewScrollListener scrollListener;
+    private ChipGroup cgAttributes;
 
     public SuggestedFragment() {
         // Required empty public constructor
@@ -52,7 +56,7 @@ public class SuggestedFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home_all, container, false);
+        return inflater.inflate(R.layout.fragment_suggested, container, false);
     }
 
     @Override
@@ -61,6 +65,21 @@ public class SuggestedFragment extends Fragment {
 
         tvEmpty = view.findViewById(R.id.tvEmpty);
         tvEmpty.setVisibility(View.GONE);
+
+        // Handles whenever a chip is checked
+        cgAttributes = view.findViewById(R.id.cgAttributes);
+        cgAttributes.setOnCheckedChangeListener(new ChipGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(ChipGroup group, int checkedId) {
+                Chip chip = group.findViewById(checkedId);
+                if (chip == null){
+                    return;
+                }
+                else{
+                    Toast.makeText(getContext(), chip.getText(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
         // Lookup the swipe container view
         swipeContainer = view.findViewById(R.id.swipeContainer);
@@ -71,7 +90,7 @@ public class SuggestedFragment extends Fragment {
                 // Your code to refresh the list here.
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
-                queryListings();
+                // queryListings();
             }
         });
 
@@ -133,7 +152,6 @@ public class SuggestedFragment extends Fragment {
                     Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(favorite.getListing().getObjectId()));
                     Listing.listingsFavoritedByCurrentuser.add(favorite.getListing().getObjectId());
                 }
-                queryListings();
             }
         });
     }
@@ -177,7 +195,7 @@ public class SuggestedFragment extends Fragment {
         });
     }
 
-    public void queryListings() {
+    public void queryListings(String category) {
         // Checks to see if there are new purchases
 //        MainActivity main = (MainActivity) getActivity();
 //        assert main != null;
