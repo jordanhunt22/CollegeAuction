@@ -53,6 +53,7 @@ public class SellerDetailFragment extends Fragment {
     private TextView tvNumber;
     private TextView tvCurrentBid;
     private TextView tvTime;
+    private TextView tvBuyersName;
     private ImageView ivListingImage;
     private Button btnDelete;
 
@@ -77,6 +78,7 @@ public class SellerDetailFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_seller_detail, container, false);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -88,6 +90,7 @@ public class SellerDetailFragment extends Fragment {
         tvLocation = view.findViewById(R.id.tvLocation);
         tvCurrentBid = view.findViewById(R.id.tvCurrentBid);
         tvTime = view.findViewById(R.id.tvTime);
+        tvBuyersName = view.findViewById(R.id.tvBuyersName);
         ivListingImage = view.findViewById(R.id.ivListingImage);
         btnDelete = view.findViewById(R.id.btnDelete);
 
@@ -100,6 +103,7 @@ public class SellerDetailFragment extends Fragment {
         listing = Parcels.unwrap(args.getParcelable("listing"));
 
         tvNumber.setVisibility(View.GONE);
+        tvBuyersName.setVisibility(View.GONE);
 
         if (listing.getString("locationName") != null) {
             String location = listing.getString("locationName");
@@ -141,47 +145,48 @@ public class SellerDetailFragment extends Fragment {
             }
         });
 
-        dateManipulator = new DateManipulator(listing.getExpireTime());
-        updater = new Runnable() {
-            @SuppressLint("SetTextI18n")
-            @Override
-            public void run() {
-                if (System.currentTimeMillis() >= listing.getExpireTime().getTime()) {
-                    tvTime.setText("NO SALE");
-                    tvTime.setText("Expired " + TimeFormatter
-                            .getTimeDifference(listing.getDate("expiresAt").toString()) + " ago");
-                    return;
+        // Only start the handler if the listing has not expired yet
+        if (listing.getExpireTime().getTime() >= System.currentTimeMillis()) {
+            dateManipulator = new DateManipulator(listing.getExpireTime());
+            updater = new Runnable() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void run() {
+                    if (System.currentTimeMillis() >= listing.getExpireTime().getTime()) {
+                        tvTime.setText("Expired " + TimeFormatter
+                                .getTimeDifference(listing.getDate("expiresAt").toString()) + " ago");
+                        return;
+                    }
+                    getCurrentBids();
+                    lastBid = (Bid) listing.getRecentBid();
+                    if (lastBid != null) {
+                        minBid = lastBid
+                                .getLong(Bid.KEY_PRICE);
+                        tvCurrentBid
+                                .setText("$" + Objects.requireNonNull(minBid
+                                        .toString()));
+                    } else {
+                        minBid = (Long) listing
+                                .getLong("minPrice");
+                        tvCurrentBid
+                                .setText("$" + minBid
+                                        .toString());
+                    }
+
+
+                    String date = dateManipulator.getDate();
+                    tvTime.setText(date);
+
+                    Log.i(TAG, "Handler is running");
+                    timerHandler.postDelayed(updater, 1000);
                 }
-                getCurrentBids();
-                lastBid = (Bid) listing.getRecentBid();
-                if (lastBid != null) {
-                    minBid = lastBid
-                            .getLong(Bid.KEY_PRICE);
-                    tvCurrentBid
-                            .setText("$" + Objects.requireNonNull(minBid
-                                    .toString()));
-                } else {
-                    minBid = (Long) listing
-                            .getLong("minPrice");
-                    tvCurrentBid
-                            .setText("$" + minBid
-                                    .toString());
-
-                }
-
-
-                String date = dateManipulator.getDate();
-                tvTime.setText(date);
-
-                Log.i(TAG, "Handler is running");
-                timerHandler.postDelayed(updater, 1000);
-            }
-        };
-        timerHandler.post(updater);
-
-        if (listing.getBoolean("isSold")) {
+            };
+            timerHandler.post(updater);
+        }
+        else{
             if (listing.getRecentBid() != null) {
                 tvNumber.setVisibility(View.VISIBLE);
+                tvBuyersName.setVisibility(View.VISIBLE);
                 ParseUser buyer = null;
                 try {
                     buyer = listing.getRecentBid().getParseUser(Bid.KEY_USER)
@@ -191,10 +196,16 @@ public class SellerDetailFragment extends Fragment {
                     tvNumber.setText("Error getting number");
                     return;
                 }
+
+                // Sets up the text for all the views
+                String buyersName = buyer.getString("name");
                 String buyersNumber = buyer.getString("phoneNumber");
+                tvBuyersName.setText("Buyer's Name" + buyersName);
                 tvNumber.setText("Buyer's number: " + buyersNumber);
             } else {
                 tvCurrentBid.setText("NO SALE");
+                tvTime.setText("Expired " + TimeFormatter
+                        .getTimeDifference(listing.getDate("expiresAt").toString()) + " ago");
             }
         }
 

@@ -50,6 +50,7 @@ public class PurchasedDetailFragment extends Fragment {
     private TextView tvSellerName;
     private ImageView ivListingImage;
 
+    private String sellersName;
     private String sellersNumber;
 
     private AlertDialog.Builder builder;
@@ -85,6 +86,7 @@ public class PurchasedDetailFragment extends Fragment {
         tvCurrentBid = view.findViewById(R.id.tvCurrentBid);
         tvTime = view.findViewById(R.id.tvTime);
         tvNumber = view.findViewById(R.id.tvNumber);
+        tvSellerName = view.findViewById(R.id.tvSellerName);
         ivListingImage = view.findViewById(R.id.ivListingImage);
 
         builder = new MaterialAlertDialogBuilder(getContext());
@@ -114,7 +116,6 @@ public class PurchasedDetailFragment extends Fragment {
                 .transform(new CenterCrop())
                 .into(ivListingImage);
 
-
         dateManipulator = new DateManipulator(listing.getExpireTime());
 
         lastBid = (Bid) listing.getRecentBid();
@@ -126,6 +127,10 @@ public class PurchasedDetailFragment extends Fragment {
 
         tvTime.setText("Expired " + TimeFormatter
                 .getTimeDifference(listing.getDate("expiresAt").toString()) + " ago");
+
+        sellersName = listing.getUser().getString("name");
+
+        tvSellerName.setText("Seller's name: " + sellersName);
 
         sellersNumber = listing.getUser().getString("phoneNumber");
 
