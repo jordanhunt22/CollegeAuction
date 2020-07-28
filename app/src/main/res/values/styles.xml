@@ -5,6 +5,24 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/newAccent</item>
         <item name="colorAccent">@color/colorAccent</item>
+
     </style>
+
+<!--    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">-->
+<!--        <item name="colorPrimary">@color/newAccent</item>-->
+<!--        <item name="colorOnPrimary">@color/white</item>-->
+<!--        <item name="textAppearanceButton">@style/TextAppearance.App.Button</item>-->
+<!--        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.App.SmallComponent</item>-->
+<!--    </style>-->
+
+<!--    <style name="TextAppearance.App.Button" parent="TextAppearance.MaterialComponents.Button">-->
+<!--        <item name="fontFamily">@font/abril_fatface</item>-->
+<!--        <item name="android:fontFamily">@font/abril_fatface</item>-->
+<!--    </style>-->
+
+<!--    <style name="ShapeAppearance.App.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">-->
+<!--        <item name="cornerFamily">cut</item>-->
+<!--        <item name="cornerSize">4dp</item>-->
+<!--    </style>-->
 
 </resources>

@@ -27,6 +27,7 @@ import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
 import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -46,6 +47,7 @@ public class PurchasedDetailFragment extends Fragment {
     private TextView tvNumber;
     private TextView tvCurrentBid;
     private TextView tvTime;
+    private TextView tvSellerName;
     private ImageView ivListingImage;
 
     private String sellersNumber;

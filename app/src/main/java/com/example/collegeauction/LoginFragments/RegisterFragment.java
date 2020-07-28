@@ -29,6 +29,7 @@ public class RegisterFragment extends Fragment {
     public static final String TAG = "RegisterFragment";
     public TextInputEditText etUsername;
     private TextInputEditText etPassword;
+    private TextInputEditText etName;
     private Button btnRegister;
     private TextInputEditText etNumber;
     private TextInputEditText etEmail;
@@ -55,6 +56,7 @@ public class RegisterFragment extends Fragment {
 
         etUsername = view.findViewById(R.id.etUsername);
         etPassword = view.findViewById(R.id.etPassword);
+        etName = view.findViewById(R.id.etName);
         etNumber = view.findViewById(R.id.etNumber);
         etEmail = view.findViewById(R.id.etEmail);
         btnRegister = view.findViewById(R.id.btnRegister);
@@ -65,14 +67,19 @@ public class RegisterFragment extends Fragment {
                 String username = etUsername.getText().toString();
                 String password = etPassword.getText().toString();
                 String phoneNumber = etNumber.getText().toString();
+                String name = etName.getText().toString();
                 String email = etEmail.getText().toString();
-                createUser(username, password, phoneNumber, email);
+                if (username.isEmpty() || password.isEmpty() || phoneNumber.isEmpty() || name.isEmpty() || email.isEmpty()){
+                    Toast.makeText(getContext(), "You must fill in every field", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                createUser(username, password, phoneNumber, email, name);
             }
         });
 
         etNumber.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
     }
-    private void createUser(final String username, final String password, final String number, final String email) {
+    private void createUser(final String username, final String password, final String number, final String email, final String name) {
         // Create the ParseUser
         ParseUser user = new ParseUser();
         // Set core properties
@@ -80,6 +87,7 @@ public class RegisterFragment extends Fragment {
         user.setPassword(password);
         user.setEmail(email);
         user.put("phoneNumber", number);
+        user.put("name", name);
         // Invoke signUpInBackground
         user.signUpInBackground(new SignUpCallback() {
             public void done(ParseException e) {

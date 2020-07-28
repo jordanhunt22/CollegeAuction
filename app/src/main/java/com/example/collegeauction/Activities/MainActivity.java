@@ -8,22 +8,19 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.collegeauction.BidsPurchasesFragments.BidsPurchasesFragment;
+import com.example.collegeauction.FavFragments.FavFragment;
 import com.example.collegeauction.HomeFragments.HomeFragment;
-import com.example.collegeauction.MainFragments.FavoritesFragment;
-import com.example.collegeauction.HomeFragments.SoonHomeFragment;
+import com.example.collegeauction.FavFragments.FavoritesFragment;
 import com.example.collegeauction.MainFragments.ProfileFragment;
 import com.example.collegeauction.Models.Purchase;
 import com.example.collegeauction.R;
@@ -31,12 +28,10 @@ import com.example.collegeauction.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.parse.DeleteCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 
 import java.util.List;
 
@@ -102,11 +97,11 @@ public class MainActivity extends AppCompatActivity {
                         newPosition = 1;
                         break;
                     case R.id.action_favorites:
-                        fragment = new FavoritesFragment();
+                        fragment = new FavFragment();
                         newPosition = 2;
                         break;
                     case R.id.action_history:
-                        fragment = new BidsPurchasesFragment(fragmentManager);
+                        fragment = new BidsPurchasesFragment();
                         newPosition = 3;
                         break;
                     case R.id.action_profile:

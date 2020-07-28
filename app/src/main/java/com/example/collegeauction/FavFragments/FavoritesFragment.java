@@ -1,4 +1,4 @@
-package com.example.collegeauction.MainFragments;
+package com.example.collegeauction.FavFragments;
 
 import android.os.Bundle;
 

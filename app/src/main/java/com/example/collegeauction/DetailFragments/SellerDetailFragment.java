@@ -101,11 +101,10 @@ public class SellerDetailFragment extends Fragment {
 
         tvNumber.setVisibility(View.GONE);
 
-        if (listing.getString("locationName") != null){
+        if (listing.getString("locationName") != null) {
             String location = listing.getString("locationName");
             tvLocation.setText("Location: " + location);
-        }
-        else{
+        } else {
             tvLocation.setText("Location: Not Available");
         }
 
@@ -147,6 +146,12 @@ public class SellerDetailFragment extends Fragment {
             @SuppressLint("SetTextI18n")
             @Override
             public void run() {
+                if (System.currentTimeMillis() >= listing.getExpireTime().getTime()) {
+                    tvTime.setText("NO SALE");
+                    tvTime.setText("Expired " + TimeFormatter
+                            .getTimeDifference(listing.getDate("expiresAt").toString()) + " ago");
+                    return;
+                }
                 getCurrentBids();
                 lastBid = (Bid) listing.getRecentBid();
                 if (lastBid != null) {
@@ -155,36 +160,27 @@ public class SellerDetailFragment extends Fragment {
                     tvCurrentBid
                             .setText("$" + Objects.requireNonNull(minBid
                                     .toString()));
-                }
-                else{
-                    if (System.currentTimeMillis() >= listing.getExpireTime().getTime()){
-                        tvTime.setText("NO SALE");
-                    }
-                    else {
-                        minBid = (Long) listing
-                                .getLong("minPrice");
-                        tvCurrentBid
-                                .setText("$" + minBid
-                                        .toString());
-                    }
+                } else {
+                    minBid = (Long) listing
+                            .getLong("minPrice");
+                    tvCurrentBid
+                            .setText("$" + minBid
+                                    .toString());
+
                 }
 
-                if(System.currentTimeMillis() >= listing.getExpireTime().getTime()){
-                    tvTime.setText("Expired " + TimeFormatter
-                            .getTimeDifference(listing.getDate("expiresAt").toString()) + " ago");
-                }
-                else {
-                    String date = dateManipulator.getDate();
-                    tvTime.setText(date);
-                }
+
+                String date = dateManipulator.getDate();
+                tvTime.setText(date);
+
                 Log.i(TAG, "Handler is running");
-                timerHandler.postDelayed(updater,1000);
+                timerHandler.postDelayed(updater, 1000);
             }
         };
         timerHandler.post(updater);
 
-        if (listing.getBoolean("isSold")){
-            if (listing.getRecentBid() != null){
+        if (listing.getBoolean("isSold")) {
+            if (listing.getRecentBid() != null) {
                 tvNumber.setVisibility(View.VISIBLE);
                 ParseUser buyer = null;
                 try {
@@ -196,9 +192,8 @@ public class SellerDetailFragment extends Fragment {
                     return;
                 }
                 String buyersNumber = buyer.getString("phoneNumber");
-                tvNumber.setText(buyersNumber);
-            }
-            else{
+                tvNumber.setText("Buyer's number: " + buyersNumber);
+            } else {
                 tvCurrentBid.setText("NO SALE");
             }
         }
@@ -207,7 +202,7 @@ public class SellerDetailFragment extends Fragment {
         tvLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (listing.getLocation() != null){
+                if (listing.getLocation() != null) {
                     Fragment fragment = new MapsFragment();
                     Bundle bundle = new Bundle();
                     bundle.putParcelable("listing", Parcels.wrap(listing));
@@ -218,15 +213,14 @@ public class SellerDetailFragment extends Fragment {
                             .addToBackStack(null)
                             .replace(R.id.flContainer, fragment)
                             .commit();
-                }
-                else{
+                } else {
                     Toast.makeText(getContext(), "This listing has no location", Toast.LENGTH_SHORT).show();
                 }
             }
         });
     }
 
-    public void getCurrentBids(){
+    public void getCurrentBids() {
         ParseQuery<ParseObject> query = ParseQuery.getQuery("Listing");
         query.include(Listing.KEY_BID);
         // Retrieve the object by id

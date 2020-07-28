@@ -17,18 +17,19 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="12dp"
+        android:ems="10"
+        android:hint="Username"
+        android:outlineProvider="background"
         app:boxCornerRadiusBottomEnd="6dp"
         app:boxCornerRadiusBottomStart="6dp"
         app:boxCornerRadiusTopEnd="6dp"
-        app:boxCornerRadiusTopStart="6dp"
-        android:ems="10"
-        android:hint="username"
-        android:outlineProvider="background">
+        app:boxCornerRadiusTopStart="6dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etUsername"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textAllCaps="false" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -43,13 +44,13 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="12dp"
+        android:ems="10"
+        android:hint="Password"
+        android:outlineProvider="bounds"
         app:boxCornerRadiusBottomEnd="6dp"
         app:boxCornerRadiusBottomStart="6dp"
         app:boxCornerRadiusTopEnd="6dp"
-        app:boxCornerRadiusTopStart="6dp"
-        android:ems="10"
-        android:hint="password"
-        android:outlineProvider="bounds">
+        app:boxCornerRadiusTopStart="6dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etPassword"
@@ -59,7 +60,6 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-
     <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
@@ -67,18 +67,19 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="12dp"
+        android:ems="10"
+        android:hint="Full Name"
+        android:outlineProvider="background"
         app:boxCornerRadiusBottomEnd="6dp"
         app:boxCornerRadiusBottomStart="6dp"
         app:boxCornerRadiusTopEnd="6dp"
-        app:boxCornerRadiusTopStart="6dp"
-        android:ems="10"
-        android:hint="phone number">
+        app:boxCornerRadiusTopStart="6dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etNumber"
-            android:inputType="phone"
+            android:id="@+id/etName"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textAllCaps="false" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -90,12 +91,35 @@
         android:layout_marginStart="12dp"
         android:layout_marginTop="12dp"
         android:layout_marginEnd="12dp"
+        android:ems="10"
+        android:hint="Phone Number"
         app:boxCornerRadiusBottomEnd="6dp"
         app:boxCornerRadiusBottomStart="6dp"
         app:boxCornerRadiusTopEnd="6dp"
-        app:boxCornerRadiusTopStart="6dp"
+        app:boxCornerRadiusTopStart="6dp">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="phone" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
         android:ems="10"
-        android:hint="email">
+        android:hint="Email"
+        app:boxCornerRadiusBottomEnd="6dp"
+        app:boxCornerRadiusBottomStart="6dp"
+        app:boxCornerRadiusTopEnd="6dp"
+        app:boxCornerRadiusTopStart="6dp">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/etEmail"

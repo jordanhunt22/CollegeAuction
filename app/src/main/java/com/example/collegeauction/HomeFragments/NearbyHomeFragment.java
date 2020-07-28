@@ -128,7 +128,6 @@ public class NearbyHomeFragment extends Fragment {
                     Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(favorite.getListing().getObjectId()));
                     Listing.listingsFavoritedByCurrentuser.add(favorite.getListing().getObjectId());
                 }
-                queryListings();
             }
         });
     }

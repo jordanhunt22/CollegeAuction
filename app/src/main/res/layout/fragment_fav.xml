@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".FavFragments.FavFragment"
     android:orientation="vertical">
 
     <com.google.android.material.tabs.TabLayout
@@ -12,21 +13,18 @@
         android:layout_height="wrap_content"
         app:tabInlineLabel="true">
 
-
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/expires_soon"
+            android:id="@+id/action_favorites"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Expires soon"
-            android:icon="@drawable/clock"
+            android:text="favorites"
             />
 
         <com.google.android.material.tabs.TabItem
-            android:id="@+id/action_purchases"
+            android:id="@+id/action_suggested"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="nearby"
-            android:icon="@drawable/nearby"
+            android:text="suggested"
             />
 
     </com.google.android.material.tabs.TabLayout>
@@ -34,11 +32,6 @@
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <!--    <FrameLayout-->
-<!--        android:id="@+id/flHome"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent" />-->
+        android:layout_height="match_parent"/>
 
 </LinearLayout>
