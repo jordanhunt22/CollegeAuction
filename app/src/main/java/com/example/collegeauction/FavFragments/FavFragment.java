@@ -54,7 +54,7 @@ public class FavFragment extends Fragment {
                     tab.setText("Favorites").setIcon(R.drawable.star);
                 }
                 else{
-                    tab.setText("Suggested").setIcon(R.drawable.suggested);
+                    tab.setText("Discover").setIcon(R.drawable.discover);
                 }
             }
         });

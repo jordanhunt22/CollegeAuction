@@ -60,7 +60,11 @@ public class CreationFragment2 extends Fragment {
             @Override
             public void onClick(View view) {
                 chipIds = cgAttributes.getCheckedChipIds();
-                if (!chipIds.isEmpty()){
+                if (chipIds.size() > 3){
+                    Toast.makeText(getContext(), "You cannot select more than 3 categories.", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                else if (!chipIds.isEmpty()){
                     for (int i = 0; i < chipIds.size(); i++){
                         pbLoading.setVisibility(View.VISIBLE);
                         Chip chip = cgAttributes.findViewById(chipIds.get(i));
@@ -76,7 +80,7 @@ public class CreationFragment2 extends Fragment {
                     });
                 }
                 else{
-                    Toast.makeText(getContext(), "You need to select a category", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "You need to select a category.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
