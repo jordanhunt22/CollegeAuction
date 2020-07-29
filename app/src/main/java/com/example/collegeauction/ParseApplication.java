@@ -23,9 +23,9 @@ public class ParseApplication extends Application {
         // ClientKey is not needed unless explicitly configured
         // Any network interceptors must be added with the Configuration Builder given this syntax
         Parse.initialize(new Parse.Configuration.Builder(this)
-                .applicationId("yVLVEGlJcV6yQhGb5Sh9WCpQ3kH97PsLoUDbt9cw") // should correspond to APP_ID env variable
-                .clientKey("6wpEeaxihttrjKyR4NCKtHLglRkNTrdfrEytFEoW")  // set explicitly unless clientKey is explicitly configured on Parse server
-                .server("https://parseapi.back4app.com/").build());
+                .applicationId("jordan-collegeauction") // should correspond to APP_ID env variable
+                .clientKey("FBUFinalApplication")  // set explicitly unless clientKey is explicitly configured on Parse server
+                .server("https://jordan-collegeauction.herokuapp.com/parse/").build());
     }
 }
 

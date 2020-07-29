@@ -47,6 +47,7 @@ public class SuggestedFragment extends Fragment {
     private List<Listing> allListings;
     private EndlessRecyclerViewScrollListener scrollListener;
     private ChipGroup cgAttributes;
+    private String category;
 
     public SuggestedFragment() {
         // Required empty public constructor
@@ -72,11 +73,10 @@ public class SuggestedFragment extends Fragment {
             @Override
             public void onCheckedChanged(ChipGroup group, int checkedId) {
                 Chip chip = group.findViewById(checkedId);
-                if (chip == null){
-                    return;
-                }
-                else{
-                    Toast.makeText(getContext(), chip.getText(), Toast.LENGTH_SHORT).show();
+                if (chip != null){
+                    category = (String) chip.getText();
+                    // Toast.makeText(getContext(), chip.getText(), Toast.LENGTH_SHORT).show();
+                    queryListings();
                 }
             }
         });
@@ -87,14 +87,14 @@ public class SuggestedFragment extends Fragment {
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // Your code to refresh the list here.
-                // Make sure you call swipeContainer.setRefreshing(false)
-                // once the network request has completed successfully.
-                // queryListings();
+                if (!cgAttributes.getCheckedChipIds().isEmpty()){
+                    queryListings();
+                }
+                else{
+                    swipeContainer.setRefreshing(false);
+                }
             }
         });
-
-        swipeContainer.setRefreshing(true);
 
         rvPosts = view.findViewById(R.id.rvPosts);
 
@@ -127,7 +127,9 @@ public class SuggestedFragment extends Fragment {
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 // Triggered only when new data needs to be appended to the list
                 // Add whatever code is needed to append new items to the bottom of the list
-                loadMoreData();
+                if (!cgAttributes.getCheckedChipIds().isEmpty()){
+                    loadMoreData();
+                }
             }
         };
 
@@ -148,9 +150,11 @@ public class SuggestedFragment extends Fragment {
         query.findInBackground(new FindCallback<Favorite>() {
             @Override
             public void done(List<Favorite> favorites, ParseException e) {
-                for (Favorite favorite : favorites) {
-                    Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(favorite.getListing().getObjectId()));
-                    Listing.listingsFavoritedByCurrentuser.add(favorite.getListing().getObjectId());
+                if (favorites != null){
+                    for (Favorite favorite : favorites) {
+                        Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(favorite.getListing().getObjectId()));
+                        Listing.listingsFavoritedByCurrentuser.add(favorite.getListing().getObjectId());
+                    }
                 }
             }
         });
@@ -165,6 +169,8 @@ public class SuggestedFragment extends Fragment {
         query.setLimit(10);
         // Only shows items that have not expired yet
         query.whereGreaterThanOrEqualTo(Listing.KEY_EXPIRATION, queryDate);
+        // Queries only the items that are in the category that is selected
+        query.whereContainedIn("categories", Collections.singleton(category));
         // order posts by creation date (newest first)
         query.addAscendingOrder(Listing.KEY_EXPIRATION);
         // Does not show the current user's posts
@@ -195,7 +201,7 @@ public class SuggestedFragment extends Fragment {
         });
     }
 
-    public void queryListings(String category) {
+    public void queryListings() {
         // Checks to see if there are new purchases
 //        MainActivity main = (MainActivity) getActivity();
 //        assert main != null;
@@ -207,6 +213,8 @@ public class SuggestedFragment extends Fragment {
         query.include(Listing.KEY_BID);
         // limit query to latest 10 items
         query.setLimit(10);
+        // Queries only the items that are in the category that is selected
+        query.whereContainedIn("categories", Collections.singleton(category));
         // Only shows items that have not expired yet
         query.whereGreaterThanOrEqualTo(Listing.KEY_EXPIRATION, queryDate);
         // order posts by creation date (newest first)

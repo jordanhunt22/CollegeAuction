@@ -124,9 +124,11 @@ public class NearbyHomeFragment extends Fragment {
         query.findInBackground(new FindCallback<Favorite>() {
             @Override
             public void done(List<Favorite> favorites, ParseException e) {
-                for (Favorite favorite : favorites) {
-                    Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(favorite.getListing().getObjectId()));
-                    Listing.listingsFavoritedByCurrentuser.add(favorite.getListing().getObjectId());
+                if (favorites != null){
+                    for (Favorite favorite : favorites) {
+                        Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(favorite.getListing().getObjectId()));
+                        Listing.listingsFavoritedByCurrentuser.add(favorite.getListing().getObjectId());
+                    }
                 }
             }
         });

@@ -99,19 +99,6 @@ public class BidsFragment extends Fragment {
             }
         });
 
-        // Makes the fab disappear when scrolling
-        rvBids.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (dy > 0 && MainActivity.fab.getVisibility() == View.VISIBLE) {
-                    MainActivity.fab.hide();
-                } else if (dy < 0 && MainActivity.fab.getVisibility() != View.VISIBLE) {
-                    MainActivity.fab.show();
-                }
-            }
-        });
-
         // Implement ScrollListener for infinite scroll
         scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
             @Override
@@ -150,14 +137,18 @@ public class BidsFragment extends Fragment {
                 }
 
                 List <Bid> returnBids = new ArrayList<>();
-                for (Bid bid : bids){
-                    if (!bidsAdapter.bidIds.contains(bid.getObjectId())){
-                        returnBids.add(bid);
+
+                if (bids != null){
+                    for (Bid bid : bids){
+                        if (!bidsAdapter.bidIds.contains(bid.getObjectId())){
+                            returnBids.add(bid);
+                        }
                     }
+
+                    // Clears the adapter
+                    bidsAdapter.addAll(bids);
                 }
 
-                // Clears the adapter
-                bidsAdapter.addAll(bids);
 
                 // Save received posts to list and notify adapter of new data
                 swipeBids.setRefreshing(false);

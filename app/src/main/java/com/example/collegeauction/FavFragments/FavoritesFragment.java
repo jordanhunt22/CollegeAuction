@@ -150,24 +150,27 @@ public class FavoritesFragment extends Fragment {
                 if (e != null) {
                     Toast.makeText(getContext(), "Error getting favorite posts", Toast.LENGTH_SHORT).show();
                 }
-                List<Listing> listings = new ArrayList<>();
-                for (Favorite favorite : favorites) {
-                    Listing listing = (Listing) favorite.getListing();
-                    if (listing.getExpireTime().getTime() >= System.currentTimeMillis()) {
-                        Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(listing.getObjectId()));
-                        Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
-                        listings.add(listing);
-                    }
-                }
-                List<Listing> returnListings = new ArrayList<>();
-                for (Listing listing : listings) {
-                    if (!adapter.listingIds.contains(listing.getObjectId())) {
-                        returnListings.add(listing);
-                    }
-                }
 
-                // Clears the adapter
-                adapter.addAll(returnListings);
+                if (favorites != null){
+                    List<Listing> listings = new ArrayList<>();
+                    for (Favorite favorite : favorites) {
+                        Listing listing = (Listing) favorite.getListing();
+                        if (listing.getExpireTime().getTime() >= System.currentTimeMillis()) {
+                            Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(listing.getObjectId()));
+                            Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
+                            listings.add(listing);
+                        }
+                    }
+                    List<Listing> returnListings = new ArrayList<>();
+                    for (Listing listing : listings) {
+                        if (!adapter.listingIds.contains(listing.getObjectId())) {
+                            returnListings.add(listing);
+                        }
+                    }
+
+                    // Clears the adapter
+                    adapter.addAll(returnListings);
+                }
 
                 // Save received posts to list and notify adapter of new data
                 swipeContainer.setRefreshing(false);

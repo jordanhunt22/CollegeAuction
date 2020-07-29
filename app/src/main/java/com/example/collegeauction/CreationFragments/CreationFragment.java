@@ -215,7 +215,7 @@ public class CreationFragment extends Fragment {
                     return;
                 }
                 // on some click or some loading we need to wait for...
-                pb.setVisibility(ProgressBar.VISIBLE);
+                // pb.setVisibility(ProgressBar.VISIBLE);
                 saveListing(name, description, bid, photoFile, returnPoint);
                 // getActivity().finish();
             }
@@ -244,21 +244,26 @@ public class CreationFragment extends Fragment {
         listing.setExpireTime(expireDate);
         listing.put("location", finalPoint);
         listing.put("isSold", false);
-        listing.saveInBackground(new SaveCallback() {
-            @Override
-            public void done(ParseException e) {
-                if (e != null) {
-                    Log.e(TAG, "Error while saving!", e);
-                    Toast.makeText(getContext(), "Error while saving!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                Log.i(TAG, "Post save was successful!");
-                // run a background job and once complete
-                pb.setVisibility(ProgressBar.INVISIBLE);
-                // Toast.makeText(getContext(), "Your listing was posted successfully!", Toast.LENGTH_SHORT).show();
-                getActivity().finish();
-            }
-        });
+        getFragmentManager()
+                .beginTransaction()
+                .addToBackStack(TAG)
+                .replace(R.id.flContainer, new CreationFragment2(listing))
+                .commit();
+//        listing.saveInBackground(new SaveCallback() {
+//            @Override
+//            public void done(ParseException e) {
+//                if (e != null) {
+//                    Log.e(TAG, "Error while saving!", e);
+//                    Toast.makeText(getContext(), "Error while saving!", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
+//                Log.i(TAG, "Post save was successful!");
+//                // run a background job and once complete
+//                pb.setVisibility(ProgressBar.INVISIBLE);
+//                // Toast.makeText(getContext(), "Your listing was posted successfully!", Toast.LENGTH_SHORT).show();
+//                getActivity().finish();
+//            }
+//        });
 
     }
 
@@ -285,9 +290,6 @@ public class CreationFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
-        // Resets the point to null whenever the view is destroyed
-        point = null;
     }
 
     @Override

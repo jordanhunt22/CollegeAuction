@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".CreationFragments.CreationFragment2"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvCategory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Choose some categories"
+        android:textAlignment="center"
+        android:textSize="24sp" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/cgAttributes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_marginTop="0dp">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/cShoes"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Shoes" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/cClothing"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clothing" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/cSupplies"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="School Supplies" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/cDecorations"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Decorations" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/cTech"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tech" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/cDormEssentials"
+            style="@style/Widget.MaterialComponents.Chip.Filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dorm Essentials" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:text="Submit" />
+
+    <ProgressBar
+        android:id="@+id/pbLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:visibility="invisible" />
+
+</LinearLayout>
