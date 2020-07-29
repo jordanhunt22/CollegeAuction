@@ -6,57 +6,86 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/cgAttributes"
+    <HorizontalScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginEnd="8dp"
-        app:singleSelection="true">
+        android:layout_height="wrap_content">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/cShoes"
-            style="@style/Widget.MaterialComponents.Chip.Filter"
-            android:layout_width="wrap_content"
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cgAttributes"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Shoes" />
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="6dp"
+            app:singleSelection="true">
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/cClothing"
-            style="@style/Widget.MaterialComponents.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Clothing" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/cShoes"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Shoes"
+                app:checkedIconTint="@color/colorPrimary" />
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/cSupplies"
-            style="@style/Widget.MaterialComponents.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="School Supplies" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/cClothing"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Clothing"
+                app:checkedIconTint="@color/colorPrimary" />
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/cDecorations"
-            style="@style/Widget.MaterialComponents.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Decorations" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/cSupplies"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="School Supplies"
+                app:checkedIconTint="@color/colorPrimary" />
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/cTech"
-            style="@style/Widget.MaterialComponents.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tech" />
+            <com.google.android.material.chip.Chip
+                android:id="@+id/cDecorations"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Decorations"
+                app:checkedIconTint="@color/colorPrimary" />
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/cDormEssentials"
-            style="@style/Widget.MaterialComponents.Chip.Filter"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Dorm Essentials" />
-    </com.google.android.material.chip.ChipGroup>
+            <com.google.android.material.chip.Chip
+                android:id="@+id/cTech"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tech"
+                app:checkedIconTint="@color/colorPrimary" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/cDormEssentials"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dorm Essentials"
+                app:checkedIconTint="@color/colorPrimary" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/cTrinkets"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trinkets"
+                app:checkedIconTint="@color/colorPrimary" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/cTextbooks"
+                style="@style/Widget.MaterialComponents.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Textbooks"
+                app:checkedIconTint="@color/colorPrimary" />
+        </com.google.android.material.chip.ChipGroup>
+
+    </HorizontalScrollView>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeContainer"

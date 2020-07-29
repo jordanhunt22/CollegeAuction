@@ -31,6 +31,7 @@
             style="@style/Widget.MaterialComponents.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:checkedIconTint="@color/colorPrimary"
             android:text="Shoes" />
 
         <com.google.android.material.chip.Chip
@@ -38,6 +39,7 @@
             style="@style/Widget.MaterialComponents.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:checkedIconTint="@color/colorPrimary"
             android:text="Clothing" />
 
         <com.google.android.material.chip.Chip
@@ -45,6 +47,7 @@
             style="@style/Widget.MaterialComponents.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:checkedIconTint="@color/colorPrimary"
             android:text="School Supplies" />
 
         <com.google.android.material.chip.Chip
@@ -52,6 +55,7 @@
             style="@style/Widget.MaterialComponents.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:checkedIconTint="@color/colorPrimary"
             android:text="Decorations" />
 
         <com.google.android.material.chip.Chip
@@ -59,6 +63,7 @@
             style="@style/Widget.MaterialComponents.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:checkedIconTint="@color/colorPrimary"
             android:text="Tech" />
 
         <com.google.android.material.chip.Chip
@@ -66,6 +71,7 @@
             style="@style/Widget.MaterialComponents.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:checkedIconTint="@color/colorPrimary"
             android:text="Dorm Essentials" />
 
         <com.google.android.material.chip.Chip
@@ -73,6 +79,7 @@
             style="@style/Widget.MaterialComponents.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:checkedIconTint="@color/colorPrimary"
             android:text="Trinkets" />
 
         <com.google.android.material.chip.Chip
@@ -80,6 +87,7 @@
             style="@style/Widget.MaterialComponents.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:checkedIconTint="@color/colorPrimary"
             android:text="Textbooks" />
     </com.google.android.material.chip.ChipGroup>
 
