@@ -46,6 +46,7 @@ public class BidsPurchasesFragment extends Fragment {
     private TabLayoutMediator tabLayoutMediator;
     private ViewPager2 viewPager;
     private BidsPurchasesAdapter adapter;
+    private Boolean toPurchases;
 
     public BidsPurchasesFragment() {
         // Required empty public constructor
@@ -64,6 +65,9 @@ public class BidsPurchasesFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Gets the bundle if there is one
+        Bundle args = getArguments();
+
         // Sets up the tabs
         tabLayout = view.findViewById(R.id.tabLayout);
         viewPager = view.findViewById(R.id.viewPager);
@@ -80,12 +84,20 @@ public class BidsPurchasesFragment extends Fragment {
                 }
             }
         });
-        viewPager.setCurrentItem(0);
         tabLayoutMediator.attach();
+
+        viewPager.setCurrentItem(0);
 
         // Makes the fab visible whenever a new fragment starts
         MainActivity.fab.show();
 
+        if (toPurchases != null && toPurchases){
+            tabLayout.selectTab(tabLayout.getTabAt(1));
+        }
+    }
+
+    public void setToPurchases(boolean bool){
+        toPurchases = bool;
     }
 
     @Override

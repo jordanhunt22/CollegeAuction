@@ -206,11 +206,13 @@ public class FavoritesFragment extends Fragment {
                     Toast.makeText(getContext(), "Error getting favorite posts", Toast.LENGTH_SHORT).show();
                 }
                 List<Listing> listings = new ArrayList<>();
-                for (Favorite favorite : favorites) {
-                    Listing listing = (Listing) favorite.getListing();
-                    Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(listing.getObjectId()));
-                    Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
-                    listings.add(listing);
+                if (favorites != null){
+                    for (Favorite favorite : favorites) {
+                        Listing listing = (Listing) favorite.getListing();
+                        Listing.listingsFavoritedByCurrentuser.removeAll(Collections.singleton(listing.getObjectId()));
+                        Listing.listingsFavoritedByCurrentuser.add(listing.getObjectId());
+                        listings.add(listing);
+                    }
                 }
 
                 // Clears the adapter

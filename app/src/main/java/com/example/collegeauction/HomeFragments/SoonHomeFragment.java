@@ -29,6 +29,8 @@ import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
+import com.google.android.material.slider.RangeSlider;
+import com.google.android.material.slider.Slider;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -37,8 +39,11 @@ import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
+import java.text.Format;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Currency;
 import java.util.Date;
 import java.util.List;
 
@@ -49,6 +54,7 @@ public class SoonHomeFragment extends Fragment {
     private RecyclerView rvPosts;
     private TextView tvEmpty;
     protected SwipeRefreshLayout swipeContainer;
+    private RangeSlider sPrices;
     private ListingsAdapter adapter;
     private List<Listing> allListings;
     private EndlessRecyclerViewScrollListener scrollListener;
@@ -72,6 +78,20 @@ public class SoonHomeFragment extends Fragment {
 
         tvEmpty = view.findViewById(R.id.tvEmpty);
         tvEmpty.setVisibility(View.GONE);
+
+        // Makes the slider visible
+//        sPrices = view.findViewById(R.id.sPrices);
+//        sPrices.setVisibility(View.VISIBLE);
+//        sPrices.setLabelFormatter(new Slider.LabelFormatter() {
+//            @NonNull
+//            @Override
+//            public String getFormattedValue(float value) {
+//                NumberFormat labelFormatter = NumberFormat.getCurrencyInstance();
+//                labelFormatter.setMaximumFractionDigits(0);
+//                labelFormatter.setCurrency(Currency.getInstance("USD"));
+//                return labelFormatter.format((double) value);
+//            }
+//        });
 
         // Lookup the swipe container view
         swipeContainer = view.findViewById(R.id.swipeContainer);

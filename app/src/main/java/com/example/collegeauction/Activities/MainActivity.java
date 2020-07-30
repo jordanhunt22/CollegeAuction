@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -42,7 +43,9 @@ public class MainActivity extends AppCompatActivity {
     private Context context;
     private int startingPosition;
     private SearchView searchView;
+    private BottomNavigationView bottomNavigationView;
     private String dialogueText;
+    private Boolean toPurchases;
     public static final String TAG = "MainActivity";
 
     private AlertDialog.Builder builder;
@@ -50,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        toPurchases = false;
 
         builder = new MaterialAlertDialogBuilder(this);
 
@@ -84,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Resolves the bottom navigation bar
-        BottomNavigationView bottomNavigationView = binding.bottomNavigation;
+        bottomNavigationView = binding.bottomNavigation;
 
         bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -135,23 +140,30 @@ public class MainActivity extends AppCompatActivity {
             if(newPosition == 0) {
                 fragmentManager
                         .beginTransaction()
-                        .replace(R.id.flContainer, fragment).commit();
+                        .replace(R.id.flContainer, fragment, fragment.getClass().getSimpleName()).commit();
 
             }
             if(startingPosition > newPosition) {
                 fragmentManager
                         .beginTransaction()
-                        .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right )
-                        .replace(R.id.flContainer, fragment).commit();
+                        .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
+                        .replace(R.id.flContainer, fragment, fragment.getClass().getSimpleName()).commit();
 
             }
             if(startingPosition < newPosition) {
                 fragmentManager
                         .beginTransaction()
                         .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
-                        .replace(R.id.flContainer, fragment)
+                        .replace(R.id.flContainer, fragment, fragment.getClass().getSimpleName())
                         .commit();
 
+            }
+
+            // Sends the BidsPurchases Fragment to the Purchases tab
+            if (toPurchases){
+                BidsPurchasesFragment tempFragment = (BidsPurchasesFragment) fragment;
+                tempFragment.setToPurchases(true);
+                toPurchases = false;
             }
             startingPosition = newPosition;
             return true;
@@ -193,14 +205,13 @@ public class MainActivity extends AppCompatActivity {
                     builder
                             // Add customization options here
                             .setTitle(dialogueText)
-//                            .setNegativeButton("YES", new DialogInterface.OnClickListener() {
-//
-//                                @Override
-//                                public void onClick(DialogInterface dialogInterface, int i) {
-//
-//                                }
-//                            })
-                            .setPositiveButton("OK", null)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    toPurchases = true;
+                                    bottomNavigationView.setSelectedItemId(R.id.action_history);
+                                }
+                            })
                             .show();
                 }
             }
@@ -212,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
         ParseQuery query = new ParseQuery(Purchase.class);
         query.whereEqualTo("seller", currentUser);
         query.whereEqualTo("seenBySeller", false);
+        query.whereExists("buyer");
         query.findInBackground(new FindCallback<Purchase>() {
             @Override
             public void done(List<Purchase> purchases, ParseException e) {
@@ -246,7 +258,12 @@ public class MainActivity extends AppCompatActivity {
 //
 //                                }
 //                            })
-                            .setPositiveButton("OK", null)
+                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    bottomNavigationView.setSelectedItemId(R.id.action_profile);
+                                }
+                            })
                             .show();
                 }
             }

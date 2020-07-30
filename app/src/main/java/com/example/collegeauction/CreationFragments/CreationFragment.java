@@ -165,7 +165,7 @@ public class CreationFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Fragment fragment = new MapsCreationFragment();
-                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment)
+                fragmentManager.beginTransaction().replace(R.id.flContainer, fragment, "CreationFragment2")
                         .addToBackStack(null)
                         .commit();
             }
@@ -230,9 +230,9 @@ public class CreationFragment extends Fragment {
         Calendar c = Calendar.getInstance();
         c.setTime(currentDate);
         // c.add(Calendar.DATE, 3);
-        // c.add(Calendar.MINUTE, 45);
+        c.add(Calendar.MINUTE, 5);
         // c.set(Calendar.MINUTE, 0);
-        c.add(Calendar.HOUR, 8);
+        // c.add(Calendar.HOUR, 8);
         Date expireDate = c.getTime();
         Listing listing = new Listing();
         listing.setDescription(description);
@@ -247,6 +247,7 @@ public class CreationFragment extends Fragment {
         getFragmentManager()
                 .beginTransaction()
                 .addToBackStack(TAG)
+                .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
                 .replace(R.id.flContainer, new CreationFragment2(listing))
                 .commit();
 //        listing.saveInBackground(new SaveCallback() {
