@@ -230,9 +230,9 @@ public class CreationFragment extends Fragment {
         Calendar c = Calendar.getInstance();
         c.setTime(currentDate);
         // c.add(Calendar.DATE, 3);
-        c.add(Calendar.MINUTE, 5);
+        // c.add(Calendar.MINUTE, 5);
         // c.set(Calendar.MINUTE, 0);
-        // c.add(Calendar.HOUR, 8);
+        c.add(Calendar.HOUR, 8);
         Date expireDate = c.getTime();
         Listing listing = new Listing();
         listing.setDescription(description);
@@ -250,22 +250,6 @@ public class CreationFragment extends Fragment {
                 .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
                 .replace(R.id.flContainer, new CreationFragment2(listing))
                 .commit();
-//        listing.saveInBackground(new SaveCallback() {
-//            @Override
-//            public void done(ParseException e) {
-//                if (e != null) {
-//                    Log.e(TAG, "Error while saving!", e);
-//                    Toast.makeText(getContext(), "Error while saving!", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
-//                Log.i(TAG, "Post save was successful!");
-//                // run a background job and once complete
-//                pb.setVisibility(ProgressBar.INVISIBLE);
-//                // Toast.makeText(getContext(), "Your listing was posted successfully!", Toast.LENGTH_SHORT).show();
-//                getActivity().finish();
-//            }
-//        });
-
     }
 
     private void launchCamera() {

@@ -28,12 +28,11 @@ public class HomeAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         if (position == 0){
             fragment = new SoonHomeFragment();
-            return fragment;
         }
         else{
             fragment = new NearbyHomeFragment();
-            return fragment;
         }
+        return fragment;
     }
 
     @Override

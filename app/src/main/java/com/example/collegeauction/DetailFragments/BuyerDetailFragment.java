@@ -1,6 +1,8 @@
 package com.example.collegeauction.DetailFragments;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -18,11 +20,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestBuilder;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.collegeauction.Miscellaneous.DateManipulator;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
+import com.facebook.share.model.ShareHashtag;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.widget.ShareButton;
+import com.facebook.share.widget.ShareDialog;
 import com.google.android.material.textfield.TextInputEditText;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -54,6 +64,11 @@ public class BuyerDetailFragment extends Fragment {
     private ImageView ivListingImage;
     private Button btnBid;
     private TextInputEditText etBid;
+    private ShareButton sbFacebook;
+    private ShareDialog shareDialog;
+    private Bitmap fbPhoto;
+    private SharePhoto photo;
+    private SharePhotoContent content;
 
     private Bid bid;
     private Bid lastBid;
@@ -90,6 +105,7 @@ public class BuyerDetailFragment extends Fragment {
         etBid = view.findViewById(R.id.etBid);
         btnBid = view.findViewById(R.id.btnBid);
         ivListingImage = view.findViewById(R.id.ivListingImage);
+        sbFacebook = view.findViewById(R.id.shareButton);
 
         // Gets the bundle with listing that was passed in
         Bundle args = getArguments();
@@ -209,6 +225,33 @@ public class BuyerDetailFragment extends Fragment {
         };
         timerHandler.post(updater);
 
+        // Sets up the sharing dialog
+        shareDialog = new ShareDialog(getActivity());
+
+        // Prepares the content for the facebook share button
+        Glide.with(getContext())
+                .asBitmap()
+                .load(listing.getImage().getUrl())
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        fbPhoto = resource;
+                        photo = new SharePhoto.Builder()
+                                .setBitmap(fbPhoto)
+                                .build();
+                        content = new SharePhotoContent.Builder()
+                                .addPhoto(photo)
+                                .setShareHashtag(new ShareHashtag.Builder()
+                                        .setHashtag("#CollegeAuction")
+                                        .build())
+                                .build();
+                        sbFacebook.setShareContent(content);
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+                    }
+                });
     }
 
     public void getCurrentBids(){
@@ -222,7 +265,6 @@ public class BuyerDetailFragment extends Fragment {
                 }
             }
         });
-
     }
 
     @Override

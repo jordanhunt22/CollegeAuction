@@ -54,6 +54,7 @@ dependencies {
     implementation "com.google.android.gms:play-services-location:$googlePlayVersion"
     implementation 'com.github.hotchemi:permissionsdispatcher:3.1.0'
     annotationProcessor 'com.github.hotchemi:permissionsdispatcher-processor:3.1.0'
+    compile 'com.facebook.android:facebook-share:[5,6)'
 }
 
 ext {

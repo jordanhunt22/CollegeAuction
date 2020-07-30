@@ -6,6 +6,7 @@ import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.Models.Purchase;
+import com.facebook.FacebookSdk;
 import com.parse.Parse;
 import com.parse.ParseObject;
 
@@ -26,6 +27,8 @@ public class ParseApplication extends Application {
                 .applicationId("jordan-collegeauction") // should correspond to APP_ID env variable
                 .clientKey("FBUFinalApplication")  // set explicitly unless clientKey is explicitly configured on Parse server
                 .server("https://jordan-collegeauction.herokuapp.com/parse/").build());
+
+        // Initialzes the Facebook SDK
     }
 }
 

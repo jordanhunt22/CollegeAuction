@@ -79,20 +79,6 @@ public class SoonHomeFragment extends Fragment {
         tvEmpty = view.findViewById(R.id.tvEmpty);
         tvEmpty.setVisibility(View.GONE);
 
-        // Makes the slider visible
-//        sPrices = view.findViewById(R.id.sPrices);
-//        sPrices.setVisibility(View.VISIBLE);
-//        sPrices.setLabelFormatter(new Slider.LabelFormatter() {
-//            @NonNull
-//            @Override
-//            public String getFormattedValue(float value) {
-//                NumberFormat labelFormatter = NumberFormat.getCurrencyInstance();
-//                labelFormatter.setMaximumFractionDigits(0);
-//                labelFormatter.setCurrency(Currency.getInstance("USD"));
-//                return labelFormatter.format((double) value);
-//            }
-//        });
-
         // Lookup the swipe container view
         swipeContainer = view.findViewById(R.id.swipeContainer);
         // Setup refresh listener which triggers new data loading

@@ -91,6 +91,7 @@ public class BidsPurchasesFragment extends Fragment {
         // Makes the fab visible whenever a new fragment starts
         MainActivity.fab.show();
 
+        // Goes to the purchases tab if toPurchases is set to true
         if (toPurchases != null && toPurchases){
             tabLayout.selectTab(tabLayout.getTabAt(1));
         }
