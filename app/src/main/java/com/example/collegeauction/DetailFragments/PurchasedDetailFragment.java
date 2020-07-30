@@ -53,15 +53,9 @@ public class PurchasedDetailFragment extends Fragment {
     private String sellersName;
     private String sellersNumber;
 
-    private AlertDialog.Builder builder;
-
     private Bid lastBid;
     private Long minBid;
     private DateManipulator dateManipulator;
-
-    // For the runnable that updates the current bid
-    Runnable updater;
-    final Handler timerHandler = new Handler();
 
     public PurchasedDetailFragment() {
         // Required empty public constructor
@@ -88,8 +82,6 @@ public class PurchasedDetailFragment extends Fragment {
         tvNumber = view.findViewById(R.id.tvNumber);
         tvSellerName = view.findViewById(R.id.tvSellerName);
         ivListingImage = view.findViewById(R.id.ivListingImage);
-
-        builder = new MaterialAlertDialogBuilder(getContext());
 
         // Gets the bundle with listing that was passed in
         Bundle args = getArguments();

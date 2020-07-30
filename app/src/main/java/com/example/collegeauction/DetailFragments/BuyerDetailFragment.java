@@ -65,7 +65,6 @@ public class BuyerDetailFragment extends Fragment {
     private Button btnBid;
     private TextInputEditText etBid;
     private ShareButton sbFacebook;
-    private ShareDialog shareDialog;
     private Bitmap fbPhoto;
     private SharePhoto photo;
     private SharePhotoContent content;
@@ -224,9 +223,6 @@ public class BuyerDetailFragment extends Fragment {
             }
         };
         timerHandler.post(updater);
-
-        // Sets up the sharing dialog
-        shareDialog = new ShareDialog(getActivity());
 
         // Prepares the content for the facebook share button
         Glide.with(getContext())

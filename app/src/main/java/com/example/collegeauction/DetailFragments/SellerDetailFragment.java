@@ -2,6 +2,8 @@ package com.example.collegeauction.DetailFragments;
 
 import android.annotation.SuppressLint;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,11 +23,18 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.collegeauction.Miscellaneous.DateManipulator;
 import com.example.collegeauction.Miscellaneous.TimeFormatter;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
+import com.facebook.share.model.ShareHashtag;
+import com.facebook.share.model.SharePhoto;
+import com.facebook.share.model.SharePhotoContent;
+import com.facebook.share.widget.ShareButton;
+import com.facebook.share.widget.ShareDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
@@ -56,6 +65,11 @@ public class SellerDetailFragment extends Fragment {
     private TextView tvBuyersName;
     private ImageView ivListingImage;
     private Button btnDelete;
+    private ShareButton sbFacebook;
+
+    private Bitmap fbPhoto;
+    private SharePhoto photo;
+    private SharePhotoContent content;
 
     private AlertDialog.Builder builder;
 
@@ -93,6 +107,7 @@ public class SellerDetailFragment extends Fragment {
         tvBuyersName = view.findViewById(R.id.tvBuyersName);
         ivListingImage = view.findViewById(R.id.ivListingImage);
         btnDelete = view.findViewById(R.id.btnDelete);
+        sbFacebook = view.findViewById(R.id.shareButton);
 
         builder = new MaterialAlertDialogBuilder(getContext());
 
@@ -207,6 +222,7 @@ public class SellerDetailFragment extends Fragment {
                 tvTime.setText("Expired " + TimeFormatter
                         .getTimeDifference(listing.getDate("expiresAt").toString()) + " ago");
             }
+            sbFacebook.setVisibility(View.GONE);
         }
 
         // Allows the user to see the location they chose
@@ -229,6 +245,31 @@ public class SellerDetailFragment extends Fragment {
                 }
             }
         });
+
+        // Prepares the content for the facebook share button
+        Glide.with(getContext())
+                .asBitmap()
+                .load(listing.getImage().getUrl())
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        fbPhoto = resource;
+                        photo = new SharePhoto.Builder()
+                                .setBitmap(fbPhoto)
+                                .build();
+                        content = new SharePhotoContent.Builder()
+                                .addPhoto(photo)
+                                .setShareHashtag(new ShareHashtag.Builder()
+                                        .setHashtag("#CollegeAuction")
+                                        .build())
+                                .build();
+                        sbFacebook.setShareContent(content);
+                    }
+
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
+                    }
+                });
     }
 
     public void getCurrentBids() {
