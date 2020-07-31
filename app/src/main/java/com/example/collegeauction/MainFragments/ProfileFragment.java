@@ -25,8 +25,10 @@ import com.example.collegeauction.Adapters.ListingsAdapter;
 import com.example.collegeauction.Activities.LoginActivity;
 import com.example.collegeauction.Adapters.PurchasesAdapter;
 import com.example.collegeauction.Miscellaneous.EndlessRecyclerViewScrollListener;
+import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.Models.Purchase;
+import com.example.collegeauction.ParseApplication;
 import com.example.collegeauction.R;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -139,6 +141,11 @@ public class ProfileFragment extends Fragment {
         btnLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Logs whenever a user logs out
+                Bundle bundle = new Bundle();
+                bundle.putString("user_id", ParseUser.getCurrentUser().getObjectId());
+                ParseApplication.mFireBaseAnalytics
+                        .logEvent("logout", bundle);
                 ParseUser.logOut();
                 goLogIn();
             }

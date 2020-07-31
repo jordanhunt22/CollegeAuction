@@ -23,12 +23,15 @@ import com.example.collegeauction.FavFragments.FavFragment;
 import com.example.collegeauction.HomeFragments.HomeFragment;
 import com.example.collegeauction.FavFragments.FavoritesFragment;
 import com.example.collegeauction.MainFragments.ProfileFragment;
+import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Purchase;
+import com.example.collegeauction.ParseApplication;
 import com.example.collegeauction.R;
 import com.example.collegeauction.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -136,21 +139,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean loadFragment(Fragment fragment, int newPosition) {
-        if(fragment != null) {
-            if(newPosition == 0) {
+        if (fragment != null) {
+            if (newPosition == 0) {
                 fragmentManager
                         .beginTransaction()
                         .replace(R.id.flContainer, fragment, fragment.getClass().getSimpleName()).commit();
 
             }
-            if(startingPosition > newPosition) {
+            if (startingPosition > newPosition) {
                 fragmentManager
                         .beginTransaction()
                         .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
                         .replace(R.id.flContainer, fragment, fragment.getClass().getSimpleName()).commit();
 
             }
-            if(startingPosition < newPosition) {
+            if (startingPosition < newPosition) {
                 fragmentManager
                         .beginTransaction()
                         .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
@@ -160,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // Sends the BidsPurchases Fragment to the Purchases tab
-            if (toPurchases){
+            if (toPurchases) {
                 BidsPurchasesFragment tempFragment = (BidsPurchasesFragment) fragment;
                 tempFragment.setToPurchases(true);
                 toPurchases = false;
@@ -172,53 +175,63 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-    public void queryBuys(){
+    public void queryBuys() {
         ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = new ParseQuery(Purchase.class);
         query.whereEqualTo("buyer", currentUser);
         query.whereEqualTo("seenByBuyer", false);
+        query.include("finalBid");
+        query.include("finalBid.price");
         query.findInBackground(new FindCallback<Purchase>() {
             @Override
             public void done(List<Purchase> purchases, ParseException e) {
-                if (e != null){
+                if (e != null) {
                     Log.e(TAG, "Issue with getting purchases", e);
                     e.printStackTrace();
                     return;
                 }
 
-                for (Purchase purchase : purchases){
-                    purchase.put("seenByBuyer", true);
-                    purchase.saveInBackground();
-                }
-
-                if (purchases.isEmpty()){
+                if (purchases.isEmpty()) {
                     return;
                 }
 
                 else{
-                    if (purchases.size() == 1){
-                        dialogueText = "You have a new purchase.";
+                    for (Purchase purchase : purchases) {
+                        purchase.put("seenByBuyer", true);
+                        purchase.saveInBackground();
+                        // Logs new purchases
+                        Bundle bundle = new Bundle();
+                        bundle.putString("item_id", purchase.getObjectId());
+                        Bid finalBid = (Bid) purchase.getBid();
+                        bundle.putInt("price", finalBid.getPrice().intValue());
+                        ParseApplication.mFireBaseAnalytics
+                                .logEvent("purchase", bundle);
                     }
-                    else {
-                        dialogueText = "You have " + purchases.size() + " new purchases.";
-                    }
-                    builder
-                            // Add customization options here
-                            .setTitle(dialogueText)
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    toPurchases = true;
-                                    bottomNavigationView.setSelectedItemId(R.id.action_history);
-                                }
-                            })
-                            .show();
                 }
+
+
+                if (purchases.size() == 1) {
+                    dialogueText = "You have a new purchase.";
+                } else {
+                    dialogueText = "You have " + purchases.size() + " new purchases.";
+                }
+                builder
+                        // Add customization options here
+                        .setTitle(dialogueText)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                toPurchases = true;
+                                bottomNavigationView.setSelectedItemId(R.id.action_history);
+                            }
+                        })
+                        .show();
             }
+
         });
     }
 
-    public void querySales(){
+    public void querySales() {
         ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = new ParseQuery(Purchase.class);
         query.whereEqualTo("seller", currentUser);
@@ -227,25 +240,23 @@ public class MainActivity extends AppCompatActivity {
         query.findInBackground(new FindCallback<Purchase>() {
             @Override
             public void done(List<Purchase> purchases, ParseException e) {
-                if (e != null){
+                if (e != null) {
                     Log.e(TAG, "Issue with getting sales", e);
                     e.printStackTrace();
                     return;
                 }
 
-                for (Purchase purchase : purchases){
+                for (Purchase purchase : purchases) {
                     purchase.put("seenBySeller", true);
                     purchase.saveInBackground();
                 }
 
-                if (purchases.isEmpty()){
+                if (purchases.isEmpty()) {
                     return;
-                }
-                else{
-                    if (purchases.size() == 1){
+                } else {
+                    if (purchases.size() == 1) {
                         dialogueText = "You have a new sale.";
-                    }
-                    else {
+                    } else {
                         dialogueText = "You have " + purchases.size() + " new sales.";
                     }
                     builder

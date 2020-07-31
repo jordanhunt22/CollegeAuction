@@ -166,6 +166,12 @@ public class BuyerDetailFragment extends Fragment {
                             listing.saveInBackground();
                             tvCurrentBid.setText("$" + numberBid.toString());
                             etBid.setText("");
+                            // Logs new new bids
+                            Bundle bundle = new Bundle();
+                            bundle.putString("item_id", listing.getObjectId());;
+                            bundle.putInt("price", numberBid.intValue());
+                            ParseApplication.mFireBaseAnalytics
+                                    .logEvent("new_bid", bundle);
                         }
                     });
                 }

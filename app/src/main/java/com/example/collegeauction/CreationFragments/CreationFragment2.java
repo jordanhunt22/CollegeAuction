@@ -13,7 +13,9 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
+import com.example.collegeauction.ParseApplication;
 import com.example.collegeauction.R;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -75,6 +77,11 @@ public class CreationFragment2 extends Fragment {
                         @Override
                         public void done(ParseException e) {
                             pbLoading.setVisibility(View.GONE);
+                            // Logs whenever a user logs out
+                            Bundle bundle = new Bundle();
+                            bundle.putInt("numCategories", listingArray.size());
+                            ParseApplication.mFireBaseAnalytics
+                                    .logEvent("new_post", bundle);
                             getActivity().finish();
                         }
                     });

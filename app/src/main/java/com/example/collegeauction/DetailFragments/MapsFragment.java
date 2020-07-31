@@ -29,7 +29,9 @@ import android.widget.Toast;
 
 import com.example.collegeauction.Activities.ListingDetailsActivity;
 import com.example.collegeauction.Miscellaneous.CustomWindowAdapter;
+import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
+import com.example.collegeauction.ParseApplication;
 import com.example.collegeauction.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -196,6 +198,12 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
                         e.printStackTrace();
                     }
                 });
+
+        // Logs when the mapsFragment is opened
+        Bundle bundle = new Bundle();
+        bundle.putString("item_id", listing.getObjectId());
+        ParseApplication.mFireBaseAnalytics
+                .logEvent("mapsfragment_opened", bundle);
     }
 
     /*

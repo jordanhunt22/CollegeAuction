@@ -29,6 +29,7 @@ import com.example.collegeauction.Miscellaneous.DateManipulator;
 import com.example.collegeauction.Miscellaneous.TimeFormatter;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
+import com.example.collegeauction.ParseApplication;
 import com.example.collegeauction.R;
 import com.facebook.share.model.ShareHashtag;
 import com.facebook.share.model.SharePhoto;
@@ -38,6 +39,7 @@ import com.facebook.share.widget.ShareDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.parse.DeleteCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -215,13 +217,13 @@ public class SellerDetailFragment extends Fragment {
                 // Sets up the text for all the views
                 String buyersName = buyer.getString("name");
                 String buyersNumber = buyer.getString("phoneNumber");
-                tvBuyersName.setText("Buyer's Name" + buyersName);
-                tvNumber.setText("Buyer's number: " + buyersNumber);
+                tvBuyersName.setText("Buyer's Name: " + buyersName);
+                tvNumber.setText("Buyer's Number: " + buyersNumber);
             } else {
                 tvCurrentBid.setText("NO SALE");
-                tvTime.setText("Expired " + TimeFormatter
-                        .getTimeDifference(listing.getDate("expiresAt").toString()) + " ago");
             }
+            tvTime.setText("Expired " + TimeFormatter
+                    .getTimeDifference(listing.getDate("expiresAt").toString()) + " ago");
             sbFacebook.setVisibility(View.GONE);
         }
 
@@ -270,6 +272,19 @@ public class SellerDetailFragment extends Fragment {
                     public void onLoadCleared(@Nullable Drawable placeholder) {
                     }
                 });
+
+        // Logs whenever a user shares content
+        sbFacebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Logs when a user opens the Facebook SDK to share an item
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "listing");
+                bundle.putString(FirebaseAnalytics.Param.ITEM_ID, listing.getObjectId());
+                ParseApplication.mFireBaseAnalytics
+                        .logEvent(FirebaseAnalytics.Event.SHARE, bundle);
+            }
+        });
     }
 
     public void getCurrentBids() {
