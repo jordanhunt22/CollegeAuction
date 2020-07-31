@@ -27,6 +27,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.collegeauction.Miscellaneous.DateManipulator;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
+import com.example.collegeauction.ParseApplication;
 import com.example.collegeauction.R;
 import com.facebook.share.model.ShareHashtag;
 import com.facebook.share.model.SharePhoto;
@@ -34,6 +35,7 @@ import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareButton;
 import com.facebook.share.widget.ShareDialog;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -248,6 +250,17 @@ public class BuyerDetailFragment extends Fragment {
                     public void onLoadCleared(@Nullable Drawable placeholder) {
                     }
                 });
+        sbFacebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Logs when a user opens the Facebook SDK to share an item
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "listing");
+                bundle.putString(FirebaseAnalytics.Param.ITEM_ID, listing.getObjectId());
+                ParseApplication.mFireBaseAnalytics
+                        .logEvent(FirebaseAnalytics.Event.SHARE, bundle);
+            }
+        });
     }
 
     public void getCurrentBids(){

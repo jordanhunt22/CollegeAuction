@@ -17,8 +17,10 @@ import android.widget.Toast;
 
 import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Models.Listing;
+import com.example.collegeauction.ParseApplication;
 import com.example.collegeauction.R;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -92,7 +94,12 @@ public class RegisterFragment extends Fragment {
         user.signUpInBackground(new SignUpCallback() {
             public void done(ParseException e) {
                 if (e == null) {
-                    loginUser(username, password);;
+                    loginUser(username, password);
+                    // Logs the registration of a new user
+                    Bundle bundle = new Bundle();
+                    bundle.putString(FirebaseAnalytics.Param.METHOD, "Android Application");
+                    ParseApplication.mFireBaseAnalytics
+                            .logEvent(FirebaseAnalytics.Event.SIGN_UP, bundle);
                 } else {
                     // Sign up didn't succeed. Look at the ParseException
                     // to figure out what went wrong

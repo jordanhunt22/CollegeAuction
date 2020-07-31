@@ -13,6 +13,7 @@ import com.example.collegeauction.CreationFragments.CreationFragment;
 import com.example.collegeauction.CreationFragments.CreationFragment2;
 import com.example.collegeauction.R;
 import com.example.collegeauction.databinding.ActivityCreationBinding;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class CreationActivity extends AppCompatActivity {
 

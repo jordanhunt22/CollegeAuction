@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -26,7 +27,9 @@ import com.example.collegeauction.Miscellaneous.DateManipulator;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
+import com.example.collegeauction.ParseApplication;
 import com.example.collegeauction.R;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -288,6 +291,8 @@ public class NearbyAdapter extends RecyclerView.Adapter<NearbyAdapter.ViewHolder
                         favorite.setUser(user);
                         favorite.put("expiresAt", listing.getExpireTime());
                         favorite.saveInBackground();
+                        // Logs when a user opens the Facebook SDK to share an item
+                        Bundle bundle = new Bundle();
                         Log.i(TAG, "favorite");
                     }
                 }

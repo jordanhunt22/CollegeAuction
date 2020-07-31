@@ -7,10 +7,14 @@ import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.Models.Purchase;
 import com.facebook.FacebookSdk;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.parse.Parse;
 import com.parse.ParseObject;
 
 public class ParseApplication extends Application {
+
+    public static FirebaseAnalytics mFireBaseAnalytics;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -28,7 +32,8 @@ public class ParseApplication extends Application {
                 .clientKey("FBUFinalApplication")  // set explicitly unless clientKey is explicitly configured on Parse server
                 .server("https://jordan-collegeauction.herokuapp.com/parse/").build());
 
-        // Initialzes the Facebook SDK
+        // Instantiates a Firebase Analytics class
+        mFireBaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 }
 

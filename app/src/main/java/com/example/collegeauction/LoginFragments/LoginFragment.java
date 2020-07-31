@@ -16,8 +16,10 @@ import android.widget.Toast;
 
 import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Models.Listing;
+import com.example.collegeauction.ParseApplication;
 import com.example.collegeauction.R;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -81,9 +83,15 @@ public class LoginFragment extends Fragment {
                 if (e != null) {
                     Log.e(TAG, "Issue with login", e);
                     Toast.makeText(getContext(), "Issue with login!", Toast.LENGTH_SHORT).show();
-                    return;
                 }
-                goMainActivity();
+                else{
+                    // Logs the log-in of a user
+                    Bundle bundle = new Bundle();
+                    bundle.putString(FirebaseAnalytics.Param.METHOD, "Android Application");
+                    ParseApplication.mFireBaseAnalytics
+                            .logEvent(FirebaseAnalytics.Event.LOGIN, bundle);
+                    goMainActivity();
+                }
             }
         });
     }

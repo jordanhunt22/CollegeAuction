@@ -28,9 +28,11 @@ import com.example.collegeauction.Miscellaneous.EndlessRecyclerViewScrollListene
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
+import com.example.collegeauction.ParseApplication;
 import com.example.collegeauction.R;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.slider.Slider;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -339,6 +341,11 @@ public class SoonHomeFragment extends Fragment {
             public boolean onQueryTextSubmit(String query) {
                 queryListingsFromSearch(query);
                 searchView.clearFocus();
+                // Logs the searches of each user
+                Bundle bundle = new Bundle();
+                bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, "Android Application");
+                ParseApplication.mFireBaseAnalytics
+                        .logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
                 return true;
             }
 
