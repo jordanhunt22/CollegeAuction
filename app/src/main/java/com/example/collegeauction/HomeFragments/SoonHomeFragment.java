@@ -58,6 +58,7 @@ public class SoonHomeFragment extends Fragment {
     private ListingsAdapter adapter;
     private List<Listing> allListings;
     private EndlessRecyclerViewScrollListener scrollListener;
+    private List<Integer> sliderVals;
 
     public SoonHomeFragment() {
         // Required empty public constructor
@@ -91,6 +92,23 @@ public class SoonHomeFragment extends Fragment {
                 labelFormatter.setMaximumFractionDigits(0);
                 labelFormatter.setCurrency(Currency.getInstance("USD"));
                 return labelFormatter.format((double) value);
+            }
+        });
+
+        // Is triggered whenever the price is changed
+        sPrices.addOnChangeListener(new RangeSlider.OnChangeListener() {
+            @Override
+            public void onValueChange(@NonNull RangeSlider slider, float value, boolean fromUser) {
+                if (fromUser) {
+                    // Sets the adapter to filtering by price
+                    adapter.setFilteringByPrice(true);
+                    sliderVals.clear();
+                    for (float val : slider.getValues()){
+                        sliderVals.add((int) val);
+                    }
+                    adapter.clearSliderVals();
+                    adapter.addAllSliderVals(sliderVals);
+                }
             }
         });
 
@@ -170,6 +188,8 @@ public class SoonHomeFragment extends Fragment {
                 queryListings();
             }
         });
+
+        sliderVals = new ArrayList<>();
     }
 
     private void loadMoreData() {

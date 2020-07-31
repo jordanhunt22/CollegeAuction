@@ -75,7 +75,6 @@ public class SuggestedFragment extends Fragment {
                 Chip chip = group.findViewById(checkedId);
                 if (chip != null){
                     category = (String) chip.getText();
-                    // Toast.makeText(getContext(), chip.getText(), Toast.LENGTH_SHORT).show();
                     queryListings();
                 }
             }

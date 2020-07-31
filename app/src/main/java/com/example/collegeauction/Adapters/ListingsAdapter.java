@@ -51,11 +51,15 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
     private Context context;
     public List<Listing> listings;
     public List<String> listingIds;
+    private Boolean filteringByPrice;
+    private List<Integer> sliderVals;
 
     public ListingsAdapter(Context context, List<Listing> listings) {
         this.context = context;
         this.listings = listings;
         this.listingIds = new ArrayList<>();
+        sliderVals = new ArrayList<>();
+        filteringByPrice = false;
     }
 
     @NonNull
@@ -193,11 +197,26 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                                 listing.getRecentBid().fetchIfNeededInBackground(new GetCallback<Bid>() {
                                     @Override
                                     public void done(Bid bid, ParseException e) {
-                                        tvBid.setText("$" + Objects.requireNonNull(bid.getNumber(Bid.KEY_PRICE)).toString());
+                                        int number = (int) Objects.requireNonNull(bid.getNumber(Bid.KEY_PRICE));
+                                        if (filteringByPrice && sliderVals != null && !sliderVals.isEmpty()){
+                                            if (number < sliderVals.get(0) || number > sliderVals.get(1)){
+                                                listings.removeAll(Collections.singleton(listing));
+                                                notifyDataSetChanged();
+                                            }
+                                        }
+                                        tvBid.setText("$" + number);
                                     }
                                 });
                             } else {
-                                tvBid.setText("$" + listing.getNumber("minPrice").toString());
+                                int number = (int) listing.getNumber("minPrice");
+                                // Checks to see if the number is in the selected range
+                                if (filteringByPrice && sliderVals != null && !sliderVals.isEmpty()){
+                                    if (number < sliderVals.get(0) || number > sliderVals.get(1)){
+                                        listings.removeAll(Collections.singleton(listing));
+                                        notifyDataSetChanged();
+                                    }
+                                }
+                                tvBid.setText("$" + number);
                             }
                             counter = 0;
                         }
@@ -226,7 +245,7 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                         .into(ivImage);
             } else {
                 Glide.with(context)
-                        .load(R.drawable.ic_launcher_background)
+                        .load(R.drawable.ic_launcher_background) // add empty picture placeholder
                         .transform(new CenterCrop())
                         .into(ivImage);
             }
@@ -334,7 +353,19 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
         notifyDataSetChanged();
     }
 
+    // Allows filtering by price to be enabled
+    public void setFilteringByPrice(Boolean bool){
+        filteringByPrice = bool;
+    }
 
+    // Clears the current sliderVals array
+    public void clearSliderVals(){
+        sliderVals.clear();
+    }
 
+    // Adds new values to the sliderVals array
+    public void addAllSliderVals(List<Integer> allSliderVals){
+        sliderVals.addAll(allSliderVals);
+    }
 }
 
