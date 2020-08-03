@@ -117,12 +117,14 @@ public class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.ViewHolder> {
                 if (position != RecyclerView.NO_POSITION){
                     Bid bid = bids.get(position);
                     ParseFile image = bid.getListing().getParseFile("photo");
+                    String name = bid.getListing().getString("name");
                     AlertDialog.Builder builder = new MaterialAlertDialogBuilder(context);
 
                     // Inflate xml for the bids details view
                     View detailView = LayoutInflater.from(context)
                             .inflate(R.layout.bids_detail_dialog, null);
                     ImageView ivListingImage = detailView.findViewById(R.id.ivListingImage);
+                    TextView tvName = detailView.findViewById(R.id.tvName);
 
                     if (image != null) {
                         Glide.with(context)
@@ -130,11 +132,11 @@ public class BidsAdapter extends RecyclerView.Adapter<BidsAdapter.ViewHolder> {
                                 .transform(new CenterCrop())
                                 .into(ivListingImage);
                     }
+                    tvName.setText(name);
 
                     // Create dialog builder
                     builder
                             .setView(detailView)
-                            .setTitle("Test")
                             .show();
                 }
             }

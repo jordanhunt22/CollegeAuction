@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cvRoot"
     android:layout_width="match_parent"
@@ -11,7 +11,9 @@
     android:foreground="?android:attr/selectableItemBackground"
     card_view:cardCornerRadius="@dimen/card_corner_radius"
     card_view:cardElevation="@dimen/card_elevation"
-    android:transitionName="shared_item_nearby">
+    android:transitionName="shared_item_nearby"
+    card_view:strokeColor="@color/colorPrimary"
+    card_view:strokeWidth="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -123,4 +125,4 @@
 
 
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>
