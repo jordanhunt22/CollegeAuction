@@ -119,13 +119,14 @@ public class BidsFragment extends Fragment {
         ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = ParseQuery.getQuery(Bid.class);
         query.include(Bid.KEY_LISTING);
+        query.include("listing.photo");
         // limit query to latest 20 items
         query.setLimit(20);
         // Skips the number of items that are already in the adapter
         query.setSkip(bidsAdapter.getItemCount());
         // Only displays items that have not been sold yet
         query.whereEqualTo("user", currentUser);
-        // order posts by creation date (newest first)t
+        // order posts by creation date (newest first)
         query.addDescendingOrder(Listing.KEY_CREATED);
         // start an asynchronous call for posts
         query.findInBackground(new FindCallback<Bid>() {
@@ -165,6 +166,7 @@ public class BidsFragment extends Fragment {
         ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = ParseQuery.getQuery(Bid.class);
         query.include(Bid.KEY_LISTING);
+        query.include("listing.photo");
         // limit query to latest 20 items
         query.setLimit(20);
         // Only displays items that have not been sold yet

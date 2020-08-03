@@ -35,8 +35,10 @@ public class ListingDetailsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
+        // Implementing ViewBinding
+        ActivityListingDetailsBinding binding = ActivityListingDetailsBinding.inflate(getLayoutInflater());
 
+        // Sets up the container transform
         View finalContainer = findViewById(android.R.id.content);
 
         sharedElementName = getIntent().getExtras().getString("elementName");
@@ -62,8 +64,6 @@ public class ListingDetailsActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
-        // Implementing ViewBinding
-        ActivityListingDetailsBinding binding = ActivityListingDetailsBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
 
