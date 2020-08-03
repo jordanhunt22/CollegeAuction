@@ -325,13 +325,17 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
 
                     // Serialize the Post using parceler, use its short name as a key
                     intent.putExtra(Listing.class.getSimpleName(), Parcels.wrap(listing));
+
+                    // Sets up the container transform
                     ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
                             (Activity) context,
                             itemView,
-                            "shared_element_container");
+                            "shared_item_listing");
 
                     // open the buyer's detail view
                     intent.putExtra("viewType", "buyer");
+                    // adds the name of the shared element container
+                    intent.putExtra("elementName", "shared_item_listing");
                     // Start the DetailsActivity
                     context.startActivity(intent, options.toBundle());
                 }

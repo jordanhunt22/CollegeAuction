@@ -1,6 +1,8 @@
 package com.example.collegeauction.Adapters;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -80,7 +82,7 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
         final Handler timerHandler = new Handler();
         private DateManipulator dateManipulator;
 
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull final View itemView) {
             super(itemView);
 
             // Resolve all of the view elements
@@ -106,6 +108,9 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
                         // Serialize the Post using parceler, use its short name as a key
                         intent.putExtra(Listing.class.getSimpleName(), Parcels.wrap(purchase.getListing()));
 
+                        // adds the name of the shared element container
+                        intent.putExtra("elementName", "shared_item_purchase");
+
                         if (currentUser.getObjectId().equals(purchase.getSeller().getObjectId())){
                             // Open the seller's detail view
                             intent.putExtra("viewType", "seller");
@@ -114,8 +119,13 @@ public class PurchasesAdapter extends RecyclerView.Adapter<PurchasesAdapter.View
                             // Open the buyer's detail view
                             intent.putExtra("viewType", "purchased");
                         }
+                        // Sets up the container transform
+                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
+                                (Activity) context,
+                                itemView,
+                                "shared_item_purchase");
                         // Start the DetailsActivity
-                        context.startActivity(intent);
+                        context.startActivity(intent, options.toBundle());
                     }
                 }
             });

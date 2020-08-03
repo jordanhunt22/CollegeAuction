@@ -1,6 +1,8 @@
 package com.example.collegeauction.Adapters;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
@@ -79,7 +81,7 @@ public class CurrentUserListingsAdapter extends RecyclerView.Adapter<CurrentUser
         final Handler timerHandler = new Handler();
         private DateManipulator dateManipulator;
 
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull final View itemView) {
             super(itemView);
 
             // Resolve all of the view elements
@@ -102,6 +104,9 @@ public class CurrentUserListingsAdapter extends RecyclerView.Adapter<CurrentUser
                         // Create a new intent
                         Intent intent = new Intent(context, ListingDetailsActivity.class);
 
+                        // adds the name of the shared element container
+                        intent.putExtra("elementName", "shared_item_listing");
+
                         // Serialize the Post using parceler, use its short name as a key
                         intent.putExtra(Listing.class.getSimpleName(), Parcels.wrap(purchase));
 
@@ -113,8 +118,14 @@ public class CurrentUserListingsAdapter extends RecyclerView.Adapter<CurrentUser
                             // Open the buyer's detail view
                             intent.putExtra("viewType", "purchased");
                         }
+
+                        // Sets up the container transform
+                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
+                                (Activity) context,
+                                itemView,
+                                "shared_item_listing");
                         // Start the DetailsActivity
-                        context.startActivity(intent);
+                        context.startActivity(intent, options.toBundle());
                     }
                 }
             });

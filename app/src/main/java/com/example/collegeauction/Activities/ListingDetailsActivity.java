@@ -30,6 +30,7 @@ public class ListingDetailsActivity extends AppCompatActivity {
     private Fragment fragment;
     private Listing listing;
     private String viewType;
+    private String sharedElementName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,9 @@ public class ListingDetailsActivity extends AppCompatActivity {
 
         View finalContainer = findViewById(android.R.id.content);
 
-        finalContainer.setTransitionName("shared_element_container");
+        sharedElementName = getIntent().getExtras().getString("elementName");
+
+        finalContainer.setTransitionName(sharedElementName);
 
         setEnterSharedElementCallback(new MaterialContainerTransformSharedElementCallback());
 

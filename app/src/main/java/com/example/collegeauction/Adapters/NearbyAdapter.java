@@ -1,6 +1,8 @@
 package com.example.collegeauction.Adapters;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -313,13 +315,23 @@ public class NearbyAdapter extends RecyclerView.Adapter<NearbyAdapter.ViewHolder
                     // Create a new intent
                     Intent intent = new Intent(context, ListingDetailsActivity.class);
 
+                    // adds the name of the shared element container
+                    intent.putExtra("elementName", "shared_item_nearby");
+
                     // Serialize the Post using parceler, use its short name as a key
                     intent.putExtra(Listing.class.getSimpleName(), Parcels.wrap(listing));
 
                     // open the buyer's detail view
                     intent.putExtra("viewType", "buyer");
+
+                    // Sets up the container transform
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
+                            (Activity) context,
+                            itemView,
+                            "shared_item_nearby");
+
                     // Start the DetailsActivity
-                    context.startActivity(intent);
+                    context.startActivity(intent, options.toBundle());
                 }
                 return true;
             }
