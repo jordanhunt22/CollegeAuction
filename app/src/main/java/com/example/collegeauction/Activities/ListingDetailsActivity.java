@@ -5,8 +5,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 
 import com.example.collegeauction.CreationFragments.CreationFragment;
 import com.example.collegeauction.DetailFragments.BuyerDetailFragment;
@@ -17,6 +19,8 @@ import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.example.collegeauction.databinding.ActivityCreationBinding;
 import com.example.collegeauction.databinding.ActivityListingDetailsBinding;
+import com.google.android.material.transition.platform.MaterialContainerTransform;
+import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback;
 
 import org.parceler.Parcels;
 
@@ -29,8 +33,31 @@ public class ListingDetailsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
+
+        View finalContainer = findViewById(android.R.id.content);
+
+        finalContainer.setTransitionName("shared_element_container");
+
+        setEnterSharedElementCallback(new MaterialContainerTransformSharedElementCallback());
+
+        MaterialContainerTransform materialContainerTransform = new MaterialContainerTransform();
+        materialContainerTransform.addTarget(finalContainer);
+        materialContainerTransform.setStartContainerColor(Color.WHITE);
+        materialContainerTransform.setFadeMode(MaterialContainerTransform.FADE_MODE_OUT);
+        materialContainerTransform.setDuration(500L);
+        getWindow().setSharedElementEnterTransition(materialContainerTransform);
+
+        MaterialContainerTransform materialContainerTransformReverse = new MaterialContainerTransform();
+        materialContainerTransformReverse.addTarget(finalContainer);
+        materialContainerTransformReverse.setFadeMode(MaterialContainerTransform.FADE_MODE_OUT);
+        materialContainerTransformReverse.setDuration(350L);
+        materialContainerTransform.setAllContainerColors(Color.WHITE);
+
+        getWindow().setSharedElementReturnTransition(materialContainerTransformReverse);
+
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_listing_details);
 
         // Implementing ViewBinding
         ActivityListingDetailsBinding binding = ActivityListingDetailsBinding.inflate(getLayoutInflater());

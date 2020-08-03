@@ -9,6 +9,7 @@ import androidx.core.view.MenuItemCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 
 import com.example.collegeauction.BidsPurchasesFragments.BidsPurchasesFragment;
 import com.example.collegeauction.FavFragments.FavFragment;
@@ -31,6 +33,8 @@ import com.example.collegeauction.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.transition.platform.MaterialContainerTransform;
+import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -45,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
     final FragmentManager fragmentManager = getSupportFragmentManager();
     private Context context;
     private int startingPosition;
-    private SearchView searchView;
     private BottomNavigationView bottomNavigationView;
     private String dialogueText;
     private Boolean toPurchases;
@@ -55,6 +58,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
+
+        setExitSharedElementCallback(new MaterialContainerTransformSharedElementCallback());
+        getWindow().setSharedElementsUseOverlay(false);
+
         super.onCreate(savedInstanceState);
 
         toPurchases = false;
@@ -79,6 +88,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Sets up action for the floating action button
         fab = binding.fab;
+
+        fab.setTransitionName("shared_element_container");
+
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -133,8 +145,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
         return true;
     }
 

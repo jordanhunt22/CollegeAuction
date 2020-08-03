@@ -1,6 +1,8 @@
 package com.example.collegeauction.Adapters;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.database.AbstractWindowedCursor;
@@ -12,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
@@ -24,11 +27,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.example.collegeauction.Activities.ListingDetailsActivity;
+import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.Miscellaneous.DateManipulator;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
+import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
@@ -320,11 +325,15 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
 
                     // Serialize the Post using parceler, use its short name as a key
                     intent.putExtra(Listing.class.getSimpleName(), Parcels.wrap(listing));
+                    ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
+                            (Activity) context,
+                            itemView,
+                            "shared_element_container");
 
                     // open the buyer's detail view
                     intent.putExtra("viewType", "buyer");
                     // Start the DetailsActivity
-                    context.startActivity(intent);
+                    context.startActivity(intent, options.toBundle());
                 }
                 return true;
             }
