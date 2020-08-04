@@ -111,13 +111,23 @@
         android:text="(510)123-4567"
         android:textSize="18sp" />
 
-    <Button
-        android:id="@+id/btnDelete"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        android:backgroundTint="#D50000"
-        android:text="Delete Listing"
-        app:cornerRadius="8dp" />
+        android:layout_height="match_parent">
+
+        <Button
+            android:id="@+id/btnDelete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginBottom="40dp"
+            android:backgroundTint="#D50000"
+            android:text="Delete Listing"
+            app:cornerRadius="8dp" />
+
+    </RelativeLayout>
 
 </LinearLayout>

@@ -30,6 +30,7 @@ import com.example.collegeauction.Models.Favorite;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.ParseApplication;
 import com.example.collegeauction.R;
+import com.google.android.material.slider.LabelFormatter;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.slider.Slider;
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -86,14 +87,14 @@ public class SoonHomeFragment extends Fragment {
         sPrices.setVisibility(View.VISIBLE);
 
         // Sets up the formatter for prices
-        sPrices.setLabelFormatter(new Slider.LabelFormatter() {
+        sPrices.setLabelFormatter(new LabelFormatter() {
             @NonNull
             @Override
             public String getFormattedValue(float value) {
                 NumberFormat labelFormatter = NumberFormat.getCurrencyInstance();
                 labelFormatter.setMaximumFractionDigits(0);
                 labelFormatter.setCurrency(Currency.getInstance("USD"));
-                return labelFormatter.format((double) value);
+                return labelFormatter.format(value);
             }
         });
 

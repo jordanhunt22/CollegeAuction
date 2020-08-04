@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.transition.Transition;
 
 import android.os.Looper;
 import android.os.SystemClock;
@@ -54,6 +55,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.transition.MaterialSharedAxis;
 
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
@@ -90,6 +92,17 @@ public class MapsCreationFragment extends Fragment implements GoogleMap.OnMapLon
 
     public MapsCreationFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Sets up the transitions
+        Transition forward = new MaterialSharedAxis(MaterialSharedAxis.Z, true);
+        Transition backward  = new MaterialSharedAxis(MaterialSharedAxis.Z, false);
+        setEnterTransition(forward);
+        setReturnTransition(backward);
     }
 
     @Nullable
