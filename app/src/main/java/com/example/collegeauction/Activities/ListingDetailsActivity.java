@@ -49,15 +49,17 @@ public class ListingDetailsActivity extends AppCompatActivity {
 
         MaterialContainerTransform materialContainerTransform = new MaterialContainerTransform();
         materialContainerTransform.addTarget(finalContainer);
-        materialContainerTransform.setStartContainerColor(Color.WHITE);
+        materialContainerTransform.setAllContainerColors(Color.WHITE);
         materialContainerTransform.setFadeMode(MaterialContainerTransform.FADE_MODE_OUT);
+        materialContainerTransform.setScrimColor(Color.WHITE);
         materialContainerTransform.setDuration(500L);
         getWindow().setSharedElementEnterTransition(materialContainerTransform);
 
         MaterialContainerTransform materialContainerTransformReverse = new MaterialContainerTransform();
         materialContainerTransformReverse.addTarget(finalContainer);
         materialContainerTransformReverse.setFadeMode(MaterialContainerTransform.FADE_MODE_OUT);
-        materialContainerTransformReverse.setDuration(350L);
+        materialContainerTransformReverse.setScrimColor(Color.WHITE);
+        materialContainerTransformReverse.setDuration(450L);
         materialContainerTransform.setAllContainerColors(Color.WHITE);
 
         getWindow().setSharedElementReturnTransition(materialContainerTransformReverse);

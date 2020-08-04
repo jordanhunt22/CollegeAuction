@@ -1,5 +1,7 @@
 package com.example.collegeauction.Activities;
 
+import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -91,8 +93,15 @@ public class MainActivity extends AppCompatActivity {
                 // Create intent for the new activity
                 Intent intent = new Intent(context, CreationActivity.class);
                 // Show the activity
-                context.startActivity(intent);
-                overridePendingTransition(R.anim.right_bottom_up, R.anim.no_animation);
+                // context.startActivity(intent);
+                // Sets up the container transform
+                ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
+                        (Activity) context,
+                        fab,
+                        "shared_element_fab");
+
+                context.startActivity(intent, options.toBundle());
+                // overridePendingTransition(R.anim.right_bottom_up, R.anim.no_animation);
             }
         });
 
