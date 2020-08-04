@@ -3,6 +3,8 @@ package com.example.collegeauction.Adapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.Image;
+import android.transition.Transition;
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -24,6 +26,7 @@ import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.parse.ParseFile;
 
 import java.util.ArrayList;

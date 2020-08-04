@@ -23,6 +23,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.transition.Transition;
 
 import android.os.Environment;
 import android.os.Handler;
@@ -56,6 +57,7 @@ import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.transition.MaterialContainerTransform;
+import com.google.android.material.transition.MaterialSharedAxis;
 import com.parse.ParseException;
 import com.parse.ParseFile;
 import com.parse.ParseGeoPoint;
@@ -119,6 +121,12 @@ public class CreationFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         onStart = true;
+
+        // Sets up the transitions
+        Transition backward = new MaterialSharedAxis(MaterialSharedAxis.Z, false);
+        Transition forward  = new MaterialSharedAxis(MaterialSharedAxis.Z, true);
+        setReenterTransition(backward);
+        setExitTransition(forward);
     }
 
     @Nullable
@@ -127,8 +135,6 @@ public class CreationFragment extends Fragment {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_creation, container, false);
     }
-
-    // Here I set up all of the views
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {

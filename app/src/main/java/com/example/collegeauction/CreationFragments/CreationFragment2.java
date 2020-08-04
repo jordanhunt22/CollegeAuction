@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.transition.Transition;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.example.collegeauction.ParseApplication;
 import com.example.collegeauction.R;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
+import com.google.android.material.transition.MaterialSharedAxis;
 import com.parse.ParseException;
 import com.parse.SaveCallback;
 
@@ -47,6 +49,17 @@ public class CreationFragment2 extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_creation2, container, false);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Sets up the transitions
+        Transition forward = new MaterialSharedAxis(MaterialSharedAxis.Z, true);
+        Transition backward  = new MaterialSharedAxis(MaterialSharedAxis.Z, false);
+        setEnterTransition(forward);
+        setReturnTransition(backward);
     }
 
     @Override

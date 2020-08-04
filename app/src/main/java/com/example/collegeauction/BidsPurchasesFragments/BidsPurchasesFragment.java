@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -86,14 +87,20 @@ public class BidsPurchasesFragment extends Fragment {
         });
         tabLayoutMediator.attach();
 
-        viewPager.setCurrentItem(0);
+        // viewPager.setCurrentItem(0);
 
         // Makes the fab visible whenever a new fragment starts
         MainActivity.fab.show();
 
         // Goes to the purchases tab if toPurchases is set to true
         if (toPurchases != null && toPurchases){
-            tabLayout.selectTab(tabLayout.getTabAt(1));
+            new Handler().postDelayed(
+                    new Runnable() {
+                        @Override public void run() {
+                            tabLayout.setSmoothScrollingEnabled(true);
+                            tabLayout.getTabAt(1).select();
+                        }
+                    }, 400);
         }
     }
 

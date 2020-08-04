@@ -33,8 +33,10 @@ import com.example.collegeauction.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.transition.MaterialSharedAxis;
 import com.google.android.material.transition.platform.MaterialContainerTransform;
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback;
+import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -149,6 +151,8 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean loadFragment(Fragment fragment, int newPosition) {
         if (fragment != null) {
+            fragment.setEnterTransition(new MaterialFadeThrough());
+            fragment.setExitTransition(new MaterialFadeThrough());
             if (newPosition == 0) {
                 fragmentManager
                         .beginTransaction()
@@ -158,14 +162,12 @@ public class MainActivity extends AppCompatActivity {
             if (startingPosition > newPosition) {
                 fragmentManager
                         .beginTransaction()
-                        .setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right)
                         .replace(R.id.flContainer, fragment, fragment.getClass().getSimpleName()).commit();
 
             }
             if (startingPosition < newPosition) {
                 fragmentManager
                         .beginTransaction()
-                        .setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left)
                         .replace(R.id.flContainer, fragment, fragment.getClass().getSimpleName())
                         .commit();
 

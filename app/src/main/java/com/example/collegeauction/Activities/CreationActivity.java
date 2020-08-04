@@ -53,6 +53,6 @@ public class CreationActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-//        overridePendingTransition(R.anim.no_animation, R.anim.slide_down_back);
+        overridePendingTransition(R.anim.no_animation, R.anim.slide_down_back);
     }
 }
