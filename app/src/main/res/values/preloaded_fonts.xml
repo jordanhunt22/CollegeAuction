@@ -2,5 +2,9 @@
 <resources>
     <array name="preloaded_fonts" translatable="false">
         <item>@font/abril_fatface</item>
+        <item>@font/inconsolata</item>
+        <item>@font/libre_baskerville</item>
+        <item>@font/playfair_display</item>
+        <item>@font/roboto_slab_light</item>
     </array>
 </resources>

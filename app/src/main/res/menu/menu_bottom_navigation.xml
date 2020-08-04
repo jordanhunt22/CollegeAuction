@@ -4,8 +4,8 @@
     <item
         android:id="@+id/action_home"
         android:enabled="true"
-        android:icon="@drawable/home_outline"
-        android:title="home"
+        android:icon="@drawable/home"
+        android:title="Home"
         android:visible="true"
         app:showAsAction="always" />
 
@@ -13,7 +13,7 @@
     android:id="@+id/action_favorites"
     android:enabled="true"
     android:icon="@drawable/star"
-    android:title="favorites"
+    android:title="Favorites"
     android:visible="true"
     app:showAsAction="always" />
 
@@ -21,15 +21,15 @@
         android:id="@+id/action_history"
         android:enabled="true"
         android:icon="@drawable/history"
-        android:title="history"
+        android:title="History"
         android:visible="true"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_profile"
         android:enabled="true"
-        android:icon="@drawable/profile"
-        android:title="profile"
+        android:icon="@drawable/person_outline"
+        android:title="Profile"
         android:visible="true"
         app:showAsAction="always" />
 </menu>
