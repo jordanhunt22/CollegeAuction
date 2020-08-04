@@ -11,6 +11,11 @@
 
     </style>
 
+    <style name="ShapeAppearanceOverlay.App.Fab" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+    </style>
+
 <!--    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">-->
 <!--        <item name="colorPrimary">@color/newAccent</item>-->
 <!--        <item name="colorOnPrimary">@color/white</item>-->

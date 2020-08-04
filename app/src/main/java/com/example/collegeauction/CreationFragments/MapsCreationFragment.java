@@ -133,8 +133,13 @@ public class MapsCreationFragment extends Fragment implements GoogleMap.OnMapLon
         btnOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                CreationFragment.point = tempPoint;
-                getActivity().onBackPressed();
+                if (tempPoint != null){
+                    CreationFragment.point = tempPoint;
+                    getActivity().onBackPressed();
+                }
+                else{
+                    Toast.makeText(getContext(), "You must select a point", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
