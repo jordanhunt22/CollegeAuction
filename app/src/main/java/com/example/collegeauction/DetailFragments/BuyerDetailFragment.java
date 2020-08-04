@@ -35,6 +35,7 @@ import com.facebook.share.model.SharePhotoContent;
 import com.facebook.share.widget.ShareButton;
 import com.facebook.share.widget.ShareDialog;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.transition.MaterialSharedAxis;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.parse.FindCallback;
 import com.parse.GetCallback;
@@ -84,6 +85,17 @@ public class BuyerDetailFragment extends Fragment {
 
     public BuyerDetailFragment(){
         // Required empty constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Sets up the transitions
+        androidx.transition.Transition backward = new MaterialSharedAxis(MaterialSharedAxis.Z, false);
+        androidx.transition.Transition forward  = new MaterialSharedAxis(MaterialSharedAxis.Z, true);
+        setReenterTransition(backward);
+        setExitTransition(forward);
     }
 
     @Nullable

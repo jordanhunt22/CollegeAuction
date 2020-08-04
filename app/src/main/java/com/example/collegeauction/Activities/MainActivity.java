@@ -1,15 +1,5 @@
 package com.example.collegeauction.Activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuItemCompat;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-
-import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,12 +8,17 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.collegeauction.BidsPurchasesFragments.BidsPurchasesFragment;
 import com.example.collegeauction.FavFragments.FavFragment;
 import com.example.collegeauction.HomeFragments.HomeFragment;
-import com.example.collegeauction.FavFragments.FavoritesFragment;
 import com.example.collegeauction.MainFragments.ProfileFragment;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Purchase;
@@ -33,11 +28,8 @@ import com.example.collegeauction.databinding.ActivityMainBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.transition.MaterialSharedAxis;
-import com.google.android.material.transition.platform.MaterialContainerTransform;
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback;
 import com.google.android.material.transition.platform.MaterialFadeThrough;
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;

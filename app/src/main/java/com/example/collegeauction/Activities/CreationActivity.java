@@ -1,24 +1,16 @@
 package com.example.collegeauction.Activities;
 
+import android.os.Bundle;
+import android.view.View;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import android.os.Bundle;
-import android.view.View;
-import android.view.Window;
-import android.widget.FrameLayout;
-import android.widget.Toast;
-
 import com.example.collegeauction.CreationFragments.CreationFragment;
-import com.example.collegeauction.CreationFragments.CreationFragment2;
 import com.example.collegeauction.R;
 import com.example.collegeauction.databinding.ActivityCreationBinding;
-import com.google.android.material.shape.ShapeAppearanceModel;
-import com.google.android.material.transition.platform.MaterialContainerTransform;
-import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback;
-import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class CreationActivity extends AppCompatActivity {
 

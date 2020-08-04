@@ -17,8 +17,12 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="12dp"
         android:ems="10"
-        android:hint="username"
+        android:hint="Username"
         android:outlineProvider="bounds"
+        app:boxCornerRadiusBottomEnd="6dp"
+        app:boxCornerRadiusBottomStart="6dp"
+        app:boxCornerRadiusTopEnd="6dp"
+        app:boxCornerRadiusTopStart="6dp"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -33,7 +37,7 @@
         android:id="@+id/outlinedTextField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="password"
+        android:hint="Password"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
         android:layout_centerHorizontal="true"
@@ -42,6 +46,11 @@
         android:layout_marginEnd="12dp"
         android:ems="10"
         android:outlineProvider="bounds"
+        app:endIconMode="password_toggle"
+        app:boxCornerRadiusBottomEnd="6dp"
+        app:boxCornerRadiusBottomStart="6dp"
+        app:boxCornerRadiusTopEnd="6dp"
+        app:boxCornerRadiusTopStart="6dp"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
         <com.google.android.material.textfield.TextInputEditText

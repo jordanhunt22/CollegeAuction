@@ -9,10 +9,8 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,7 +23,6 @@ import com.example.collegeauction.Miscellaneous.TimeFormatter;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
-import com.google.android.material.textfield.TextInputEditText;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -34,7 +31,6 @@ import com.parse.ParseUser;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;

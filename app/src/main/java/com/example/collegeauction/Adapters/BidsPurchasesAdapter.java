@@ -6,7 +6,6 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.example.collegeauction.BidsPurchasesFragments.BidsFragment;
 import com.example.collegeauction.BidsPurchasesFragments.PurchasesFragment;
-import com.example.collegeauction.HomeFragments.SoonHomeFragment;
 
 public class BidsPurchasesAdapter extends FragmentStateAdapter {
 

@@ -39,6 +39,7 @@ import com.facebook.share.widget.ShareDialog;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.transition.MaterialSharedAxis;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.parse.DeleteCallback;
 import com.parse.GetCallback;
@@ -85,6 +86,17 @@ public class SellerDetailFragment extends Fragment {
 
     public SellerDetailFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Sets up the transitions
+        androidx.transition.Transition backward = new MaterialSharedAxis(MaterialSharedAxis.Z, false);
+        androidx.transition.Transition forward  = new MaterialSharedAxis(MaterialSharedAxis.Z, true);
+        setReenterTransition(backward);
+        setExitTransition(forward);
     }
 
     @Override

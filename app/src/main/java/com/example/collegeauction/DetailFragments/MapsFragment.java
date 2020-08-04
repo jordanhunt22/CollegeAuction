@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.transition.Transition;
 
 import android.os.Looper;
 import android.os.SystemClock;
@@ -56,6 +57,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.transition.MaterialSharedAxis;
 import com.parse.ParseGeoPoint;
 
 import org.parceler.Parcels;
@@ -80,15 +82,21 @@ public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickLi
     private Listing listing;
 
     private final static String KEY_LOCATION = "location";
-
-    /*
-     * Define a request code to send to Google Play services This code is
-     * returned in Activity.onActivityResult
-     */
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
     public MapsFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Sets up the transitions
+        Transition forward = new MaterialSharedAxis(MaterialSharedAxis.Z, true);
+        Transition backward  = new MaterialSharedAxis(MaterialSharedAxis.Z, false);
+        setEnterTransition(forward);
+        setReturnTransition(backward);
     }
 
     @Nullable

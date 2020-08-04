@@ -31,8 +31,8 @@
             style="@style/Widget.MaterialComponents.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:checkedIconTint="@color/colorPrimary"
-            android:text="Shoes" />
+            android:text="Shoes"
+            app:checkedIconTint="@color/colorPrimary" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/cClothing"

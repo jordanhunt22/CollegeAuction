@@ -1,13 +1,12 @@
 package com.example.collegeauction.Activities;
 
+import android.content.Intent;
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import android.content.Intent;
-import android.os.Bundle;
-
-import com.example.collegeauction.Activities.MainActivity;
 import com.example.collegeauction.LoginFragments.LoginFragment;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;

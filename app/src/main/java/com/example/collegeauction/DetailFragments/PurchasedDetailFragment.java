@@ -28,6 +28,7 @@ import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.transition.MaterialSharedAxis;
 import com.parse.DeleteCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
@@ -59,6 +60,17 @@ public class PurchasedDetailFragment extends Fragment {
 
     public PurchasedDetailFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Sets up the transitions
+        androidx.transition.Transition backward = new MaterialSharedAxis(MaterialSharedAxis.Z, false);
+        androidx.transition.Transition forward  = new MaterialSharedAxis(MaterialSharedAxis.Z, true);
+        setReenterTransition(backward);
+        setExitTransition(forward);
     }
 
     @Override

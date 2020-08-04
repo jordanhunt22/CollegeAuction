@@ -56,6 +56,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.android.material.transition.MaterialContainerTransform;
 import com.google.android.material.transition.MaterialSharedAxis;
 import com.parse.ParseException;
@@ -91,6 +92,9 @@ public class CreationFragment extends Fragment {
     private Button btnCaptureImage;
     private ImageView ivListingImage;
     private TextView tvLocation;
+    private TextInputLayout tlName;
+    private TextInputLayout tlBid;
+    private TextInputLayout tlDescription;
     private Button btnSubmit;
     private Button btnLocation;
     private Button btnGallery;
@@ -151,6 +155,9 @@ public class CreationFragment extends Fragment {
         ivListingImage = view.findViewById(R.id.ivListingImage);
         etBid = view.findViewById(R.id.etBid);
         etName = view.findViewById(R.id.etName);
+        tlName = view.findViewById(R.id.tlName);
+        tlBid = view.findViewById(R.id.tlBid);
+        tlDescription = view.findViewById(R.id.tlDescription);
 
         // Sets up fragment manager for transition to choose location
         fragmentManager = getFragmentManager();
@@ -200,19 +207,25 @@ public class CreationFragment extends Fragment {
                 String name = etName.getText().toString();
                 String description = etDescription.getText().toString();
                 Long bid = null;
+                // Sets the errors to null
+                tlName.setError(null);
+                tlBid.setError(null);
+                tlDescription.setError(null);
+
+                // Checks to see if any of the text boxes are empty
                 if (name.isEmpty()) {
-                    Toast.makeText(getContext(), "The item name cannot be empty. Try again", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                if (description.isEmpty()) {
-                    Toast.makeText(getContext(), "The item description cannot be empty", Toast.LENGTH_SHORT).show();
+                    tlName.setError("Item name is empty");
                     return;
                 }
                 try {
                     bid = Long.parseLong(etBid.getText().toString());
                 } catch (NumberFormatException e) {
                     Log.e(TAG, "Your bid is not a valid number", e);
-                    Toast.makeText(getContext(), "Your bid is invalid. Try again", Toast.LENGTH_SHORT).show();
+                    tlBid.setError("Bid not valid");
+                    return;
+                }
+                if (description.isEmpty()) {
+                    tlDescription.setError("Item description is empty");
                     return;
                 }
 
