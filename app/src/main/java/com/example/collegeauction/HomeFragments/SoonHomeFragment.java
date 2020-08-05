@@ -61,6 +61,7 @@ public class SoonHomeFragment extends Fragment {
     private ListingsAdapter adapter;
     private List<Listing> allListings;
     private EndlessRecyclerViewScrollListener scrollListener;
+    private Boolean queryWithinRange;
     private List<Integer> sliderVals;
 
     public SoonHomeFragment() {
@@ -79,6 +80,9 @@ public class SoonHomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Initially, the slider values are not considered
+        queryWithinRange = false;
 
         tvEmpty = view.findViewById(R.id.tvEmpty);
         tvEmpty.setVisibility(View.GONE);
@@ -104,13 +108,12 @@ public class SoonHomeFragment extends Fragment {
             public void onValueChange(@NonNull RangeSlider slider, float value, boolean fromUser) {
                 if (fromUser) {
                     // Sets the adapter to filtering by price
-                    adapter.setFilteringByPrice(true);
+                    queryWithinRange = true;
                     sliderVals.clear();
                     for (float val : slider.getValues()){
                         sliderVals.add((int) val);
                     }
-                    adapter.clearSliderVals();
-                    adapter.addAllSliderVals(sliderVals);
+                    queryListingsInRange(sliderVals);
                 }
             }
         });
@@ -124,7 +127,12 @@ public class SoonHomeFragment extends Fragment {
                 // Your code to refresh the list here.
                 // Make sure you call swipeContainer.setRefreshing(false)
                 // once the network request has completed successfully.
-                queryListings();
+                if (queryWithinRange){
+                    queryListingsInRange(sliderVals);
+                }
+                else{
+                    queryListings();
+                }
             }
         });
 
@@ -195,6 +203,63 @@ public class SoonHomeFragment extends Fragment {
         sliderVals = new ArrayList<>();
     }
 
+    private void queryListingsInRange(final List<Integer> queryVals) {
+        // Collapses the SearchView if it is open
+        HomeFragment parentFrag = ((HomeFragment) SoonHomeFragment.this.getParentFragment());
+        assert parentFrag != null;
+        parentFrag.collapseMenuItem();
+        final ParseUser currentUser = ParseUser.getCurrentUser();
+        Date queryDate = new Date();
+        ParseQuery query = ParseQuery.getQuery(Listing.class);
+        query.include(Listing.KEY_BID);
+        // limit query to latest 10 items
+        query.setLimit(40);
+        // Only shows items that have not expired yet
+        query.whereGreaterThanOrEqualTo(Listing.KEY_EXPIRATION, queryDate);
+        // order posts by creation date (newest first)
+        query.addAscendingOrder(Listing.KEY_EXPIRATION);
+        // Does not show the current user's posts
+        query.whereNotEqualTo(Listing.KEY_USER, currentUser);
+        // start an asynchronous call for posts
+        query.findInBackground(new FindCallback<Listing>() {
+            @Override
+            public void done(List<Listing> listings, ParseException e) {
+                if (e != null) {
+                    Log.e(TAG, "Issue with getting listings", e);
+                    return;
+                }
+
+                List<Listing> returnListings = new ArrayList<>();
+                for (Listing listing : listings){
+                    if (listing.getRecentBid() == null){
+                        if (listing.getMinPrice() >= queryVals.get(0) && listing.getMinPrice() <= queryVals.get(1)){
+                            returnListings.add(listing);
+                        }
+                    }
+                    else{
+                        int price = (int) listing.getRecentBid().getNumber("price");
+                        if ((price >= queryVals.get(0) && price <= queryVals.get(1))){
+                            returnListings.add(listing);
+                        }
+                    }
+                }
+
+                // Clears the adapter
+                adapter.clear();
+                adapter.addAll(returnListings);
+
+                if (returnListings.isEmpty()) {
+                    tvEmpty.setVisibility(View.VISIBLE);
+                } else {
+                    tvEmpty.setVisibility(View.GONE);
+                }
+
+                // Save received posts to list and notify adapter of new data
+                swipeContainer.setRefreshing(false);
+            }
+        });
+    }
+
     private void loadMoreData() {
         final ParseUser currentUser = ParseUser.getCurrentUser();
         Date queryDate = new Date();
@@ -223,6 +288,25 @@ public class SoonHomeFragment extends Fragment {
                     if (!adapter.listingIds.contains(listing.getObjectId())) {
                         returnListings.add(listing);
                     }
+                }
+                
+                // Only loads items within a range if the slider has been moved
+                if (queryWithinRange){
+                    List<Listing> finalListings = new ArrayList<>();
+                    for (Listing listing : listings){
+                        if (listing.getRecentBid() == null){
+                            if (listing.getMinPrice() >= sliderVals.get(0) && listing.getMinPrice() <= sliderVals.get(1)){
+                                finalListings.add(listing);
+                            }
+                        }
+                        else{
+                            int price = (int) listing.getRecentBid().getNumber("price");
+                            if ((price >= sliderVals.get(0) && price <= sliderVals.get(1))){
+                                finalListings.add(listing);
+                            }
+                        }
+                    }
+                    returnListings = finalListings;
                 }
 
                 // Clears the adapter

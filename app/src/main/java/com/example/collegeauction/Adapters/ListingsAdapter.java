@@ -56,15 +56,11 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
     private Context context;
     public List<Listing> listings;
     public List<String> listingIds;
-    private Boolean filteringByPrice;
-    private List<Integer> sliderVals;
 
     public ListingsAdapter(Context context, List<Listing> listings) {
         this.context = context;
         this.listings = listings;
         this.listingIds = new ArrayList<>();
-        sliderVals = new ArrayList<>();
-        filteringByPrice = false;
     }
 
     @NonNull
@@ -203,24 +199,11 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
                                     @Override
                                     public void done(Bid bid, ParseException e) {
                                         int number = (int) Objects.requireNonNull(bid.getNumber(Bid.KEY_PRICE));
-                                        if (filteringByPrice && sliderVals != null && !sliderVals.isEmpty()){
-                                            if (number < sliderVals.get(0) || number > sliderVals.get(1)){
-                                                listings.removeAll(Collections.singleton(listing));
-                                                notifyDataSetChanged();
-                                            }
-                                        }
                                         tvBid.setText("$" + number);
                                     }
                                 });
                             } else {
                                 int number = (int) listing.getNumber("minPrice");
-                                // Checks to see if the number is in the selected range
-                                if (filteringByPrice && sliderVals != null && !sliderVals.isEmpty()){
-                                    if (number < sliderVals.get(0) || number > sliderVals.get(1)){
-                                        listings.removeAll(Collections.singleton(listing));
-                                        notifyDataSetChanged();
-                                    }
-                                }
                                 tvBid.setText("$" + number);
                             }
                             counter = 0;
@@ -364,21 +347,6 @@ public class ListingsAdapter extends RecyclerView.Adapter<ListingsAdapter.ViewHo
     public void addAll(List<Listing> allPosts) {
         listings.addAll(allPosts);
         notifyDataSetChanged();
-    }
-
-    // Allows filtering by price to be enabled
-    public void setFilteringByPrice(Boolean bool){
-        filteringByPrice = bool;
-    }
-
-    // Clears the current sliderVals array
-    public void clearSliderVals(){
-        sliderVals.clear();
-    }
-
-    // Adds new values to the sliderVals array
-    public void addAllSliderVals(List<Integer> allSliderVals){
-        sliderVals.addAll(allSliderVals);
     }
 }
 
