@@ -288,14 +288,13 @@ public class SoonHomeFragment extends Fragment {
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
         // limit query to latest 20 items
-        query.setLimit(20);
+        query.setLimit(10);
         // Only shows items that have not expired yet
         query.whereGreaterThanOrEqualTo(Listing.KEY_EXPIRATION, queryDate);
         // order posts by creation date (newest first)
         query.addAscendingOrder(Listing.KEY_EXPIRATION);
         // Query only returns items which have the search string in its name or description
         query.whereContains(Listing.KEY_NAME, queryString);
-        query.whereContains(Listing.KEY_DESCRIPTION, queryString);
         // Does not show the current user's posts
         query.whereNotEqualTo(Listing.KEY_USER, currentUser);
         // start an asynchronous call for posts

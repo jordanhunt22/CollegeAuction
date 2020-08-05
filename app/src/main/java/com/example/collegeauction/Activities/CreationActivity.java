@@ -42,13 +42,13 @@ public class CreationActivity extends AppCompatActivity {
         materialContainerTransform.setAllContainerColors(Color.WHITE);
         materialContainerTransform.setScrimColor(Color.WHITE);
         materialContainerTransform.setFadeMode(MaterialContainerTransform.FADE_MODE_IN);
-        materialContainerTransform.setDuration(600L);
+        materialContainerTransform.setDuration(550L);
         getWindow().setSharedElementEnterTransition(materialContainerTransform);
 
         MaterialContainerTransform materialContainerTransformReverse = new MaterialContainerTransform();
         materialContainerTransformReverse.addTarget(finalContainer);
         materialContainerTransformReverse.setFadeMode(MaterialContainerTransform.FADE_MODE_OUT);
-        materialContainerTransformReverse.setDuration(550L);
+        materialContainerTransformReverse.setDuration(500L);
         materialContainerTransformReverse.setScrimColor(Color.WHITE);
         materialContainerTransform.setAllContainerColors(Color.WHITE);
         materialContainerTransform.excludeTarget(binding.toolbar, true);

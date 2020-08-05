@@ -2,6 +2,7 @@ package com.example.collegeauction.Activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.transition.Transition;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -10,6 +11,7 @@ import androidx.fragment.app.FragmentManager;
 import com.example.collegeauction.LoginFragments.LoginFragment;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.R;
+import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.parse.ParseUser;
 
 public class LoginActivity extends AppCompatActivity {
@@ -21,6 +23,11 @@ public class LoginActivity extends AppCompatActivity {
     // Handles the login for users
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        Transition exitTransition = new MaterialFadeThrough();
+        exitTransition.addTarget(android.R.id.content);
+        getWindow().setExitTransition(exitTransition);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 

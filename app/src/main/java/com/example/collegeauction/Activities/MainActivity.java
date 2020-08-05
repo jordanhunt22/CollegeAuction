@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.transition.Transition;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -55,6 +56,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
+        // Sets up entering transition
+        Transition enterTransition = new MaterialFadeThrough();
+        enterTransition.addTarget(android.R.id.content);
+        getWindow().setEnterTransition(enterTransition);
+        getWindow().setAllowEnterTransitionOverlap(true);
+
         // Sets up the container transform
         setExitSharedElementCallback(new MaterialContainerTransformSharedElementCallback());
         getWindow().setSharedElementsUseOverlay(false);
@@ -73,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(view);
 
         // Find the toolbar view inside the activity layout
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         // Sets the Toolbar to act as the ActionBar for this Activity window.
         // Make sure the toolbar exists in the activity and is not null
         setSupportActionBar(toolbar);
