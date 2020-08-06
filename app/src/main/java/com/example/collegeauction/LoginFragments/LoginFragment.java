@@ -19,6 +19,7 @@ import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.ParseApplication;
 import com.example.collegeauction.R;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.transition.platform.MaterialSharedAxis;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -44,7 +45,13 @@ public class LoginFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
 
-    // Here we should set up all of the views
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        // Sets up the transitions
+        setReenterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
+        setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -70,7 +77,9 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 Fragment fragment = new RegisterFragment();
-                getFragmentManager().beginTransaction().replace(R.id.flContainer, fragment).addToBackStack("login").commit();
+                getFragmentManager().beginTransaction().replace(R.id.flContainer, fragment)
+                        .addToBackStack("login")
+                        .commit();
             }
         });
     }

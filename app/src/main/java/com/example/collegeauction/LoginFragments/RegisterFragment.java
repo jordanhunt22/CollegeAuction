@@ -20,6 +20,8 @@ import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.ParseApplication;
 import com.example.collegeauction.R;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.transition.platform.MaterialSharedAxis;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -35,6 +37,7 @@ public class RegisterFragment extends Fragment {
     private Button btnRegister;
     private TextInputEditText etNumber;
     private TextInputEditText etEmail;
+    private TextInputLayout tlUsername;
 
     public RegisterFragment(){
         // Required constructor
@@ -46,6 +49,14 @@ public class RegisterFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_register, container, false);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        // Sets up the transitions
+        setEnterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, true));
+        setExitTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
+        super.onCreate(savedInstanceState);
     }
 
     // Here, we should set up all of the views
@@ -62,6 +73,7 @@ public class RegisterFragment extends Fragment {
         etNumber = view.findViewById(R.id.etNumber);
         etEmail = view.findViewById(R.id.etEmail);
         btnRegister = view.findViewById(R.id.btnRegister);
+        tlUsername = view.findViewById(R.id.tlUsername);
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -73,6 +85,10 @@ public class RegisterFragment extends Fragment {
                 String email = etEmail.getText().toString();
                 if (username.isEmpty() || password.isEmpty() || phoneNumber.isEmpty() || name.isEmpty() || email.isEmpty()){
                     Toast.makeText(getContext(), "You must fill in every field", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (username.contains(" ")){
+                    tlUsername.setError("Your username cannot have a space");
                     return;
                 }
                 createUser(username, password, phoneNumber, email, name);

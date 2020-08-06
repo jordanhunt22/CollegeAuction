@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
+import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,12 +35,16 @@ public class SettingsFragment extends Fragment {
     private Button btnLogOut;
     private Button btnChangeUsername;
     private Button btnChangeName;
+    private Button btnChangePassword;
+    private Button btnChangeNumber;
     private TextInputEditText etUsername;
     private TextInputEditText etName;
     private TextInputEditText etPassword;
+    private TextInputEditText etNumber;
     private TextInputLayout tlName;
     private TextInputLayout tlUsername;
     private TextInputLayout tlPassword;
+    private TextInputLayout tlNumber;
     private ParseUser currentUser;
 
     public SettingsFragment() {
@@ -67,15 +72,20 @@ public class SettingsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Resolves all of the view objects
         btnLogOut = view.findViewById(R.id.btnLogOut);
         btnChangeUsername = view.findViewById(R.id.btnChangeUsername);
         btnChangeName = view.findViewById(R.id.btnChangeName);
+        btnChangePassword = view.findViewById(R.id.btnChangePassword);
+        btnChangeNumber = view.findViewById(R.id.btnChangeNumber);
         etUsername = view.findViewById(R.id.etUsername);
         etName = view.findViewById(R.id.etName);
         etPassword = view.findViewById(R.id.etPassword);
+        etNumber = view.findViewById(R.id.etNumber);
         tlName = view.findViewById(R.id.tlName);
         tlUsername = view.findViewById(R.id.tlUsername);
         tlPassword = view.findViewById(R.id.tlPassword);
+        tlNumber = view.findViewById(R.id.tlNumber);
 
         // Makes the fab invisible whenever a new fragment starts
         MainActivity.fab.hide();
@@ -115,7 +125,7 @@ public class SettingsFragment extends Fragment {
                             }
                             else{
                                 tlName.setPlaceholderText(name);
-                                tlName.setError("");
+                                tlName.setError(null);
                                 etName.setText("");
                                 Toast.makeText(getContext(), "Your new name was saved!", Toast.LENGTH_SHORT)
                                         .show();
@@ -134,6 +144,9 @@ public class SettingsFragment extends Fragment {
                 if (username.isEmpty()){
                     tlUsername.setError("New username cannot be empty");
                 }
+                else if (username.contains(" ")){
+                    tlUsername.setError("New username cannot have a space");
+                }
                 else{
                     currentUser.setUsername(username);
                     currentUser.saveInBackground(new SaveCallback() {
@@ -145,7 +158,7 @@ public class SettingsFragment extends Fragment {
                             }
                             else{
                                 tlUsername.setPlaceholderText(username);
-                                tlUsername.setError("");
+                                tlUsername.setError(null);
                                 etUsername.setText("");
                                 Toast.makeText(getContext(), "Your new username was saved!", Toast.LENGTH_SHORT)
                                         .show();
@@ -156,8 +169,40 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        btnChangeNumber.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Checks to see if the EditText is empty
+                final String number = etNumber.getText().toString();
+                if (number.isEmpty()){
+                    tlNumber.setError("New number cannot be empty");
+                }
+                else{
+                    currentUser.put("phoneNumber", number);
+                    currentUser.saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            if (e != null){
+                                Toast.makeText(getContext(), "There was an error saving your number", Toast.LENGTH_SHORT)
+                                        .show();
+                            }
+                            else{
+                                tlNumber.setPlaceholderText(number);
+                                tlNumber.setError(null);
+                                etNumber.setText("");
+                                Toast.makeText(getContext(), "Your new number was saved", Toast.LENGTH_SHORT)
+                                        .show();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+
         tlName.setPlaceholderText(currentUser.getString("name"));
         tlUsername.setPlaceholderText(currentUser.getUsername());
+        tlNumber.setPlaceholderText(currentUser.getString("phoneNumber"));
+        etNumber.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
     }
 
     private void goLogIn() {
