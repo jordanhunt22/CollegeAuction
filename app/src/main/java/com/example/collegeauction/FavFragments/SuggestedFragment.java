@@ -202,10 +202,6 @@ public class SuggestedFragment extends Fragment {
 
     public void queryListings() {
         // Checks to see if there are new purchases
-//        MainActivity main = (MainActivity) getActivity();
-//        assert main != null;
-//        main.queryBuys();
-//        main.querySales();
         final ParseUser currentUser = ParseUser.getCurrentUser();
         Date queryDate = new Date();
         ParseQuery query = ParseQuery.getQuery(Listing.class);

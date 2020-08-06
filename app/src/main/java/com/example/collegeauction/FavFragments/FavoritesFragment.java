@@ -182,9 +182,10 @@ public class FavoritesFragment extends Fragment {
     protected void queryListings() {
         // Checks to see if there are new purchases
         MainActivity main = (MainActivity) getActivity();
-        assert main != null;
-        main.queryBuys();
-        main.querySales();
+        if (main != null){
+            main.queryBuys();
+            main.querySales();
+        }
         // Retrieves a user's favorited listings
         ParseUser user = ParseUser.getCurrentUser();
         Date queryDate = new Date();

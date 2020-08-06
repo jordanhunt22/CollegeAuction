@@ -32,6 +32,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.transition.platform.MaterialContainerTransformSharedElementCallback;
+import com.google.android.material.transition.platform.MaterialFade;
 import com.google.android.material.transition.platform.MaterialFadeThrough;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -55,12 +56,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        // Sets up entering transition
-        Transition enterTransition = new MaterialFadeThrough();
-        enterTransition.addTarget(android.R.id.content);
-        getWindow().setEnterTransition(enterTransition);
-        getWindow().setAllowEnterTransitionOverlap(true);
 
         // Sets up the container transform
         setExitSharedElementCallback(new MaterialContainerTransformSharedElementCallback());

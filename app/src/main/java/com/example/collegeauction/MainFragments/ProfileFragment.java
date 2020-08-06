@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.transition.Transition;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,12 +25,16 @@ import com.example.collegeauction.Adapters.CurrentUserListingsAdapter;
 import com.example.collegeauction.Adapters.ListingsAdapter;
 import com.example.collegeauction.Activities.LoginActivity;
 import com.example.collegeauction.Adapters.PurchasesAdapter;
+import com.example.collegeauction.CreationFragments.CreationFragment2;
 import com.example.collegeauction.Miscellaneous.EndlessRecyclerViewScrollListener;
 import com.example.collegeauction.Models.Bid;
 import com.example.collegeauction.Models.Listing;
 import com.example.collegeauction.Models.Purchase;
 import com.example.collegeauction.ParseApplication;
 import com.example.collegeauction.R;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.transition.MaterialFadeThrough;
+import com.google.android.material.transition.platform.MaterialSharedAxis;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -141,13 +146,20 @@ public class ProfileFragment extends Fragment {
         btnLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Logs whenever a user logs out
-                Bundle bundle = new Bundle();
-                bundle.putString("user_id", ParseUser.getCurrentUser().getObjectId());
-                ParseApplication.mFireBaseAnalytics
-                        .logEvent("logout", bundle);
-                ParseUser.logOut();
-                goLogIn();
+                Fragment fragment = new SettingsFragment();
+                ProfileFragment.this.setReenterTransition(new MaterialSharedAxis(MaterialSharedAxis.X, false));
+                getFragmentManager()
+                        .beginTransaction()
+                        .addToBackStack(TAG)
+                        .replace(R.id.flContainer, fragment)
+                        .commit();
+//                // Logs whenever a user logs out
+//                Bundle bundle = new Bundle();
+//                bundle.putString("user_id", ParseUser.getCurrentUser().getObjectId());
+//                ParseApplication.mFireBaseAnalytics
+//                        .logEvent("logout", bundle);
+//                ParseUser.logOut();
+//                goLogIn();
             }
         });
 
@@ -196,9 +208,10 @@ public class ProfileFragment extends Fragment {
     private void queryUsersListings() {
         // Checks to see if there are new purchases
         MainActivity main = (MainActivity) getActivity();
-        assert main != null;
-        main.queryBuys();
-        main.querySales();
+        if (main != null){
+            main.queryBuys();
+            main.querySales();
+        }
         final ParseUser currentUser = ParseUser.getCurrentUser();
         ParseQuery query = ParseQuery.getQuery(Listing.class);
         query.include(Listing.KEY_BID);
@@ -234,12 +247,6 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void goLogIn() {
-        Intent i = new Intent(getContext(), LoginActivity.class);
-        startActivity(i);
-        getActivity().finish();
-    }
-
     @Override
     public void onResume() {
         super.onResume();
@@ -249,7 +256,7 @@ public class ProfileFragment extends Fragment {
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         MenuItem item = menu.findItem(R.id.action_search);
-        if(item!=null)
+        if(item != null)
             item.setVisible(false);
     }
 }

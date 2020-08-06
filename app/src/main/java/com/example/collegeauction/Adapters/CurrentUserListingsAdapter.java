@@ -77,7 +77,7 @@ public class CurrentUserListingsAdapter extends RecyclerView.Adapter<CurrentUser
         final Handler timerHandler = new Handler();
         private DateManipulator dateManipulator;
 
-        public ViewHolder(@NonNull final View itemView) {
+        public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             // Resolve all of the view elements
@@ -85,6 +85,7 @@ public class CurrentUserListingsAdapter extends RecyclerView.Adapter<CurrentUser
             tvTime = itemView.findViewById(R.id.tvTime);
             tvBid = itemView.findViewById(R.id.tvBid);
             ivImage = itemView.findViewById(R.id.ivImage);
+            final View itemViewFinal = itemView;
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -118,7 +119,7 @@ public class CurrentUserListingsAdapter extends RecyclerView.Adapter<CurrentUser
                         // Sets up the container transform
                         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(
                                 (Activity) context,
-                                itemView,
+                                itemViewFinal,
                                 "shared_item_listing");
                         // Start the DetailsActivity
                         context.startActivity(intent, options.toBundle());

@@ -24,11 +24,8 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        Transition exitTransition = new MaterialFadeThrough();
-        exitTransition.addTarget(android.R.id.content);
-        getWindow().setExitTransition(exitTransition);
-
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_login);
 
         // Logs out user for testing

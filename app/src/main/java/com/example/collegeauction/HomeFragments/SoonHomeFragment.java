@@ -289,7 +289,7 @@ public class SoonHomeFragment extends Fragment {
                         returnListings.add(listing);
                     }
                 }
-                
+
                 // Only loads items within a range if the slider has been moved
                 if (queryWithinRange){
                     List<Listing> finalListings = new ArrayList<>();
@@ -321,9 +321,10 @@ public class SoonHomeFragment extends Fragment {
     public void queryListings() {
         // Checks to see if there are new purchases
         MainActivity main = (MainActivity) getActivity();
-        assert main != null;
-        main.queryBuys();
-        main.querySales();
+        if (main != null){
+            main.queryBuys();
+            main.querySales();
+        }
         // Collapses the SearchView if it is open
         HomeFragment parentFrag = ((HomeFragment) SoonHomeFragment.this.getParentFragment());
         assert parentFrag != null;

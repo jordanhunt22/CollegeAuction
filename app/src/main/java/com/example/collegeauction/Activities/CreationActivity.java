@@ -51,7 +51,6 @@ public class CreationActivity extends AppCompatActivity {
         materialContainerTransformReverse.setDuration(500L);
         materialContainerTransformReverse.setScrimColor(Color.WHITE);
         materialContainerTransform.setAllContainerColors(Color.WHITE);
-        materialContainerTransform.excludeTarget(binding.toolbar, true);
         getWindow().setSharedElementReturnTransition(materialContainerTransformReverse);
 
         setContentView(view);
