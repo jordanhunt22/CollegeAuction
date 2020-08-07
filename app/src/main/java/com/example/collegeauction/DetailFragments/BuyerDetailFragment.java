@@ -217,7 +217,7 @@ public class BuyerDetailFragment extends Fragment {
             @Override
             public void run() {
                 if (System.currentTimeMillis() >= listing.getExpireTime().getTime()){
-                    return;
+                    getActivity().finish();
                 }
                 getCurrentBids();
                 lastBid = (Bid) listing.getRecentBid();
@@ -229,7 +229,7 @@ public class BuyerDetailFragment extends Fragment {
                                     .toString()));
                 }
                 else{
-                    minBid =(Long) listing
+                    minBid = listing
                             .getLong("minPrice");
                     tvCurrentBid
                             .setText("$" + minBid
