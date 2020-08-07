@@ -134,6 +134,11 @@ public class SellerDetailFragment extends Fragment {
         tvNumber.setVisibility(View.GONE);
         tvBuyersName.setVisibility(View.GONE);
 
+        // A user cannot delete a listing if someone has bid on it already
+        if (listing.getRecentBid() != null){
+            btnDelete.setVisibility(View.GONE);
+        }
+
         if (listing.getString("locationName") != null) {
             String location = listing.getString("locationName");
             tvLocation.setText("Location: " + location);
