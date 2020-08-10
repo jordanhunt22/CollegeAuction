@@ -134,7 +134,7 @@ public class PurchasedDetailFragment extends Fragment {
 
         sellersName = listing.getUser().getString("name");
 
-        tvSellerName.setText("Seller's name: " + sellersName);
+        tvSellerName.setText("Seller's Name: " + sellersName);
 
         sellersNumber = listing.getUser().getString("phoneNumber");
 

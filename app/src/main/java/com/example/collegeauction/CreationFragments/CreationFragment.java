@@ -206,7 +206,7 @@ public class CreationFragment extends Fragment {
                 // Here I will save the listing to Parse
                 String name = etName.getText().toString();
                 String description = etDescription.getText().toString();
-                Long bid = null;
+                Long bid;
                 // Sets the errors to null
                 tlName.setError(null);
                 tlBid.setError(null);
@@ -233,10 +233,10 @@ public class CreationFragment extends Fragment {
                     Toast.makeText(getContext(), "There is no image", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                // on some click or some loading we need to wait for...
-                // pb.setVisibility(ProgressBar.VISIBLE);
+                // Sets the reentering transition to sliding backwards
+                Transition backward  = new MaterialSharedAxis(MaterialSharedAxis.Z, false);
+                setReenterTransition(backward);
                 saveListing(name, description, bid, photoFile, returnPoint);
-                // getActivity().finish();
             }
         });
     }
@@ -248,10 +248,8 @@ public class CreationFragment extends Fragment {
         Date currentDate = new Date();
         Calendar c = Calendar.getInstance();
         c.setTime(currentDate);
-        // c.add(Calendar.DATE, 3);
-        // c.add(Calendar.MINUTE, 5);
-        // c.set(Calendar.MINUTE, 0);
-        c.add(Calendar.HOUR, 8);
+        c.add(Calendar.DATE, 3);
+        c.set(Calendar.MINUTE, 0);
         Date expireDate = c.getTime();
         Listing listing = new Listing();
         listing.setDescription(description);

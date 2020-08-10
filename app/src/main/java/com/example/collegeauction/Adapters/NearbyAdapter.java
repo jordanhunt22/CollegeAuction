@@ -36,6 +36,7 @@ import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -194,18 +195,22 @@ public class NearbyAdapter extends RecyclerView.Adapter<NearbyAdapter.ViewHolder
                             return;
                         }
                         if (counter >= 3) {
-                            listing.fetchInBackground();
-                            if (listing.getRecentBid() != null) {
-                                listing.getRecentBid().fetchIfNeededInBackground(new GetCallback<Bid>() {
-                                    @Override
-                                    public void done(Bid bid, ParseException e) {
-                                        tvBid.setText("$" + Objects.requireNonNull(bid.getNumber(Bid.KEY_PRICE)).toString());
+                            listing.fetchInBackground(new GetCallback<ParseObject>() {
+                                @Override
+                                public void done(ParseObject object, ParseException e) {
+                                    if (listing.getRecentBid() != null) {
+                                        listing.getRecentBid().fetchIfNeededInBackground(new GetCallback<Bid>() {
+                                            @Override
+                                            public void done(Bid bid, ParseException e) {
+                                                tvBid.setText("$" + Objects.requireNonNull(bid.getNumber(Bid.KEY_PRICE)).toString());
+                                            }
+                                        });
+                                    } else {
+                                        tvBid.setText("$" + Objects.requireNonNull(listing.getNumber("minPrice")).toString());
                                     }
-                                });
-                            } else {
-                                tvBid.setText("$" + listing.getNumber("minPrice").toString());
-                            }
-                            counter = 0;
+                                    counter = 0;
+                                }
+                            });
                         }
                         else {
                             counter += 1;

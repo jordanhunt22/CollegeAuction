@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -103,18 +104,36 @@ public class SoonHomeFragment extends Fragment {
         });
 
         // Is triggered whenever the price is changed
-        sPrices.addOnChangeListener(new RangeSlider.OnChangeListener() {
+//        sPrices.addOnChangeListener(new RangeSlider.OnChangeListener() {
+//            @Override
+//            public void onValueChange(@NonNull RangeSlider slider, float value, boolean fromUser) {
+//                if (fromUser) {
+//                    // Sets the adapter to filtering by price
+//                    queryWithinRange = true;
+//                    sliderVals.clear();
+//                    for (float val : slider.getValues()){
+//                        sliderVals.add((int) val);
+//                    }
+//                    queryListingsInRange(sliderVals);
+//                }
+//            }
+//        });
+
+        sPrices.addOnSliderTouchListener(new RangeSlider.OnSliderTouchListener() {
             @Override
-            public void onValueChange(@NonNull RangeSlider slider, float value, boolean fromUser) {
-                if (fromUser) {
-                    // Sets the adapter to filtering by price
-                    queryWithinRange = true;
-                    sliderVals.clear();
-                    for (float val : slider.getValues()){
-                        sliderVals.add((int) val);
-                    }
-                    queryListingsInRange(sliderVals);
+            public void onStartTrackingTouch(@NonNull RangeSlider slider) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(@NonNull RangeSlider slider) {
+                // Sets the adapter to filtering by price
+                queryWithinRange = true;
+                sliderVals.clear();
+                for (float val : slider.getValues()){
+                    sliderVals.add((int) val);
                 }
+                queryListingsInRange(sliderVals);
             }
         });
 
